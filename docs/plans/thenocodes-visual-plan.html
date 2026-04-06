@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Nocodes - 기획안</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #0a0a0f;
+    color: #e0e0e0;
+    line-height: 1.6;
+  }
+
+  /* Hero */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    background: radial-gradient(ellipse at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(168, 85, 247, 0.08) 0%, transparent 40%),
+                #0a0a0f;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='1' cy='1' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    padding: 0.5rem 1.2rem;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    color: #a5b4fc;
+    margin-bottom: 2rem;
+    letter-spacing: 0.05em;
+  }
+
+  .hero h1 {
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #fff 0%, #a5b4fc 50%, #c084fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero p {
+    font-size: 1.25rem;
+    color: #9ca3af;
+    max-width: 600px;
+    margin-bottom: 3rem;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 3rem;
+    margin-top: 2rem;
+  }
+
+  .hero-stat {
+    text-align: center;
+  }
+
+  .hero-stat .number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #a5b4fc;
+  }
+
+  .hero-stat .label {
+    font-size: 0.8rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* Sections */
+  .section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 6rem 2rem;
+  }
+
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #818cf8;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+    color: #f3f4f6;
+  }
+
+  .section-desc {
+    font-size: 1.1rem;
+    color: #9ca3af;
+    max-width: 700px;
+    margin-bottom: 3rem;
+  }
+
+  /* Divider */
+  .divider {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
+  }
+
+  /* Cards Grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+  }
+
+  .card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(99, 102, 241, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .card-icon.purple { background: rgba(168, 85, 247, 0.15); }
+  .card-icon.blue { background: rgba(59, 130, 246, 0.15); }
+  .card-icon.green { background: rgba(34, 197, 94, 0.15); }
+  .card-icon.orange { background: rgba(249, 115, 22, 0.15); }
+  .card-icon.pink { background: rgba(236, 72, 153, 0.15); }
+  .card-icon.cyan { background: rgba(6, 182, 212, 0.15); }
+
+  .card h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #f3f4f6;
+  }
+
+  .card p {
+    font-size: 0.9rem;
+    color: #9ca3af;
+    line-height: 1.7;
+  }
+
+  /* Site Map */
+  .sitemap {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .sitemap-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .sitemap-item:hover {
+    border-color: rgba(99, 102, 241, 0.4);
+    background: rgba(99, 102, 241, 0.05);
+  }
+
+  .sitemap-item .path {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.85rem;
+    color: #818cf8;
+    margin-bottom: 0.5rem;
+  }
+
+  .sitemap-item .name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #f3f4f6;
+    margin-bottom: 0.3rem;
+  }
+
+  .sitemap-item .desc {
+    font-size: 0.8rem;
+    color: #6b7280;
+  }
+
+  /* Pipeline */
+  .pipeline {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .pipeline-step {
+    flex: 1;
+    min-width: 200px;
+    max-width: 280px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    position: relative;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .pipeline-step:first-child { border-radius: 16px 0 0 16px; }
+  .pipeline-step:last-child { border-radius: 0 16px 16px 0; }
+
+  .pipeline-step::after {
+    content: '→';
+    position: absolute;
+    right: -14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.5rem;
+    color: #4f46e5;
+    z-index: 1;
+  }
+
+  .pipeline-step:last-child::after { display: none; }
+
+  .pipeline-step .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(99, 102, 241, 0.2);
+    color: #a5b4fc;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .pipeline-step h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #f3f4f6;
+    margin-bottom: 0.4rem;
+  }
+
+  .pipeline-step p {
+    font-size: 0.8rem;
+    color: #9ca3af;
+  }
+
+  /* Points Table */
+  .points-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+  }
+
+  .points-table th {
+    text-align: left;
+    padding: 1rem 1.5rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #6b7280;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .points-table td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    font-size: 0.95rem;
+  }
+
+  .points-table tr:hover td {
+    background: rgba(99, 102, 241, 0.03);
+  }
+
+  .points-value {
+    font-weight: 700;
+    color: #22c55e;
+    font-size: 1.1rem;
+  }
+
+  .badge-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid;
+  }
+
+  .badge.gold { background: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.3); color: #fbbf24; }
+  .badge.silver { background: rgba(148, 163, 184, 0.1); border-color: rgba(148, 163, 184, 0.3); color: #94a3b8; }
+  .badge.bronze { background: rgba(180, 83, 9, 0.1); border-color: rgba(180, 83, 9, 0.3); color: #d97706; }
+  .badge.special { background: rgba(168, 85, 247, 0.1); border-color: rgba(168, 85, 247, 0.3); color: #c084fc; }
+
+  /* Tech Stack */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+
+  .tech-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  .tech-item .tech-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+  .tech-item .tech-name { font-weight: 700; color: #f3f4f6; margin-bottom: 0.2rem; }
+  .tech-item .tech-role { font-size: 0.8rem; color: #6b7280; }
+
+  /* Win-Win Diagram */
+  .winwin {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    gap: 1rem;
+    align-items: center;
+    margin: 2rem 0;
+  }
+
+  @media (max-width: 768px) {
+    .winwin {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+    .winwin-arrow { transform: rotate(90deg); }
+  }
+
+  .winwin-box {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .winwin-box .emoji { font-size: 2.5rem; margin-bottom: 0.8rem; }
+  .winwin-box h4 { font-size: 1.1rem; font-weight: 700; color: #f3f4f6; margin-bottom: 0.5rem; }
+
+  .winwin-arrow {
+    font-size: 1.5rem;
+    color: #4f46e5;
+    text-align: center;
+  }
+
+  .winwin-gives, .winwin-gets {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    display: inline-block;
+  }
+
+  .winwin-gives { background: rgba(99, 102, 241, 0.1); color: #a5b4fc; }
+  .winwin-gets { background: rgba(34, 197, 94, 0.1); color: #4ade80; }
+
+  /* Roadmap */
+  .roadmap {
+    position: relative;
+    padding-left: 3rem;
+  }
+
+  .roadmap::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #4f46e5, #7c3aed, #a855f7);
+  }
+
+  .roadmap-item {
+    position: relative;
+    margin-bottom: 2.5rem;
+    padding: 1.5rem 2rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+  }
+
+  .roadmap-item::before {
+    content: '';
+    position: absolute;
+    left: -2.35rem;
+    top: 1.8rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #4f46e5;
+    border: 3px solid #0a0a0f;
+  }
+
+  .roadmap-item .phase {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #818cf8;
+    margin-bottom: 0.3rem;
+  }
+
+  .roadmap-item h4 { font-weight: 700; color: #f3f4f6; margin-bottom: 0.3rem; }
+  .roadmap-item p { font-size: 0.9rem; color: #9ca3af; }
+
+  /* Team */
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .team-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .team-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto 1rem;
+  }
+
+  .team-name { font-size: 1.2rem; font-weight: 700; color: #f3f4f6; }
+  .team-role { font-size: 0.85rem; color: #818cf8; margin-bottom: 0.8rem; }
+
+  .team-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .team-tag {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #9ca3af;
+  }
+
+  /* Data Model */
+  .db-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .db-table {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .db-table-header {
+    padding: 1rem 1.2rem;
+    background: rgba(99, 102, 241, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #a5b4fc;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+
+  .db-field {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.8rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .db-field:last-child { border-bottom: none; }
+  .db-field-name { color: #e0e0e0; font-family: 'SF Mono', 'Fira Code', monospace; }
+  .db-field-type { color: #6b7280; font-size: 0.75rem; }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #4b5563;
+    font-size: 0.85rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">DESIGN DOCUMENT / 2025.04.06</div>
+  <h1>The Nocodes</h1>
+  <p>AI 시대, 실무 문제를 풀며 성장하는 커뮤니티.<br>비개발자와 주니어 개발자 모두를 위한 실전 챌린지 플랫폼.</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="number">thenocodes.org</div>
+      <div class="label">Domain</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SITE STRUCTURE -->
+<section class="section">
+  <div class="section-label">01 / Site Structure</div>
+  <h2 class="section-title">사이트 구조</h2>
+  <p class="section-desc">챌린지 중심 + 콘텐츠 허브 + 커뮤니티 참여를 위한 페이지 구성</p>
+  <div class="sitemap">
+    <div class="sitemap-item">
+      <div class="path">/</div>
+      <div class="name">랜딩</div>
+      <div class="desc">히어로 + 챌린지 미리보기 + CTA</div>
+    </div>
+    <div class="sitemap-item">
+      <div class="path">/challenges</div>
+      <div class="name">챌린지 목록</div>
+      <div class="desc">진행 중/마감 필터, 난이도/태그</div>
+    </div>
+    <div class="sitemap-item">
+      <div class="path">/challenges/[slug]</div>
+      <div class="name">챌린지 상세</div>
+      <div class="desc">문제 + 제출 + 투표 + 우수 풀이</div>
+    </div>
+    <div class="sitemap-item">
+      <div class="path">/challenges/propose</div>
+      <div class="name">문제 제안</div>
+      <div class="desc">커뮤니티 문제 제안 폼</div>
+    </div>
+    <div class="sitemap-item">
+      <div class="path">/leaderboard</div>
+      <div class="name">리더보드</div>
+      <div class="desc">전체/월간/카테고리 랭킹</div>
+    </div>
+    <div class="sitemap-item">
+      <div class="path">/blog</div>
+      <div class="name">블로그</div>
+      <div class="desc">AI 팁, 풀이 해설, 채용 정보</div>
+    </div>
+    <div class="sitemap-item">
+      <div class="path">/about</div>
+      <div class="name">소개</div>
+      <div class="desc">비전 + 운영진 + 참여 방법</div>
+    </div>
+    <div class="sitemap-item">
+      <div class="path">/admin</div>
+      <div class="name">관리자</div>
+      <div class="desc">문제 관리, 스케줄링, 유저 관리</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CORE FEATURES -->
+<section class="section">
+  <div class="section-label">02 / Core Features</div>
+  <h2 class="section-title">핵심 기능</h2>
+  <p class="section-desc">실무 문제 풀기 + 커뮤니티 참여 + 성장 트래킹</p>
+  <div class="cards-grid">
+    <div class="card">
+      <div class="card-icon purple">🏆</div>
+      <h3>챌린지 시스템</h3>
+      <p>주간/격주 챌린지 출제. 입문/중급/실전 난이도. AI 자동화, 데이터 분석, 노코드, 프롬프트 엔지니어링 카테고리.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon blue">📝</div>
+      <h3>풀이 제출 & 투표</h3>
+      <p>GitHub 링크 또는 텍스트로 풀이 제출. 커뮤니티 투표로 우수 풀이 선정. 풀이가 곧 콘텐츠.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon green">📊</div>
+      <h3>리더보드 & 포인트</h3>
+      <p>활동별 포인트 적립. 전체/월간/카테고리 랭킹. 뱃지 시스템으로 성장 가시화.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon orange">💡</div>
+      <h3>문제 제안</h3>
+      <p>커뮤니티가 직접 문제를 제안. 운영진 검수 후 채택. 채택 시 포인트 보상.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon pink">📰</div>
+      <h3>블로그 & 콘텐츠</h3>
+      <p>AI 활용 팁, 챌린지 풀이 해설, 채용 정보, 업계 소식을 정기적으로 발행.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon cyan">🏢</div>
+      <h3>기업 연계</h3>
+      <p>실제 기업의 실무 문제를 챌린지로 출제. 우수 참여자에게 채용 기회 연결.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CHALLENGE PIPELINE -->
+<section class="section">
+  <div class="section-label">03 / Challenge Pipeline</div>
+  <h2 class="section-title">문제 수집 파이프라인</h2>
+  <p class="section-desc">3가지 소스에서 문제를 수집하고, 검수 후 발행하는 구조</p>
+  <div class="pipeline">
+    <div class="pipeline-step">
+      <div class="step-num">1</div>
+      <h4>문제 소스</h4>
+      <p>운영진 출제<br>커뮤니티 제안<br>기업 연계</p>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num">2</div>
+      <h4>제안 큐</h4>
+      <p>관리자 대시보드에서<br>제안된 문제 확인</p>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num">3</div>
+      <h4>검수 & 편집</h4>
+      <p>운영진이 검수<br>난이도/태그 분류</p>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num">4</div>
+      <h4>스케줄링</h4>
+      <p>발행 일정 지정<br>시작/마감일 설정</p>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num">5</div>
+      <h4>챌린지 발행</h4>
+      <p>/challenges에<br>공개 발행</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- POINTS SYSTEM -->
+<section class="section">
+  <div class="section-label">04 / Points & Badges</div>
+  <h2 class="section-title">포인트 & 뱃지 시스템</h2>
+  <p class="section-desc">참여할수록 성장이 보이는 보상 구조</p>
+
+  <table class="points-table">
+    <thead>
+      <tr><th>활동</th><th>포인트</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>챌린지 풀이 제출</td><td><span class="points-value">+10</span></td></tr>
+      <tr><td>풀이에 투표 받음 (1표당)</td><td><span class="points-value">+2</span></td></tr>
+      <tr><td>우수 풀이 선정</td><td><span class="points-value">+30</span></td></tr>
+      <tr><td>문제 제안 → 채택</td><td><span class="points-value">+20</span></td></tr>
+      <tr><td>블로그 기고</td><td><span class="points-value">+15</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="color: #f3f4f6; margin-bottom: 1rem; font-size: 1.1rem;">뱃지</h3>
+  <div class="badge-row">
+    <div class="badge gold">🌟 First Step &mdash; 첫 제출</div>
+    <div class="badge silver">🔥 Streak &mdash; 5회 연속 참여</div>
+    <div class="badge bronze">🧠 Problem Solver &mdash; 우수 풀이 3회</div>
+    <div class="badge special">✨ Creator &mdash; 문제 제안 채택</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- WIN-WIN MODEL -->
+<section class="section">
+  <div class="section-label">05 / Win-Win Model</div>
+  <h2 class="section-title">참여 구조 (Win-Win)</h2>
+  <p class="section-desc">거지맵 모델처럼, 사용자 참여가 플랫폼 가치를 높이는 선순환 구조</p>
+
+  <div class="winwin">
+    <div class="winwin-box">
+      <div class="emoji">👩‍💻</div>
+      <h4>사용자</h4>
+      <div class="winwin-gives">제공: 풀이, 문제 제안, 투표</div>
+      <div class="winwin-gets">획득: 포인트, 노출, 채용 기회</div>
+    </div>
+    <div class="winwin-arrow">⇄</div>
+    <div class="winwin-box">
+      <div class="emoji">🚀</div>
+      <h4>The Nocodes</h4>
+      <div class="winwin-gives">제공: 챌린지, 콘텐츠, 리더보드</div>
+      <div class="winwin-gets">획득: 콘텐츠 자산, 트래픽, 커뮤니티</div>
+    </div>
+    <div class="winwin-arrow">⇄</div>
+    <div class="winwin-box">
+      <div class="emoji">🏢</div>
+      <h4>기업</h4>
+      <div class="winwin-gives">제공: 실무 문제, 스폰서십</div>
+      <div class="winwin-gets">획득: 인재 파이프라인, 브랜딩</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- DATA MODEL -->
+<section class="section">
+  <div class="section-label">06 / Data Model</div>
+  <h2 class="section-title">데이터 모델</h2>
+  <p class="section-desc">Supabase PostgreSQL 기반 핵심 테이블 구조</p>
+  <div class="db-grid">
+    <div class="db-table">
+      <div class="db-table-header">users</div>
+      <div class="db-field"><span class="db-field-name">id</span><span class="db-field-type">UUID (PK)</span></div>
+      <div class="db-field"><span class="db-field-name">username</span><span class="db-field-type">text</span></div>
+      <div class="db-field"><span class="db-field-name">display_name</span><span class="db-field-type">text</span></div>
+      <div class="db-field"><span class="db-field-name">role</span><span class="db-field-type">enum</span></div>
+      <div class="db-field"><span class="db-field-name">total_points</span><span class="db-field-type">int</span></div>
+    </div>
+    <div class="db-table">
+      <div class="db-table-header">challenges</div>
+      <div class="db-field"><span class="db-field-name">id</span><span class="db-field-type">UUID (PK)</span></div>
+      <div class="db-field"><span class="db-field-name">slug</span><span class="db-field-type">text</span></div>
+      <div class="db-field"><span class="db-field-name">title</span><span class="db-field-type">text</span></div>
+      <div class="db-field"><span class="db-field-name">category</span><span class="db-field-type">enum</span></div>
+      <div class="db-field"><span class="db-field-name">difficulty</span><span class="db-field-type">enum</span></div>
+      <div class="db-field"><span class="db-field-name">status</span><span class="db-field-type">enum</span></div>
+      <div class="db-field"><span class="db-field-name">source</span><span class="db-field-type">enum</span></div>
+    </div>
+    <div class="db-table">
+      <div class="db-table-header">submissions</div>
+      <div class="db-field"><span class="db-field-name">id</span><span class="db-field-type">UUID (PK)</span></div>
+      <div class="db-field"><span class="db-field-name">challenge_id</span><span class="db-field-type">FK → challenges</span></div>
+      <div class="db-field"><span class="db-field-name">user_id</span><span class="db-field-type">FK → users</span></div>
+      <div class="db-field"><span class="db-field-name">content</span><span class="db-field-type">text</span></div>
+      <div class="db-field"><span class="db-field-name">vote_count</span><span class="db-field-type">int</span></div>
+      <div class="db-field"><span class="db-field-name">is_featured</span><span class="db-field-type">boolean</span></div>
+    </div>
+    <div class="db-table">
+      <div class="db-table-header">votes</div>
+      <div class="db-field"><span class="db-field-name">id</span><span class="db-field-type">UUID (PK)</span></div>
+      <div class="db-field"><span class="db-field-name">submission_id</span><span class="db-field-type">FK → submissions</span></div>
+      <div class="db-field"><span class="db-field-name">user_id</span><span class="db-field-type">FK → users</span></div>
+      <div class="db-field"><span class="db-field-name">UNIQUE</span><span class="db-field-type">(submission, user)</span></div>
+    </div>
+    <div class="db-table">
+      <div class="db-table-header">challenge_proposals</div>
+      <div class="db-field"><span class="db-field-name">id</span><span class="db-field-type">UUID (PK)</span></div>
+      <div class="db-field"><span class="db-field-name">proposed_by</span><span class="db-field-type">FK → users</span></div>
+      <div class="db-field"><span class="db-field-name">title</span><span class="db-field-type">text</span></div>
+      <div class="db-field"><span class="db-field-name">status</span><span class="db-field-type">enum</span></div>
+      <div class="db-field"><span class="db-field-name">reviewed_by</span><span class="db-field-type">FK → users</span></div>
+    </div>
+    <div class="db-table">
+      <div class="db-table-header">point_logs</div>
+      <div class="db-field"><span class="db-field-name">id</span><span class="db-field-type">UUID (PK)</span></div>
+      <div class="db-field"><span class="db-field-name">user_id</span><span class="db-field-type">FK → users</span></div>
+      <div class="db-field"><span class="db-field-name">points</span><span class="db-field-type">int</span></div>
+      <div class="db-field"><span class="db-field-name">reason</span><span class="db-field-type">enum</span></div>
+      <div class="db-field"><span class="db-field-name">reference_id</span><span class="db-field-type">UUID</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TECH STACK -->
+<section class="section">
+  <div class="section-label">07 / Tech Stack</div>
+  <h2 class="section-title">기술 스택</h2>
+  <p class="section-desc">빠른 개발 + 확장성 + 무료 티어 활용</p>
+  <div class="tech-grid">
+    <div class="tech-item">
+      <div class="tech-icon">▲</div>
+      <div class="tech-name">Next.js</div>
+      <div class="tech-role">Frontend + SSR</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon">⚡</div>
+      <div class="tech-name">Supabase</div>
+      <div class="tech-role">DB + Auth + Storage</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon">🔷</div>
+      <div class="tech-name">TypeScript</div>
+      <div class="tech-role">Type Safety</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon">🎨</div>
+      <div class="tech-name">Tailwind CSS</div>
+      <div class="tech-role">Styling</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon">☁️</div>
+      <div class="tech-name">Cloudflare</div>
+      <div class="tech-role">DNS + CDN</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon">🚀</div>
+      <div class="tech-name">Vercel</div>
+      <div class="tech-role">Hosting + Deploy</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TEAM -->
+<section class="section">
+  <div class="section-label">08 / Team</div>
+  <h2 class="section-title">운영진</h2>
+  <div class="team-grid">
+    <div class="team-card">
+      <div class="team-avatar">🧑‍💻</div>
+      <div class="team-name">코작 (Cozac)</div>
+      <div class="team-role">Co-Founder & Tech Lead</div>
+      <div class="team-tags">
+        <span class="team-tag">기술/개발 메인</span>
+        <span class="team-tag">챌린지 기획</span>
+        <span class="team-tag">콘텐츠</span>
+      </div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar">🧑‍🔬</div>
+      <div class="team-name">송규선</div>
+      <div class="team-role">Co-Founder & Operations</div>
+      <div class="team-tags">
+        <span class="team-tag">개발 서포트</span>
+        <span class="team-tag">챌린지 기획</span>
+        <span class="team-tag">커뮤니티 관리</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ROADMAP -->
+<section class="section">
+  <div class="section-label">09 / Roadmap</div>
+  <h2 class="section-title">수익화 로드맵</h2>
+  <p class="section-desc">커뮤니티 먼저, 수익은 나중에</p>
+  <div class="roadmap">
+    <div class="roadmap-item">
+      <div class="phase">Phase 1 &mdash; 0~6개월</div>
+      <h4>🌱 성장기: 완전 무료</h4>
+      <p>챌린지 + 콘텐츠로 초기 사용자 유치. 커뮤니티 문화 형성에 집중.</p>
+    </div>
+    <div class="roadmap-item">
+      <div class="phase">Phase 2 &mdash; 6~12개월</div>
+      <h4>💰 초기 수익</h4>
+      <p>채용 공고 게재비, 기업 스폰서십, 기업 연계 챌린지 수수료.</p>
+    </div>
+    <div class="roadmap-item">
+      <div class="phase">Phase 3 &mdash; 12개월+</div>
+      <h4>🚀 확장</h4>
+      <p>유료 강의/워크숍, 프리미엄 콘텐츠, 광고 수익, 기업 교육 프로그램.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>The Nocodes &mdash; Design Document &mdash; 2025.04.06</p>
+  <p style="margin-top: 0.5rem; color: #374151;">Built by 코작 & 송규선</p>
+</footer>
+
+</body>
+</html>
