@@ -47,6 +47,44 @@ export async function getHackathons(filter?: HackathonStatus) {
   return sortHackathons(filteredRows, now, filter);
 }
 
+export async function getDeadlineSoon(days = 7): Promise<HackathonRow[]> {
+  const supabase = await createClient();
+  const now = new Date().toISOString();
+  const cutoff = new Date(Date.now() + days * 86400000).toISOString();
+
+  const { data } = await supabase
+    .from("hackathons")
+    .select("*")
+    .gte("ends_at", now)
+    .lte("ends_at", cutoff)
+    .order("ends_at", { ascending: true })
+    .limit(6);
+
+  return ((data ?? []) as HackathonRow[]).filter(isKoreanHackathon);
+}
+
+export async function getStats() {
+  const supabase = await createClient();
+  const now = new Date().toISOString();
+
+  const { count: hackathonCount } = await supabase
+    .from("hackathons")
+    .select("*", { count: "exact", head: true })
+    .neq("category", "contest")
+    .gte("ends_at", now);
+
+  const { count: contestCount } = await supabase
+    .from("hackathons")
+    .select("*", { count: "exact", head: true })
+    .eq("category", "contest")
+    .gte("ends_at", now);
+
+  return {
+    hackathons: hackathonCount ?? 0,
+    contests: contestCount ?? 0,
+  };
+}
+
 export async function getContests(filter?: HackathonStatus) {
   const supabase = await createClient();
   const now = new Date();

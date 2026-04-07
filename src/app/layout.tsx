@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import { Header } from "@/components/layout/header";
+import { Sidebar } from "@/components/layout/sidebar";
 import { Footer } from "@/components/layout/footer";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
-
 export const metadata: Metadata = {
-  title: "더노코즈 - 해커톤 & 공모전 모아보기",
-  description: "한국 해커톤, AI 경진대회, 공모전 정보를 한눈에",
+  title: "더노코즈 - AI & 노코드 커뮤니티",
+  description: "해커톤, 공모전, 팀 모집까지. AI와 노코드로 만드는 사람들의 커뮤니티.",
 };
 
 export default function RootLayout({
@@ -18,10 +15,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`${inter.className} bg-white text-[#18181B] antialiased`}>
-        <Header />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
+      </head>
+      <body className="font-pretendard bg-[#FAFAF9] text-[#18181B] antialiased">
+        <Sidebar />
+        <div className="lg:ml-56 flex flex-col min-h-screen">
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </div>
       </body>
     </html>
   );
