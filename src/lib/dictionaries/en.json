@@ -12,12 +12,11 @@
     "start": "Get Started"
   },
   "categories": {
-    "hackathon": "🏆 Hackathon",
-    "singularity": "🚀 AI Singularity",
-    "automation": "🤖 Automation Cases",
-    "data": "📊 Data Intelligence",
-    "tools": "🛠️ Custom Tools",
-    "prompt": "✍️ Magical Prompts"
+    "ai_automation": "🤖 AI Automation",
+    "data": "📊 Data Analysis",
+    "nocode": "🛠️ No-code Building",
+    "prompt": "✍️ Prompt Engineering",
+    "project": "🚀 Projects"
   },
   "hero": {
     "notice": "Notice",

@@ -9,8 +9,8 @@ export const metadata = {
   description: "AI 활용 실무 챌린지에 참여하세요",
 };
 
-async function ChallengeList({ status }: { status?: string }) {
-  const challenges = await getAllChallenges(status);
+async function ChallengeList({ status, category }: { status?: string; category?: string }) {
+  const challenges = await getAllChallenges(status, category);
 
   if (challenges.length === 0) {
     return (
@@ -32,9 +32,9 @@ async function ChallengeList({ status }: { status?: string }) {
 export default async function ChallengesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; category?: string }>;
 }) {
-  const { status } = await searchParams;
+  const { status, category } = await searchParams;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
@@ -57,7 +57,7 @@ export default async function ChallengesPage({
 
       <div className="mt-6">
         <Suspense fallback={<div className="animate-pulse bg-gray-100 rounded-xl h-96" />}>
-          <ChallengeList status={status} />
+          <ChallengeList status={status} category={category} />
         </Suspense>
       </div>
     </div>

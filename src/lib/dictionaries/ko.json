@@ -12,12 +12,11 @@
     "start": "시작하기"
   },
   "categories": {
-    "hackathon": "🏆 해커톤",
-    "singularity": "🚀 기술 특이점 공유",
-    "automation": "🤖 실무 자동화 사례",
-    "data": "📊 데이터 지능",
-    "tools": "🛠️ 나만의 도구 자랑",
-    "prompt": "✍️ 마법의 프롬프트"
+    "ai_automation": "🤖 AI 자동화",
+    "data": "📊 데이터 분석",
+    "nocode": "🛠️ 노코드 빌딩",
+    "prompt": "✍️ 프롬프트",
+    "project": "🚀 실전 프로젝트"
   },
   "hero": {
     "notice": "Notice",

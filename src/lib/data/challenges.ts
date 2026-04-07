@@ -25,7 +25,7 @@ export async function getChallengeBySlug(slug: string): Promise<Challenge | null
   return data;
 }
 
-export async function getAllChallenges(status?: string): Promise<Challenge[]> {
+export async function getAllChallenges(status?: string, category?: string): Promise<Challenge[]> {
   const supabase = await createClient();
   let query = supabase
     .from("challenges")
@@ -39,6 +39,10 @@ export async function getAllChallenges(status?: string): Promise<Challenge[]> {
       .select("*")
       .eq("status", status)
       .order("created_at", { ascending: false });
+  }
+
+  if (category) {
+    query = query.eq("category", category);
   }
 
   const { data, error } = await query;

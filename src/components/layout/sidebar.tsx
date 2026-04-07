@@ -19,11 +19,11 @@ export async function Sidebar() {
   ];
 
   const boards = [
-    { label: dict.categories.singularity, href: "/challenges?category=singularity" },
-    { label: dict.categories.automation, href: "/challenges?category=automation" },
+    { label: dict.categories.ai_automation, href: "/challenges?category=ai_automation" },
     { label: dict.categories.data, href: "/challenges?category=data" },
-    { label: dict.categories.tools, href: "/challenges?category=tools" },
+    { label: dict.categories.nocode, href: "/challenges?category=nocode" },
     { label: dict.categories.prompt, href: "/challenges?category=prompt" },
+    { label: dict.categories.project, href: "/challenges?category=project" },
   ];
 
   return (
