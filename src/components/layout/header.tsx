@@ -20,6 +20,7 @@ export async function Header() {
           <nav className="hidden md:flex items-center gap-8">
             <Link href="/challenges" className="text-[13px] font-bold text-[#71717A] hover:text-black transition-colors tracking-tight">{dict.navigation.challenges}</Link>
             <Link href="/hackathons" className="text-[13px] font-bold text-[#71717A] hover:text-black transition-colors tracking-tight">Hackathons</Link>
+            <Link href="/contests" className="text-[13px] font-bold text-[#71717A] hover:text-black transition-colors tracking-tight">Contests</Link>
             <Link href="/leaderboard" className="text-[13px] font-bold text-[#71717A] hover:text-black transition-colors tracking-tight">{dict.navigation.showcase}</Link>
           </nav>
         </div>

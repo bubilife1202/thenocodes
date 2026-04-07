@@ -32,6 +32,7 @@ export function MobileMenu({ user }: { user: User | null }) {
           <Link href="/leaderboard" onClick={() => setOpen(false)} className="block px-4 py-3 text-[#3F3F46] hover:text-[#14B8A6] hover:bg-gray-50 rounded-lg">리더보드</Link>
           <Link href="/blog" onClick={() => setOpen(false)} className="block px-4 py-3 text-[#3F3F46] hover:text-[#14B8A6] hover:bg-gray-50 rounded-lg">블로그</Link>
           <Link href="/hackathons" onClick={() => setOpen(false)} className="block px-4 py-3 text-[#3F3F46] hover:text-[#14B8A6] hover:bg-gray-50 rounded-lg">해커톤</Link>
+          <Link href="/contests" onClick={() => setOpen(false)} className="block px-4 py-3 text-[#3F3F46] hover:text-[#14B8A6] hover:bg-gray-50 rounded-lg">공모전</Link>
           <Link href="/how-it-works" onClick={() => setOpen(false)} className="block px-4 py-3 text-[#3F3F46] hover:text-[#14B8A6] hover:bg-gray-50 rounded-lg">이용 가이드</Link>
           <Link href="/about" onClick={() => setOpen(false)} className="block px-4 py-3 text-[#3F3F46] hover:text-[#14B8A6] hover:bg-gray-50 rounded-lg">소개</Link>
           <Link href="/challenges/propose" onClick={() => setOpen(false)} className="block px-4 py-3 text-[#3F3F46] hover:text-[#14B8A6] hover:bg-gray-50 rounded-lg">문제 제안</Link>

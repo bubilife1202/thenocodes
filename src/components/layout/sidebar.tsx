@@ -16,6 +16,7 @@ export async function Sidebar() {
     { label: dict.navigation.showcase, href: "/leaderboard" },
     { label: dict.navigation.insights, href: "/blog" },
     { label: dict.navigation.hackathons, href: "/hackathons" },
+    { label: dict.navigation.contests, href: "/contests" },
   ];
 
   const boards = [

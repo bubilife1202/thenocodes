@@ -16,6 +16,7 @@ export function Footer() {
               <Link href="/leaderboard" className="block text-sm text-[#71717A] hover:text-[#14B8A6]">리더보드</Link>
               <Link href="/blog" className="block text-sm text-[#71717A] hover:text-[#14B8A6]">블로그</Link>
               <Link href="/hackathons" className="block text-sm text-[#71717A] hover:text-[#14B8A6]">해커톤</Link>
+              <Link href="/contests" className="block text-sm text-[#71717A] hover:text-[#14B8A6]">공모전</Link>
             </div>
             <div className="space-y-2">
               <p className="text-sm font-medium text-[#3F3F46]">정보</p>
