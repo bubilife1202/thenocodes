@@ -44,12 +44,28 @@ export async function getHackathons(filter?: HackathonStatus) {
     query = query.not("ends_at", "is", null).lt("ends_at", now);
   }
 
-  const { data, error } = await query.limit(50);
+  const { data, error } = await query.limit(100);
 
   if (error) {
     console.error("Failed to fetch hackathons:", error.message);
     return [];
   }
 
-  return (data ?? []) as HackathonRow[];
+  const rows = (data ?? []) as HackathonRow[];
+
+  // For "all" view: sort by status priority (active first, then upcoming, then ended)
+  // Within each group, sort by ends_at ascending (deadline soonest first)
+  if (!filter) {
+    const priority: Record<HackathonStatus, number> = { active: 0, upcoming: 1, ended: 2 };
+    rows.sort((a, b) => {
+      const pa = priority[getHackathonStatus(a)];
+      const pb = priority[getHackathonStatus(b)];
+      if (pa !== pb) return pa - pb;
+      const ea = a.ends_at ? new Date(a.ends_at).getTime() : Infinity;
+      const eb = b.ends_at ? new Date(b.ends_at).getTime() : Infinity;
+      return ea - eb;
+    });
+  }
+
+  return rows;
 }
