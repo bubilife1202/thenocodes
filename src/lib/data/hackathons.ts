@@ -28,20 +28,20 @@ export function getHackathonStatus(h: HackathonRow): HackathonStatus {
 
 export async function getHackathons(filter?: HackathonStatus) {
   const supabase = await createClient();
+  const now = new Date().toISOString();
 
   let query = supabase
     .from("hackathons")
     .select("*")
-    .order("ends_at", { ascending: true, nullsFirst: true });
-
-  const now = new Date().toISOString();
+    .order("ends_at", { ascending: true, nullsFirst: false });
 
   if (filter === "upcoming") {
     query = query.gt("starts_at", now);
   } else if (filter === "active") {
-    query = query.lte("starts_at", now).gte("ends_at", now);
+    // Active: started (or no start date) AND not ended yet
+    query = query.or(`starts_at.is.null,starts_at.lte.${now}`).or(`ends_at.is.null,ends_at.gte.${now}`);
   } else if (filter === "ended") {
-    query = query.lt("ends_at", now);
+    query = query.not("ends_at", "is", null).lt("ends_at", now);
   }
 
   const { data, error } = await query.limit(50);
