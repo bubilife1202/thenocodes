@@ -19,9 +19,15 @@ const ACCENT_STYLES: Record<Accent, { hover: string; title: string }> = {
   orange: { hover: "hover:border-orange-200", title: "group-hover:text-orange-600" },
 };
 
+const KR_DATE = new Intl.DateTimeFormat("ko-KR", {
+  month: "short",
+  day: "numeric",
+  timeZone: "Asia/Seoul",
+});
+
 function formatDate(d: string | null) {
   if (!d) return "미정";
-  return new Date(d).toLocaleDateString("ko-KR", { month: "short", day: "numeric" });
+  return KR_DATE.format(new Date(d));
 }
 
 function getDday(endsAt: string | null) {
@@ -49,6 +55,7 @@ export function EventCard({
       href={item.url}
       target="_blank"
       rel="noopener noreferrer"
+      aria-label={`${item.title} - 외부 사이트에서 열기`}
       className={`group block p-5 border rounded-xl hover:shadow-sm transition-all ${
         urgent ? "bg-red-50/30 border-red-200" : "bg-white border-gray-100"
       } ${styles.hover}`}
@@ -70,29 +77,35 @@ export function EventCard({
           </span>
         )}
         {item.source && item.source !== "manual" && (
-          <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-50 text-[#A1A1AA]">
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-50 text-[#71717A]">
             {item.source}
           </span>
         )}
       </div>
 
-      <h3 className={`font-bold text-[#18181B] ${styles.title} transition-colors mb-1.5 leading-snug`}>
+      <h3 className={`font-extrabold text-[#18181B] ${styles.title} transition-colors mb-1.5 leading-snug`}>
         {item.title}
+        <span className="sr-only"> (외부 링크)</span>
       </h3>
 
       {item.description && (
         <p className="text-sm text-[#71717A] line-clamp-2 mb-3">{item.description}</p>
       )}
 
-      <div className="flex items-center justify-between text-[11px] text-[#A1A1AA]">
+      <div className="flex items-center justify-between text-[11px] text-[#71717A] flex-wrap gap-1">
         <span>{item.organizer ?? ""}</span>
-        <span>{formatDate(item.starts_at)} — {formatDate(item.ends_at)}</span>
+        <span>
+          {item.starts_at && <time dateTime={item.starts_at}>{formatDate(item.starts_at)}</time>}
+          {" — "}
+          {item.ends_at && <time dateTime={item.ends_at}>{formatDate(item.ends_at)}</time>}
+          {!item.starts_at && !item.ends_at && "미정"}
+        </span>
       </div>
 
       {showTags && item.tags.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mt-3">
           {item.tags.slice(0, 4).map((tag) => (
-            <span key={tag} className="text-[10px] text-[#A1A1AA] px-2 py-0.5 rounded bg-gray-50">
+            <span key={tag} className="text-[10px] text-[#71717A] px-2 py-0.5 rounded bg-gray-50">
               {tag}
             </span>
           ))}

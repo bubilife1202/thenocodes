@@ -7,7 +7,7 @@ export function Footer() {
         <div className="flex flex-col sm:flex-row justify-between gap-8">
           <div>
             <p className="font-black text-[15px] mb-1">
-              THE NOCODES<span className="text-[#14B8A6]">.</span>
+              더노코즈<span className="text-[#14B8A6]">.</span>
             </p>
             <p className="text-sm text-[#71717A]">AI와 노코드로 만드는 사람들의 커뮤니티</p>
           </div>
@@ -23,7 +23,7 @@ export function Footer() {
           </div>
         </div>
         <p className="mt-8 pt-6 border-t border-gray-100 text-[12px] text-[#A1A1AA]">
-          &copy; {new Date().getFullYear()} The Nocodes. 데이터는 매일 자동 수집됩니다.
+          &copy; {new Date().getFullYear()} 더노코즈. 데이터는 매일 자동 수집됩니다.
         </p>
       </div>
     </footer>

@@ -6,6 +6,8 @@ import {
   type HackathonStatus,
 } from "@/lib/hackathons";
 
+const FIELDS = "id,source,external_id,title,description,organizer,url,prize,tags,starts_at,ends_at,location,collected_at,category" as const;
+
 export interface HackathonRow {
   id: string;
   source: string;
@@ -14,7 +16,7 @@ export interface HackathonRow {
   description: string | null;
   organizer: string | null;
   url: string;
-  thumbnail_url: string | null;
+  thumbnail_url?: string | null;
   prize: string | null;
   tags: string[];
   starts_at: string | null;
@@ -28,21 +30,54 @@ export async function getHackathons(filter?: HackathonStatus) {
   const supabase = await createClient();
   const now = new Date();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("hackathons")
-    .select("*")
+    .select(FIELDS)
+    .neq("category", "contest")
     .limit(200);
 
+  if (!filter || filter !== "ended") {
+    query = query.gte("ends_at", now.toISOString());
+  }
+
+  const { data, error } = await query;
   if (error) {
     console.error("Failed to fetch hackathons:", error.message);
     return [];
   }
 
   const rows = ((data ?? []) as HackathonRow[]).filter(isKoreanHackathon);
-  const hackathonRows = rows.filter((row) => row.category !== "contest");
   const filteredRows = filter
-    ? hackathonRows.filter((row) => getHackathonStatus(row, now) === filter)
-    : hackathonRows.filter((row) => getHackathonStatus(row, now) !== "ended");
+    ? rows.filter((row) => getHackathonStatus(row, now) === filter)
+    : rows;
+
+  return sortHackathons(filteredRows, now, filter);
+}
+
+export async function getContests(filter?: HackathonStatus) {
+  const supabase = await createClient();
+  const now = new Date();
+
+  let query = supabase
+    .from("hackathons")
+    .select(FIELDS)
+    .eq("category", "contest")
+    .limit(200);
+
+  if (!filter || filter !== "ended") {
+    query = query.gte("ends_at", now.toISOString());
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    console.error("Failed to fetch contests:", error.message);
+    return [];
+  }
+
+  const rows = (data ?? []) as HackathonRow[];
+  const filteredRows = filter
+    ? rows.filter((row) => getHackathonStatus(row, now) === filter)
+    : rows;
 
   return sortHackathons(filteredRows, now, filter);
 }
@@ -54,7 +89,7 @@ export async function getDeadlineSoon(days = 7): Promise<HackathonRow[]> {
 
   const { data } = await supabase
     .from("hackathons")
-    .select("*")
+    .select(FIELDS)
     .gte("ends_at", now)
     .lte("ends_at", cutoff)
     .order("ends_at", { ascending: true })
@@ -63,47 +98,54 @@ export async function getDeadlineSoon(days = 7): Promise<HackathonRow[]> {
   return ((data ?? []) as HackathonRow[]).filter(isKoreanHackathon);
 }
 
+export async function getHomeData() {
+  const [hackathons, contests, deadlineSoon, stats] = await Promise.all([
+    getHackathons(),
+    getContests(),
+    getDeadlineSoon(7),
+    getStats(),
+  ]);
+
+  const allItems = [...hackathons, ...contests];
+  const tagCounts = new Map<string, number>();
+  for (const item of allItems) {
+    for (const tag of item.tags) {
+      tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+    }
+  }
+  const popularTags = [...tagCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 12);
+
+  return {
+    hackathons: hackathons.slice(0, 4),
+    contests,
+    deadlineSoon,
+    stats,
+    popularTags,
+    lastUpdated: allItems[0]?.collected_at ?? null,
+  };
+}
+
 export async function getStats() {
   const supabase = await createClient();
   const now = new Date().toISOString();
 
-  const { count: hackathonCount } = await supabase
-    .from("hackathons")
-    .select("*", { count: "exact", head: true })
-    .neq("category", "contest")
-    .gte("ends_at", now);
-
-  const { count: contestCount } = await supabase
-    .from("hackathons")
-    .select("*", { count: "exact", head: true })
-    .eq("category", "contest")
-    .gte("ends_at", now);
+  const [{ count: hackathonCount }, { count: contestCount }] = await Promise.all([
+    supabase
+      .from("hackathons")
+      .select("*", { count: "exact", head: true })
+      .neq("category", "contest")
+      .gte("ends_at", now),
+    supabase
+      .from("hackathons")
+      .select("*", { count: "exact", head: true })
+      .eq("category", "contest")
+      .gte("ends_at", now),
+  ]);
 
   return {
     hackathons: hackathonCount ?? 0,
     contests: contestCount ?? 0,
   };
-}
-
-export async function getContests(filter?: HackathonStatus) {
-  const supabase = await createClient();
-  const now = new Date();
-
-  const { data, error } = await supabase
-    .from("hackathons")
-    .select("*")
-    .eq("category", "contest")
-    .limit(200);
-
-  if (error) {
-    console.error("Failed to fetch contests:", error.message);
-    return [];
-  }
-
-  const rows = (data ?? []) as HackathonRow[];
-  const filteredRows = filter
-    ? rows.filter((row) => getHackathonStatus(row, now) === filter)
-    : rows.filter((row) => getHackathonStatus(row, now) !== "ended");
-
-  return sortHackathons(filteredRows, now, filter);
 }
