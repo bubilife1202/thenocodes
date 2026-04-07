@@ -32,7 +32,7 @@ export async function getHackathons(filter?: HackathonStatus) {
   let query = supabase
     .from("hackathons")
     .select("*")
-    .order("starts_at", { ascending: true, nullsFirst: false });
+    .order("ends_at", { ascending: true, nullsFirst: true });
 
   const now = new Date().toISOString();
 

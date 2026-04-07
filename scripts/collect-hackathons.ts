@@ -4,6 +4,7 @@ import { collectKaggle } from "./collectors/kaggle.js";
 import { collectDacon } from "./collectors/dacon.js";
 import { collectLablab } from "./collectors/lablab.js";
 import { collectHackerEarth } from "./collectors/hackerearth.js";
+import { collectEventUs } from "./collectors/eventus.js";
 import type { Hackathon } from "./collectors/types.js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -44,6 +45,7 @@ async function main() {
     collectDacon,
     collectLablab,
     collectHackerEarth,
+    collectEventUs,
   ];
 
   const results = await Promise.allSettled(collectors.map((c) => c()));
