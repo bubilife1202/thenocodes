@@ -48,27 +48,27 @@ export default async function AdminProposalsPage() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-white mb-6">문제 제안 관리</h2>
+      <h2 className="text-2xl font-bold text-[#3F3F46] mb-6">문제 제안 관리</h2>
       <div className="space-y-4">
         {proposals?.map((p) => (
-          <div key={p.id} className="p-6 bg-gray-900/50 border border-gray-800 rounded-xl">
+          <div key={p.id} className="p-6 bg-white border border-gray-200 rounded-xl shadow-sm">
             <div className="flex items-start justify-between mb-3">
               <div>
-                <h3 className="font-semibold text-white">{p.title}</h3>
-                <p className="text-xs text-gray-500">
+                <h3 className="font-semibold text-[#3F3F46]">{p.title}</h3>
+                <p className="text-xs text-[#71717A]">
                   by {(p.proposer as any)?.display_name ?? (p.proposer as any)?.username} &middot;{" "}
                   {new Date(p.created_at).toLocaleDateString("ko-KR")}
                 </p>
               </div>
               <span className={`text-xs px-2 py-1 rounded ${
-                p.status === "pending" ? "bg-yellow-500/10 text-yellow-400" :
-                p.status === "approved" ? "bg-green-500/10 text-green-400" :
-                "bg-red-500/10 text-red-400"
+                p.status === "pending" ? "bg-yellow-50 text-yellow-600" :
+                p.status === "approved" ? "bg-green-50 text-green-600" :
+                "bg-red-50 text-red-600"
               }`}>{p.status}</span>
             </div>
-            <p className="text-sm text-gray-300 mb-2">{p.description}</p>
+            <p className="text-sm text-[#71717A] mb-2">{p.description}</p>
             {p.real_world_context ? (
-              <p className="text-sm text-gray-500 mb-3">실무 맥락: {p.real_world_context}</p>
+              <p className="text-sm text-[#A1A1AA] mb-3">실무 맥락: {p.real_world_context}</p>
             ) : null}
             {p.status === "pending" ? (
               <div className="flex gap-2">

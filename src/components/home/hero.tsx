@@ -1,29 +1,34 @@
 import Link from "next/link";
+import { getDictionary } from "@/lib/i18n";
 
-export function Hero() {
+export async function Hero() {
+  const dict = await getDictionary("ko");
+
   return (
-    <section className="relative py-24 md:py-32">
-      <div className="mx-auto max-w-4xl text-center px-4">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm mb-8">
-          AI 시대의 실무 챌린지 플랫폼
+    <section className="px-6 py-10 md:py-14 bg-white border-b border-black/[0.03]">
+      <div className="max-w-4xl">
+        <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[#14B8A6]/10 text-[10px] font-bold text-[#0F766E] uppercase tracking-wider mb-6">
+          {dict.hero.notice}
         </div>
-        <h1 className="text-4xl md:text-6xl font-black tracking-tight text-white leading-tight mb-6">
-          실무 문제를 풀며
-          <br />
-          <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-            함께 성장하세요
-          </span>
+        <h1 className="text-3xl md:text-5xl font-black tracking-tight text-[#18181B] leading-tight mb-5">
+          {dict.hero.title_line1} <br />
+          <span className="text-[#71717A]">{dict.hero.title_line2}</span>
         </h1>
-        <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-10">
-          AI 활용, 데이터 분석, 노코드 빌딩 — 실제 업무에서 만나는 문제들을 풀고,
-          커뮤니티와 함께 성장하는 챌린지 플랫폼입니다.
+        <p className="text-sm md:text-base text-[#71717A] max-w-xl font-medium leading-relaxed mb-10">
+          {dict.hero.description}
         </p>
-        <div className="flex items-center justify-center gap-4">
-          <Link href="/challenges" className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-lg transition-colors">
-            챌린지 참여하기
+        <div className="flex gap-3">
+          <Link
+            href="/challenges"
+            className="px-6 py-2.5 bg-black text-white text-[12px] font-bold rounded-lg hover:bg-[#27272A] transition-all shadow-sm flex items-center gap-2"
+          >
+            {dict.hero.btn_browse} 🚀
           </Link>
-          <Link href="/about" className="px-6 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium rounded-lg border border-gray-700 transition-colors">
-            더 알아보기
+          <Link
+            href="/leaderboard"
+            className="px-6 py-2.5 bg-white text-[#18181B] text-[12px] font-bold rounded-lg border border-black/[0.08] hover:bg-gray-50 transition-all flex items-center gap-2"
+          >
+            {dict.hero.btn_showcase}
           </Link>
         </div>
       </div>

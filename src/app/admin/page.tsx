@@ -24,12 +24,12 @@ export default async function AdminDashboard() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-white mb-6">대시보드</h2>
+      <h2 className="text-2xl font-bold text-[#3F3F46] mb-6">대시보드</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <div key={stat.label} className="p-6 bg-gray-900/50 border border-gray-800 rounded-xl">
-            <p className="text-3xl font-bold text-white">{stat.value}</p>
-            <p className="text-sm text-gray-500 mt-1">{stat.label}</p>
+          <div key={stat.label} className="p-6 bg-white border border-gray-200 rounded-xl shadow-sm">
+            <p className="text-3xl font-bold text-[#3F3F46]">{stat.value}</p>
+            <p className="text-sm text-[#71717A] mt-1">{stat.label}</p>
           </div>
         ))}
       </div>

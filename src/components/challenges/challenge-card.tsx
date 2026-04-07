@@ -4,46 +4,66 @@ import { CATEGORY_LABELS, DIFFICULTY_LABELS } from "@/lib/types";
 
 export function ChallengeCard({ challenge }: { challenge: Challenge }) {
   const isActive = challenge.status === "active";
+  const isSponsored = challenge.source === "company";
 
   return (
     <Link
       href={`/challenges/${challenge.slug}`}
-      className="group block p-6 bg-gray-900/50 border border-gray-800 rounded-xl hover:border-indigo-500/40 transition-all"
-      style={{ contentVisibility: "auto", containIntrinsicSize: "auto 200px" }}
+      className={`group relative overflow-hidden p-6 md:p-8 rounded-[2rem] border transition-all ${
+        isSponsored
+          ? "bg-gradient-to-br from-white to-[#34D399]/5 border-[#34D399]/20 shadow-[0_4px_20px_-4px_rgba(52,211,153,0.1)] ring-1 ring-[#34D399]/10"
+          : "bg-white border-gray-100 shadow-sm hover:shadow-md hover:border-[#14B8A6]/20"
+      } hover:-translate-y-1`}
     >
-      <div className="flex items-center gap-2 mb-3 flex-wrap">
-        <span className={`text-xs px-2 py-0.5 rounded-full ${
+      {/* Sponsored Badge */}
+      {isSponsored && (
+        <div className="absolute top-0 right-0">
+          <div className="bg-[#34D399] text-[#0F766E] text-[9px] font-black px-4 py-1 rounded-bl-2xl uppercase tracking-widest shadow-sm">
+            Sponsored
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-center gap-2 mb-5 flex-wrap">
+        <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${
           isActive
-            ? "bg-green-500/10 text-green-400 border border-green-500/20"
-            : "bg-gray-800 text-gray-500"
+            ? "bg-[#14B8A6]/10 text-[#0F766E]"
+            : "bg-gray-100 text-[#A1A1AA]"
         }`}>
-          {isActive ? "진행 중" : "마감"}
+          {isActive ? "Active" : "Closed"}
         </span>
-        <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400">
+        <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-gray-50 text-[#71717A]">
           {CATEGORY_LABELS[challenge.category]}
         </span>
-        <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-400">
-          {DIFFICULTY_LABELS[challenge.difficulty]}
-        </span>
-        {challenge.source === "company" && challenge.company_name ? (
-          <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400">
-            {challenge.company_name}
+        {isSponsored && (
+          <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-[#FB923C]/10 text-[#C2410C]">
+            {challenge.company_name ?? "Partner"} Quest
           </span>
-        ) : null}
+        )}
       </div>
-      <h3 className="text-lg font-semibold text-white group-hover:text-indigo-300 transition-colors mb-2">
+
+      <h3 className="text-xl font-black text-[#3F3F46] group-hover:text-[#14B8A6] transition-colors mb-3 leading-tight tracking-tight">
         {challenge.title}
       </h3>
-      <p className="text-sm text-gray-500 line-clamp-2 mb-3">
-        {challenge.description.slice(0, 150)}...
+      
+      <p className="text-sm text-[#71717A] line-clamp-2 mb-6 leading-relaxed font-medium">
+        {challenge.description}
       </p>
-      <div className="flex items-center gap-4 text-xs text-gray-600">
-        {challenge.starts_at ? (
-          <span>시작: {new Date(challenge.starts_at).toLocaleDateString("ko-KR")}</span>
-        ) : null}
-        {challenge.ends_at ? (
-          <span>마감: {new Date(challenge.ends_at).toLocaleDateString("ko-KR")}</span>
-        ) : null}
+
+      <div className="mt-auto pt-5 border-t border-black/[0.03] flex items-center justify-between">
+        <div className="flex -space-x-2">
+          {[1, 2].map((n) => (
+            <div key={n} className="w-6 h-6 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center text-[10px]">
+              👤
+            </div>
+          ))}
+          <div className="w-6 h-6 rounded-full bg-gray-50 border-2 border-white flex items-center justify-center text-[8px] font-black text-stone-400">
+            +8
+          </div>
+        </div>
+        <span className="text-[10px] font-black text-[#14B8A6] uppercase tracking-widest flex items-center gap-1 group-hover:translate-x-1 transition-all">
+          Join Quest <span className="text-sm">🚀</span>
+        </span>
       </div>
     </Link>
   );

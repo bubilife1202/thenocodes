@@ -3,7 +3,7 @@ import { getPostBySlug } from "@/lib/data/blog";
 import dynamic from "next/dynamic";
 
 const MarkdownContent = dynamic(() => import("@/components/blog/markdown-content"), {
-  loading: () => <div className="animate-pulse bg-gray-800/50 rounded h-96" />,
+  loading: () => <div className="animate-pulse bg-gray-100 rounded h-96" />,
 });
 
 export default async function BlogPostPage({
@@ -21,13 +21,13 @@ export default async function BlogPostPage({
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-4 flex-wrap">
           {post.tags.map((tag) => (
-            <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-400">
+            <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-[#71717A]">
               {tag}
             </span>
           ))}
         </div>
-        <h1 className="text-3xl font-bold text-white mb-4">{post.title}</h1>
-        <p className="text-sm text-gray-500">
+        <h1 className="text-3xl font-bold text-[#3F3F46] mb-4">{post.title}</h1>
+        <p className="text-sm text-[#71717A]">
           {post.author?.display_name ?? post.author?.username} &middot;{" "}
           {post.published_at
             ? new Date(post.published_at).toLocaleDateString("ko-KR")

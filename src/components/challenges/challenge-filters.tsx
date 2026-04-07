@@ -32,7 +32,7 @@ export function ChallengeFilters() {
           className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
             currentStatus === s.value
               ? "bg-indigo-600 text-white"
-              : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+              : "bg-gray-100 text-[#71717A] hover:bg-gray-200"
           }`}
         >
           {s.label}

@@ -4,7 +4,7 @@ export type ChallengeDifficulty = "beginner" | "intermediate" | "advanced";
 export type ChallengeStatus = "draft" | "active" | "closed";
 export type ChallengeSource = "admin" | "community" | "company";
 export type ProposalStatus = "pending" | "approved" | "rejected";
-export type PointReason = "submission" | "vote_received" | "featured" | "proposal_accepted" | "blog";
+export type PointReason = "submission" | "vote_received" | "featured" | "proposal_accepted" | "blog" | "comment_written";
 
 export interface User {
   id: string;
@@ -15,6 +15,16 @@ export interface User {
   role: UserRole;
   total_points: number;
   created_at: string;
+}
+
+export interface Comment {
+  id: string;
+  submission_id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+  // Joined fields
+  user?: Pick<User, "username" | "display_name" | "avatar_url">;
 }
 
 export interface Challenge {
@@ -65,12 +75,12 @@ export interface ChallengeProposal {
   reviewed_by: string | null;
   created_at: string;
 }
-
 export interface BlogPost {
   id: string;
   slug: string;
   title: string;
   content: string;
+  link_url?: string | null;
   author_id: string;
   tags: string[];
   published_at: string | null;
