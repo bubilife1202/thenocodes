@@ -6,6 +6,7 @@ import { collectLablab } from "./collectors/lablab.js";
 import { collectHackerEarth } from "./collectors/hackerearth.js";
 import { collectEventUs } from "./collectors/eventus.js";
 import type { Hackathon } from "./collectors/types.js";
+import { isKoreanHackathon } from "../src/lib/hackathons.js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -60,7 +61,11 @@ async function main() {
   }
 
   console.log(`Total collected: ${all.length}`);
-  await upsertHackathons(all);
+
+  const koreanOnly = all.filter(isKoreanHackathon);
+  console.log(`Korean-only kept: ${koreanOnly.length}`);
+
+  await upsertHackathons(koreanOnly);
 
   console.log("=== Done ===");
 }

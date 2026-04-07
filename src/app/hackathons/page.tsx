@@ -1,6 +1,7 @@
 import { Suspense } from "react";
-import { getHackathons, getHackathonStatus } from "@/lib/data/hackathons";
-import type { HackathonRow, HackathonStatus } from "@/lib/data/hackathons";
+import { getHackathons } from "@/lib/data/hackathons";
+import { getHackathonStatus, type HackathonStatus } from "@/lib/hackathons";
+import type { HackathonRow } from "@/lib/data/hackathons";
 import Link from "next/link";
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -9,7 +10,7 @@ const SOURCE_LABELS: Record<string, string> = {
   dacon: "Dacon",
   lablab: "Lablab.ai",
   hackerearth: "HackerEarth",
-  festa: "Festa",
+  eventus: "EventUs",
 };
 
 const STATUS_STYLES: Record<HackathonStatus, string> = {
