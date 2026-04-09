@@ -33,7 +33,7 @@ export async function getHackathons(filter?: HackathonStatus) {
   let query = supabase
     .from("hackathons")
     .select(FIELDS)
-    .neq("category", "contest")
+    .eq("category", "hackathon")
     .limit(200);
 
   if (!filter || filter !== "ended") {
@@ -74,7 +74,7 @@ export async function getContests(filter?: HackathonStatus) {
     return [];
   }
 
-  const rows = (data ?? []) as HackathonRow[];
+  const rows = ((data ?? []) as HackathonRow[]).filter(isKoreanHackathon);
   const filteredRows = filter
     ? rows.filter((row) => getHackathonStatus(row, now) === filter)
     : rows;
@@ -82,48 +82,15 @@ export async function getContests(filter?: HackathonStatus) {
   return sortHackathons(filteredRows, now, filter);
 }
 
-export async function getDeadlineSoon(days = 7): Promise<HackathonRow[]> {
-  const supabase = await createClient();
-  const now = new Date().toISOString();
-  const cutoff = new Date(Date.now() + days * 86400000).toISOString();
-
-  const { data } = await supabase
-    .from("hackathons")
-    .select(FIELDS)
-    .gte("ends_at", now)
-    .lte("ends_at", cutoff)
-    .order("ends_at", { ascending: true })
-    .limit(6);
-
-  return ((data ?? []) as HackathonRow[]).filter(isKoreanHackathon);
-}
-
 export async function getHomeData() {
-  const [hackathons, contests, deadlineSoon, stats] = await Promise.all([
+  const [hackathons, contests] = await Promise.all([
     getHackathons(),
     getContests(),
-    getDeadlineSoon(7),
-    getStats(),
   ]);
 
-  const allItems = [...hackathons, ...contests];
-  const tagCounts = new Map<string, number>();
-  for (const item of allItems) {
-    for (const tag of item.tags) {
-      tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
-    }
-  }
-  const popularTags = [...tagCounts.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 12);
-
   return {
-    hackathons: hackathons.slice(0, 4),
+    hackathons,
     contests,
-    deadlineSoon,
-    stats,
-    popularTags,
-    lastUpdated: allItems[0]?.collected_at ?? null,
   };
 }
 
@@ -135,7 +102,7 @@ export async function getStats() {
     supabase
       .from("hackathons")
       .select("*", { count: "exact", head: true })
-      .neq("category", "contest")
+      .eq("category", "hackathon")
       .gte("ends_at", now),
     supabase
       .from("hackathons")

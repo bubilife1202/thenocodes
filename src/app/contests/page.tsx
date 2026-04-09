@@ -42,7 +42,7 @@ export default async function ContestsPage({
   ];
 
   return (
-    <div className="max-w-4xl px-6 pt-10 pb-16 pl-14 lg:pl-6">
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
       <div className="mb-8">
         <h1 className="text-2xl font-black tracking-tight mb-1">공모전</h1>
         <p className="text-sm text-[#71717A]">

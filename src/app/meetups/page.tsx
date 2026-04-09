@@ -1,33 +1,33 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { getHackathons } from "@/lib/data/hackathons";
 import { type HackathonStatus } from "@/lib/hackathons";
 import { EventCard } from "@/components/event-card";
+import { getMeetups } from "@/lib/data/meetups";
 
 export const revalidate = 300;
 
-async function HackathonList({ filter }: { filter?: HackathonStatus }) {
-  const hackathons = await getHackathons(filter);
+async function MeetupList({ filter }: { filter?: HackathonStatus }) {
+  const meetups = await getMeetups(filter);
 
-  if (hackathons.length === 0) {
+  if (meetups.length === 0) {
     return (
-      <div className="text-center py-16 text-[#A1A1AA]">
-        <p className="font-bold mb-1">해커톤이 없습니다</p>
-        <p className="text-sm">매일 자동으로 업데이트됩니다</p>
+      <div className="py-16 text-center text-[#A1A1AA]">
+        <p className="mb-1 font-bold">서울 AI 밋업/세미나가 없습니다</p>
+        <p className="text-sm">새로운 Luma 행사 확인 후 추가됩니다</p>
       </div>
     );
   }
 
   return (
     <div className="grid gap-3 sm:grid-cols-2">
-      {hackathons.map((h) => (
-        <EventCard key={h.id} item={h} accent="teal" showTags />
+      {meetups.map((item) => (
+        <EventCard key={item.id} item={item} accent="teal" showTags />
       ))}
     </div>
   );
 }
 
-export default async function HackathonsPage({
+export default async function MeetupsPage({
   searchParams,
 }: {
   searchParams: Promise<{ status?: string }>;
@@ -44,18 +44,18 @@ export default async function HackathonsPage({
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
       <div className="mb-8">
-        <h1 className="text-2xl font-black tracking-tight mb-1">해커톤</h1>
+        <h1 className="mb-1 text-2xl font-black tracking-tight">밋업 / 세미나</h1>
         <p className="text-sm text-[#71717A]">
-          AI · 데이터 · 노코드 해커톤 공고를 매일 자동으로 수집합니다
+          Luma에서 확인한 서울 AI 관련 밋업과 세미나를 선별해서 모아둡니다
         </p>
       </div>
 
-      <div className="flex gap-2 mb-6">
+      <div className="mb-6 flex gap-2">
         {tabs.map((tab) => (
           <Link
             key={tab.label}
-            href={tab.value ? `/hackathons?status=${tab.value}` : "/hackathons"}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+            href={tab.value ? `/meetups?status=${tab.value}` : "/meetups"}
+            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
               currentFilter === tab.value
                 ? "bg-[#18181B] text-white"
                 : "bg-gray-100 text-[#71717A] hover:bg-gray-200"
@@ -69,13 +69,13 @@ export default async function HackathonsPage({
       <Suspense
         fallback={
           <div className="grid gap-3 sm:grid-cols-2">
-            {[1, 2, 3, 4].map((n) => (
-              <div key={n} className="animate-pulse bg-gray-50 rounded-xl h-40" />
+            {[1, 2].map((n) => (
+              <div key={n} className="h-40 animate-pulse rounded-xl bg-gray-50" />
             ))}
           </div>
         }
       >
-        <HackathonList filter={currentFilter} />
+        <MeetupList filter={currentFilter} />
       </Suspense>
     </div>
   );

@@ -4,9 +4,9 @@ import type { HackathonRow } from "@/lib/data/hackathons";
 type Accent = "teal" | "orange";
 
 const STATUS_COLORS: Record<HackathonStatus, string> = {
-  active: "bg-emerald-50 text-emerald-700",
-  upcoming: "bg-blue-50 text-blue-700",
-  ended: "bg-gray-50 text-gray-400",
+  active: "bg-[#EAF7F3] text-[#0F766E]",
+  upcoming: "bg-[#EEF5FF] text-[#315E9B]",
+  ended: "bg-[#F5F3EF] text-[#A8A29A]",
 };
 
 const STATUS_LABELS: Record<Accent, Record<HackathonStatus, string>> = {
@@ -15,8 +15,8 @@ const STATUS_LABELS: Record<Accent, Record<HackathonStatus, string>> = {
 };
 
 const ACCENT_STYLES: Record<Accent, { hover: string; title: string }> = {
-  teal: { hover: "hover:border-emerald-200", title: "group-hover:text-emerald-600" },
-  orange: { hover: "hover:border-orange-200", title: "group-hover:text-orange-600" },
+  teal: { hover: "hover:border-[#B7DDD6]", title: "group-hover:text-[#0F766E]" },
+  orange: { hover: "hover:border-[#F3DDC3]", title: "group-hover:text-[#C46A1A]" },
 };
 
 const KR_DATE = new Intl.DateTimeFormat("ko-KR", {
@@ -56,43 +56,47 @@ export function EventCard({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`${item.title} - 외부 사이트에서 열기`}
-      className={`group block p-5 border rounded-xl hover:shadow-sm transition-all ${
-        urgent ? "bg-red-50/30 border-red-200" : "bg-white border-gray-100"
+      className={`group block rounded-xl border p-5 transition-all hover:shadow-sm ${
+        urgent ? "border-red-200 bg-red-50/30" : "border-[#ECE7DF] bg-white"
       } ${styles.hover}`}
     >
-      <div className="flex items-center gap-2 mb-3 flex-wrap">
-        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${STATUS_COLORS[status]}`}>
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${STATUS_COLORS[status]}`}>
           {STATUS_LABELS[accent][status]}
         </span>
         {dday !== null && (
-          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-            dday <= 3 ? "bg-red-50 text-red-600" : dday <= 7 ? "bg-amber-50 text-amber-600" : "bg-gray-50 text-gray-500"
-          }`}>
+          <span
+            className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+              dday <= 3
+                ? "bg-red-50 text-red-600"
+                : dday <= 7
+                  ? "bg-[#FFF2E4] text-[#C46A1A]"
+                  : "bg-[#F5F3EF] text-[#78716C]"
+            }`}
+          >
             {dday === 0 ? "오늘 마감" : `마감 D-${dday}`}
           </span>
         )}
         {item.prize && (
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
+          <span className="rounded-full bg-[#FFF2E4] px-2 py-0.5 text-[10px] font-bold text-[#C46A1A]">
             {item.prize}
           </span>
         )}
         {item.source && item.source !== "manual" && (
-          <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-50 text-[#71717A]">
+          <span className="rounded bg-[#F5F3EF] px-1.5 py-0.5 text-[10px] text-[#78716C]">
             {item.source}
           </span>
         )}
       </div>
 
-      <h3 className={`font-extrabold text-[#18181B] ${styles.title} transition-colors mb-1.5 leading-snug`}>
+      <h3 className={`mb-1.5 font-extrabold leading-snug text-[#18181B] transition-colors ${styles.title}`}>
         {item.title}
         <span className="sr-only"> (외부 링크)</span>
       </h3>
 
-      {item.description && (
-        <p className="text-sm text-[#71717A] line-clamp-2 mb-3">{item.description}</p>
-      )}
+      {item.description && <p className="mb-3 line-clamp-2 text-sm text-[#71717A]">{item.description}</p>}
 
-      <div className="flex items-center justify-between text-[11px] text-[#71717A] flex-wrap gap-1">
+      <div className="flex flex-wrap items-center justify-between gap-1 text-[11px] text-[#71717A]">
         <span>{item.organizer ?? ""}</span>
         <span>
           {item.starts_at && <time dateTime={item.starts_at}>{formatDate(item.starts_at)}</time>}
@@ -103,9 +107,9 @@ export function EventCard({
       </div>
 
       {showTags && item.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mt-3">
+        <div className="mt-3 flex flex-wrap gap-1.5">
           {item.tags.slice(0, 4).map((tag) => (
-            <span key={tag} className="text-[10px] text-[#71717A] px-2 py-0.5 rounded bg-gray-50">
+            <span key={tag} className="rounded bg-[#F5F3EF] px-2 py-0.5 text-[10px] text-[#78716C]">
               {tag}
             </span>
           ))}
