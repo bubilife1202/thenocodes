@@ -2,15 +2,18 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { getHomeData, getStats } from "@/lib/data/hackathons";
 import { getFeaturedMeetups } from "@/lib/data/meetups";
+import { getFeaturedSignals } from "@/lib/data/signals";
 import { getHackathonStatus, sortHackathons } from "@/lib/hackathons";
 import { EventCard } from "@/components/event-card";
+import { SignalCard } from "@/components/signal-card";
 
 export const revalidate = 300;
 
 async function HomeContent() {
-  const [{ hackathons, contests }, meetups, stats] = await Promise.all([
+  const [{ hackathons, contests }, meetups, signals, stats] = await Promise.all([
     getHomeData(),
     getFeaturedMeetups(2),
+    getFeaturedSignals(3),
     getStats(),
   ]);
 
@@ -104,6 +107,31 @@ async function HomeContent() {
           </div>
         )}
       </section>
+
+      {/* Signals */}
+      {signals.length > 0 && (
+        <section className="scroll-mt-24">
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-xl font-black tracking-tight text-[#18181B]">흐름</h2>
+              <p className="mt-1 text-sm text-[#71717A]">
+                지금 빌더가 챙겨야 할 플랫폼, API, 오픈모델, 정책 변화를 모았습니다.
+              </p>
+            </div>
+            <Link
+              href="/signals"
+              className="rounded-lg border border-[#E9DDFE] bg-[#FAF7FF] px-3 py-1.5 text-xs font-semibold text-[#7C3AED] hover:bg-[#F3EDFF]"
+            >
+              전체 흐름 보기
+            </Link>
+          </div>
+          <div className="grid gap-4 lg:grid-cols-3">
+            {signals.map((item) => (
+              <SignalCard key={item.id} item={item} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Meetups */}
       {meetups.length > 0 && (
