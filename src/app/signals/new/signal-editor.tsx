@@ -5,6 +5,7 @@ import { useFormStatus } from "react-dom";
 import { SIGNAL_TYPE_VALUES, type SignalType } from "@/lib/signals/constants";
 import { createSignalSlug } from "@/lib/signals/slug";
 import { createSignal, initialSignalState } from "./actions";
+// password-gate는 더 이상 사용하지 않음 (쿼리 파라미터 방식으로 전환)
 
 const SIGNAL_TYPE_LABELS: Record<SignalType, string> = {
   platform_launch: "플랫폼 런칭",
@@ -35,7 +36,7 @@ function SubmitButton() {
   );
 }
 
-export function SignalEditor({ initialPublishedAt }: { initialPublishedAt: string }) {
+export function SignalEditor({ initialPublishedAt, adminKey }: { initialPublishedAt: string; adminKey: string }) {
   const [state, formAction] = useActionState(createSignal, initialSignalState);
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -98,6 +99,7 @@ export function SignalEditor({ initialPublishedAt }: { initialPublishedAt: strin
       </div>
 
       <form action={formAction} className="space-y-6">
+        <input type="hidden" name="admin_key" value={adminKey} />
         <div className="grid gap-6 sm:grid-cols-2">
           <label className="block sm:col-span-2">
             <span className="mb-2 block text-sm font-semibold text-[#18181B]">제목 *</span>
