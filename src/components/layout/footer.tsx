@@ -5,7 +5,6 @@ const PRIMARY_LINKS = [
   { href: "/hackathons", label: "해커톤" },
   { href: "/contests", label: "공모전" },
   { href: "/meetups", label: "밋업 / 세미나" },
-  { href: "/#problems", label: "비즈니스 문제" },
   { href: "/feedback", label: "피드백 보드" },
 ];
 
@@ -24,7 +23,7 @@ export function Footer() {
               더노코즈<span className="text-[#14B8A6]">.</span>
             </p>
             <p className="text-sm leading-relaxed text-[#71717A]">
-              실행 기회와 비즈니스 문제를 정리하고, 커뮤니티 피드백으로 계속 다듬어가는 공간.
+              한국 AI 해커톤, 공모전, 밋업을 매일 자동으로 모아둡니다.
             </p>
           </div>
 

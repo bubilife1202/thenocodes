@@ -16,16 +16,13 @@ type NavItem = {
 
 const MAIN_ITEMS: NavItem[] = [
   { label: "홈", href: "/", tone: "neutral", description: "더노코즈 메인" },
-  { label: "실행 기회", href: "/#opportunities", tone: "teal", description: "해커톤 · 공모전 · 밋업" },
-  { label: "비즈니스 문제", href: "/#problems", tone: "neutral", description: "실무 문제 제보" },
-  { label: "피드백 보드", href: "/feedback", tone: "neutral", description: "대기중 · 진행중 · 완료" },
+  { label: "해커톤", href: "/hackathons", tone: "teal", description: "AI · 데이터 · 노코드" },
+  { label: "공모전", href: "/contests", tone: "orange", description: "경진대회 · 아이디어 공모" },
+  { label: "밋업 / 세미나", href: "/meetups", tone: "teal", description: "서울 AI 오프라인 행사" },
 ];
 
-const OPPORTUNITY_ITEMS: NavItem[] = [
-  { label: "전체 기회", href: "/#opportunities", tone: "neutral" },
-  { label: "해커톤", href: "/hackathons", tone: "teal" },
-  { label: "공모전", href: "/contests", tone: "orange" },
-  { label: "밋업 / 세미나", href: "/meetups", tone: "teal" },
+const COMMUNITY_ITEMS: NavItem[] = [
+  { label: "피드백 보드", href: "/feedback", tone: "neutral", description: "대기중 · 진행중 · 완료" },
 ];
 
 function isActive(pathname: string, href?: string) {
@@ -117,13 +114,13 @@ function SidebarBody({ pathname, onNavigate }: { pathname: string; onNavigate?: 
           더노코즈<span className="text-[#14B8A6]">.</span>
         </Link>
         <p className="mt-2 text-sm leading-relaxed text-[#71717A]">
-          실행 기회와 비즈니스 문제를 한 화면에서 정리합니다.
+          해커톤, 공모전, AI 밋업을 매일 자동으로 모아둡니다.
         </p>
       </div>
 
       <div className="mt-5 space-y-6">
-        <NavSection title="메인" items={MAIN_ITEMS} pathname={pathname} onNavigate={onNavigate} />
-        <NavSection title="실행 기회" items={OPPORTUNITY_ITEMS} pathname={pathname} onNavigate={onNavigate} />
+        <NavSection title="탐색" items={MAIN_ITEMS} pathname={pathname} onNavigate={onNavigate} />
+        <NavSection title="커뮤니티" items={COMMUNITY_ITEMS} pathname={pathname} onNavigate={onNavigate} />
       </div>
 
       <div className="mt-auto rounded-[20px] border border-[#D9EFEA] bg-[linear-gradient(180deg,#F6FCFB_0%,#EEF8F6_100%)] p-4">
