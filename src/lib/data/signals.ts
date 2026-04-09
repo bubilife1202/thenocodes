@@ -1,13 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-
-export const SIGNAL_TYPE_VALUES = [
-  "platform_launch",
-  "api_tool",
-  "open_model",
-  "policy",
-] as const;
-
-export type SignalType = (typeof SIGNAL_TYPE_VALUES)[number];
+import { SIGNAL_TYPE_VALUES, type SignalType } from "@/lib/signals/constants";
 
 export interface SignalRow {
   id: string;

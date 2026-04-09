@@ -1,7 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { SignalCard } from "@/components/signal-card";
-import { getSignals, isSignalType, type SignalType } from "@/lib/data/signals";
+import { getSignals, isSignalType } from "@/lib/data/signals";
+import type { SignalType } from "@/lib/signals/constants";
 
 export const revalidate = 300;
 

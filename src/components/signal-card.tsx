@@ -1,4 +1,5 @@
-import type { SignalRow, SignalType } from "@/lib/data/signals";
+import type { SignalRow } from "@/lib/data/signals";
+import type { SignalType } from "@/lib/signals/constants";
 
 const SIGNAL_TYPE_LABELS: Record<SignalType, string> = {
   platform_launch: "플랫폼",
