@@ -5,6 +5,8 @@ import { collectDacon } from "./collectors/dacon.js";
 import { collectLablab } from "./collectors/lablab.js";
 import { collectHackerEarth } from "./collectors/hackerearth.js";
 import { collectEventUs } from "./collectors/eventus.js";
+import { collectLuma } from "./collectors/luma.js";
+import { collectFesta } from "./collectors/festa.js";
 import type { Hackathon } from "./collectors/types.js";
 import { isKoreanHackathon } from "../src/lib/hackathons.js";
 
@@ -18,11 +20,11 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-async function upsertHackathons(hackathons: Hackathon[]) {
-  if (hackathons.length === 0) return;
+async function upsertEvents(events: Hackathon[]) {
+  if (events.length === 0) return;
 
   const { error } = await supabase.from("hackathons").upsert(
-    hackathons.map((h) => ({
+    events.map((h) => ({
       ...h,
       collected_at: new Date().toISOString(),
     })),
@@ -32,15 +34,16 @@ async function upsertHackathons(hackathons: Hackathon[]) {
   if (error) {
     console.error("Upsert error:", error.message);
   } else {
-    console.log(`Upserted ${hackathons.length} hackathons`);
+    console.log(`Upserted ${events.length} events`);
   }
 }
 
 async function main() {
-  console.log("=== Hackathon Collection Started ===");
+  console.log("=== Event Collection Started ===");
   console.log(new Date().toISOString());
 
-  const collectors = [
+  // 해커톤/공모전 수집
+  const hackathonCollectors = [
     collectDevpost,
     collectKaggle,
     collectDacon,
@@ -49,25 +52,42 @@ async function main() {
     collectEventUs,
   ];
 
-  const results = await Promise.allSettled(collectors.map((c) => c()));
+  // 밋업 수집
+  const meetupCollectors = [
+    collectLuma,
+    collectFesta,
+  ];
 
-  const all: Hackathon[] = [];
-  for (const result of results) {
+  // 전부 병렬 실행
+  const allCollectors = [...hackathonCollectors, ...meetupCollectors];
+  const results = await Promise.allSettled(allCollectors.map((c) => c()));
+
+  const hackathons: Hackathon[] = [];
+  const meetups: Hackathon[] = [];
+
+  results.forEach((result, i) => {
     if (result.status === "fulfilled") {
-      all.push(...result.value);
+      if (i < hackathonCollectors.length) {
+        hackathons.push(...result.value);
+      } else {
+        meetups.push(...result.value);
+      }
     } else {
-      console.error("Collector failed:", result.reason);
+      console.error(`Collector ${i} failed:`, result.reason);
     }
-  }
+  });
 
-  console.log(`Total collected: ${all.length}`);
+  // 해커톤/공모전: 한국 필터 적용
+  console.log(`\nHackathons total: ${hackathons.length}`);
+  const koreanHackathons = hackathons.filter(isKoreanHackathon);
+  console.log(`Korean-only kept: ${koreanHackathons.length}`);
+  await upsertEvents(koreanHackathons);
 
-  const koreanOnly = all.filter(isKoreanHackathon);
-  console.log(`Korean-only kept: ${koreanOnly.length}`);
+  // 밋업: 이미 서울/한국 기반으로 수집했으므로 추가 필터 불필요
+  console.log(`\nMeetups total: ${meetups.length}`);
+  await upsertEvents(meetups);
 
-  await upsertHackathons(koreanOnly);
-
-  console.log("=== Done ===");
+  console.log("\n=== Done ===");
 }
 
 main().catch(console.error);
