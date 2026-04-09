@@ -189,10 +189,12 @@ export async function POST(request: Request) {
 
       if (urls && urls.length > 0) {
         const firstUrl = urls[0].replace(/[>|].*$/, "");
-        processUrl(firstUrl).catch(async (err) => {
+        try {
+          await processUrl(firstUrl);
+        } catch (err) {
           console.error("processUrl error:", err);
           await postSlackMessage(`⚠️ 처리 중 에러: ${String(err)}`);
-        });
+        }
       }
     }
   }
