@@ -1,4 +1,3 @@
-import "server-only";
 import { cookies } from "next/headers";
 
 const ADMIN_COOKIE_NAME = "thenocodes-signals-admin";
