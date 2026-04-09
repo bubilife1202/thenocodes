@@ -33,19 +33,21 @@ function classifySignalType(text: string): string {
   return "api_tool";
 }
 
-async function postSlackMessage(text: string, threadTs?: string) {
+async function postSlackMessage(text: string) {
   const token = process.env.SLACK_BOT_TOKEN;
-  if (!token) return;
+  if (!token) {
+    console.error("SLACK_BOT_TOKEN is missing");
+    return;
+  }
 
-  await fetch("https://slack.com/api/chat.postMessage", {
+  const res = await fetch("https://slack.com/api/chat.postMessage", {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      channel: SLACK_CHANNEL_ID,
-      text,
-      ...(threadTs ? { thread_ts: threadTs } : {}),
-    }),
+    body: JSON.stringify({ channel: SLACK_CHANNEL_ID, text }),
   });
+
+  const data = await res.json() as { ok: boolean; error?: string };
+  if (!data.ok) console.error("Slack postMessage error:", data.error);
 }
 
 function extractMeta(html: string) {
@@ -72,8 +74,8 @@ function toSlug(title: string): string {
     .slice(0, 80);
 }
 
-async function processUrl(url: string, slackTs: string) {
-  await postSlackMessage(`🔍 링크 분석 중...`, slackTs);
+async function processUrl(url: string) {
+  await postSlackMessage(`🔍 링크 분석 중...`);
 
   // 1. URL 내용 가져오기
   let html: string;
@@ -82,12 +84,12 @@ async function processUrl(url: string, slackTs: string) {
       headers: { "User-Agent": "Mozilla/5.0 (compatible; TheNocodesBot/1.0)", Accept: "text/html" },
     });
     if (!res.ok) {
-      await postSlackMessage(`⚠️ URL 접근 실패 (${res.status})`, slackTs);
+      await postSlackMessage(`⚠️ URL 접근 실패 (${res.status})`);
       return;
     }
     html = await res.text();
   } catch {
-    await postSlackMessage(`⚠️ URL을 가져올 수 없습니다.`, slackTs);
+    await postSlackMessage(`⚠️ URL을 가져올 수 없습니다.`);
     return;
   }
 
@@ -98,7 +100,7 @@ async function processUrl(url: string, slackTs: string) {
   // 3. 기준 판정
   const hasReject = REJECT_KEYWORDS.some((k) => fullText.includes(k));
   if (hasReject) {
-    await postSlackMessage(`❌ 기준 미달: 투자/벤치마크/밈 관련 콘텐츠입니다.\n제목: ${meta.title}`, slackTs);
+    await postSlackMessage(`❌ 기준 미달: 투자/벤치마크/밈 관련 콘텐츠입니다.\n제목: ${meta.title}`);
     return;
   }
 
@@ -106,8 +108,7 @@ async function processUrl(url: string, slackTs: string) {
   if (matchedKeywords.length === 0) {
     await postSlackMessage(
       `❌ 기준 미달: 빌더가 만드는 방식을 바꾸는 변화가 아닌 것 같습니다.\n` +
-      `제목: ${meta.title}`,
-      slackTs
+      `제목: ${meta.title}`
     );
     return;
   }
@@ -123,7 +124,7 @@ async function processUrl(url: string, slackTs: string) {
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    await postSlackMessage(`⚠️ DB 설정이 없어서 등록할 수 없습니다.`, slackTs);
+    await postSlackMessage(`⚠️ DB 설정이 없어서 등록할 수 없습니다.`);
     return;
   }
 
@@ -145,7 +146,7 @@ async function processUrl(url: string, slackTs: string) {
   );
 
   if (error) {
-    await postSlackMessage(`⚠️ DB 저장 실패: ${error.message}`, slackTs);
+    await postSlackMessage(`⚠️ DB 저장 실패: ${error.message}`);
     return;
   }
 
@@ -161,8 +162,7 @@ async function processUrl(url: string, slackTs: string) {
     `📌 ${title}\n` +
     `🏷️ ${typeLabels[signalType] || signalType}\n` +
     `📝 ${summary.slice(0, 100)}...\n\n` +
-    `🔗 https://thenocodes.org/signals`,
-    slackTs
+    `🔗 https://thenocodes.org/signals`
   );
 }
 
@@ -189,9 +189,9 @@ export async function POST(request: Request) {
 
       if (urls && urls.length > 0) {
         const firstUrl = urls[0].replace(/[>|].*$/, "");
-        processUrl(firstUrl, event.ts).catch(async (err) => {
+        processUrl(firstUrl).catch(async (err) => {
           console.error("processUrl error:", err);
-          await postSlackMessage(`⚠️ 처리 중 에러: ${String(err)}`, event.ts);
+          await postSlackMessage(`⚠️ 처리 중 에러: ${String(err)}`);
         });
       }
     }
