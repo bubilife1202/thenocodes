@@ -74,27 +74,35 @@ function toSlug(title: string): string {
     .slice(0, 80);
 }
 
-async function processUrl(url: string) {
+async function processUrl(url: string, slackText?: string) {
   await postSlackMessage(`🔍 링크 분석 중...`);
 
-  // 1. URL 내용 가져오기
-  let html: string;
+  // 1. URL 내용 가져오기 (실패해도 계속 진행)
+  let html = "";
   try {
     const res = await fetch(url, {
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; TheNocodesBot/1.0)", Accept: "text/html" },
+      headers: { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", Accept: "text/html,application/xhtml+xml" },
+      redirect: "follow",
     });
-    if (!res.ok) {
-      await postSlackMessage(`⚠️ URL 접근 실패 (${res.status})`);
-      return;
+    if (res.ok) {
+      html = await res.text();
     }
-    html = await res.text();
   } catch {
-    await postSlackMessage(`⚠️ URL을 가져올 수 없습니다.`);
-    return;
+    // URL 접근 실패해도 URL 자체와 슬랙 텍스트로 판정 계속
   }
 
-  // 2. 메타 정보 추출
-  const meta = extractMeta(html);
+  // 2. 메타 정보 추출 (HTML이 없으면 URL과 슬랙 텍스트에서 추출)
+  const meta = html ? extractMeta(html) : { title: "", description: "", siteName: "" };
+
+  // HTML에서 못 가져왔으면 URL 경로와 슬랙 텍스트에서 제목 추출
+  if (!meta.title) {
+    // URL 경로에서 제목 추출 (예: /blog/claude-managed-agents → claude managed agents)
+    const pathTitle = new URL(url).pathname.split("/").pop()?.replace(/[-_]/g, " ").trim() ?? "";
+    meta.title = slackText?.replace(/<[^>]+>/g, "").replace(url, "").trim() || pathTitle || url;
+  }
+  if (!meta.siteName) {
+    meta.siteName = new URL(url).hostname.replace("www.", "");
+  }
   const fullText = `${meta.title} ${meta.description} ${url}`.toLowerCase();
 
   // 3. 기준 판정
@@ -190,7 +198,7 @@ export async function POST(request: Request) {
       if (urls && urls.length > 0) {
         const firstUrl = urls[0].replace(/[>|].*$/, "");
         try {
-          await processUrl(firstUrl);
+          await processUrl(firstUrl, text);
         } catch (err) {
           console.error("processUrl error:", err);
           await postSlackMessage(`⚠️ 처리 중 에러: ${String(err)}`);
