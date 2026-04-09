@@ -79,31 +79,16 @@ export async function getHomeData() {
 }
 
 export async function getStats() {
-  const supabase = await createClient();
-  const now = new Date().toISOString();
-
-  const [{ count: hackathonCount }, { count: contestCount }, { count: meetupCount }] =
-    await Promise.all([
-      supabase
-        .from("hackathons")
-        .select("*", { count: "exact", head: true })
-        .eq("category", "hackathon")
-        .or(`ends_at.gte.${now},ends_at.is.null`),
-      supabase
-        .from("hackathons")
-        .select("*", { count: "exact", head: true })
-        .eq("category", "contest")
-        .or(`ends_at.gte.${now},ends_at.is.null`),
-      supabase
-        .from("hackathons")
-        .select("*", { count: "exact", head: true })
-        .eq("category", "meetup")
-        .or(`ends_at.gte.${now},ends_at.is.null`),
-    ]);
+  // Use the same filtered data as the actual pages to ensure consistent counts
+  const [hackathons, contests, meetups] = await Promise.all([
+    getHackathons(),
+    getContests(),
+    getMeetups(),
+  ]);
 
   return {
-    hackathons: hackathonCount ?? 0,
-    contests: contestCount ?? 0,
-    meetups: meetupCount ?? 0,
+    hackathons: hackathons.length,
+    contests: contests.length,
+    meetups: meetups.length,
   };
 }
