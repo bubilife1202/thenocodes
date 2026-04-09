@@ -51,3 +51,49 @@ source thenocodes-secrets/env.local && echo '<JSON>' | npx tsx scripts/add-signa
 - api_tool: 새 API, SDK, 개발자 도구 (예: GPT Actions API)
 - open_model: 오픈소스 모델 공개 (예: LG 엑사원 4.5)
 - policy: 한국 AI 정책, 규제, 지원사업 변화
+
+# 슬랙 대기열 처리 워크플로우
+
+유저가 "슬랙 링크 처리해" 또는 "pending 확인해"라고 하면 아래 프로세스를 실행한다.
+
+## 1단계: 대기열 조회
+```bash
+export $(grep -v '^#' thenocodes-secrets/env.local | xargs) && npx tsx -e '
+import { createClient } from "@supabase/supabase-js";
+async function run() {
+  const s = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+  const { data } = await s.from("pending_signals").select("*").eq("status", "pending").order("created_at", { ascending: true });
+  console.log(JSON.stringify(data, null, 2));
+}
+run();
+'
+```
+
+## 2단계: 각 URL에 대해 위의 "흐름 추가 워크플로우" 실행
+- WebFetch로 내용 읽기
+- 기준 판정
+- O이면 add-signal.ts로 DB 추가
+- X이면 reject_reason 기록
+
+## 3단계: 대기열 상태 업데이트 + 슬랙 알림
+```bash
+# 승인 시
+export $(grep -v '^#' thenocodes-secrets/env.local | xargs) && npx tsx -e '
+import { createClient } from "@supabase/supabase-js";
+async function run() {
+  const s = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+  await s.from("pending_signals").update({ status: "approved" }).eq("id", "PENDING_ID");
+}
+run();
+'
+
+# 슬랙 알림
+curl -s -X POST "https://slack.com/api/chat.postMessage" \
+  -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"channel":"C0AS5JSTU4R","text":"✅ 등록 완료: 제목\nhttps://thenocodes.org/signals","thread_ts":"SLACK_TS"}'
+```
+
+## 슬랙 환경변수
+- SLACK_BOT_TOKEN: Cloudflare Workers secret에 설정됨
+- 채널 ID: C0AS5JSTU4R (#흐름-링크)
