@@ -58,7 +58,7 @@ export function SignalCard({ item }: { item: SignalRow }) {
           rel="noopener noreferrer"
           className="inline-flex shrink-0 items-center rounded-full border border-[#ECE7DF] bg-[#FCFBF8] px-3 py-2 text-sm font-semibold text-[#18181B] transition-colors hover:border-[#CFC7BB] hover:bg-[#F8F5F0]"
         >
-          써보기 →
+          원문 보기 →
         </a>
       </div>
     </article>
