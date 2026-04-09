@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import { LoginForm } from "./login-form";
 import { SignalEditor } from "./signal-editor";
 
 export const metadata: Metadata = {
@@ -7,23 +9,18 @@ export const metadata: Metadata = {
 };
 
 function getTodayInSeoul() {
-  const formatter = new Intl.DateTimeFormat("en-CA", {
+  return new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Seoul",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  });
-  return formatter.format(new Date());
+  }).format(new Date());
 }
 
-export default async function NewSignalPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ key?: string }>;
-}) {
-  const params = await searchParams;
-  const adminPassword = process.env.ADMIN_PASSWORD || "thenocodes2026";
-  const isAuthorized = params.key === adminPassword;
+export default async function NewSignalPage() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("signals-admin")?.value;
+  const isAuthorized = token === "authenticated";
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
@@ -36,17 +33,9 @@ export default async function NewSignalPage({
       </section>
 
       {isAuthorized ? (
-        <SignalEditor initialPublishedAt={getTodayInSeoul()} adminKey={params.key!} />
+        <SignalEditor initialPublishedAt={getTodayInSeoul()} />
       ) : (
-        <section className="rounded-[28px] border border-[#ECE7DF] bg-white p-5 shadow-[0_12px_36px_-28px_rgba(15,118,110,0.25)] sm:p-8">
-          <div className="mb-6">
-            <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-[#0F766E]">Admin Access</p>
-            <h2 className="text-2xl font-black tracking-tight text-[#18181B]">접근 제한</h2>
-            <p className="mt-2 text-sm leading-relaxed text-[#6B6760]">
-              관리자 키가 필요합니다. URL에 <code className="rounded bg-[#F5F3EF] px-1.5 py-0.5 text-xs">?key=비밀번호</code>를 붙여서 접속하세요.
-            </p>
-          </div>
-        </section>
+        <LoginForm />
       )}
     </div>
   );

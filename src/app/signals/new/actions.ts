@@ -1,5 +1,6 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -28,7 +29,6 @@ const signalSchema = z.object({
     .trim()
     .regex(/^\d{4}-\d{2}-\d{2}$/, "발행일을 선택해 주세요."),
   is_featured: z.boolean(),
-  admin_key: z.string().min(1),
 });
 
 export const initialSignalState: SignalActionState = {
@@ -39,11 +39,12 @@ export async function createSignal(
   _prevState: SignalActionState,
   formData: FormData
 ): Promise<SignalActionState> {
-  const adminPassword = process.env.ADMIN_PASSWORD || "thenocodes2026";
-  const adminKey = formData.get("admin_key") as string;
+  // 쿠키로 인증 확인
+  const cookieStore = await cookies();
+  const token = cookieStore.get("signals-admin")?.value;
 
-  if (adminKey !== adminPassword) {
-    return { message: "관리자 인증이 만료되었습니다. 다시 접속해 주세요." };
+  if (token !== "authenticated") {
+    return { message: "관리자 인증이 필요합니다. 페이지를 새로고침해주세요." };
   }
 
   const parsed = signalSchema.safeParse({
@@ -57,7 +58,6 @@ export async function createSignal(
     tags: formData.get("tags"),
     published_at: formData.get("published_at"),
     is_featured: formData.get("is_featured") === "on",
-    admin_key: adminKey,
   });
 
   if (!parsed.success) {

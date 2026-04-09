@@ -36,7 +36,7 @@ function SubmitButton() {
   );
 }
 
-export function SignalEditor({ initialPublishedAt, adminKey }: { initialPublishedAt: string; adminKey: string }) {
+export function SignalEditor({ initialPublishedAt }: { initialPublishedAt: string }) {
   const [state, formAction] = useActionState(createSignal, initialSignalState);
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -99,7 +99,6 @@ export function SignalEditor({ initialPublishedAt, adminKey }: { initialPublishe
       </div>
 
       <form action={formAction} className="space-y-6">
-        <input type="hidden" name="admin_key" value={adminKey} />
         <div className="grid gap-6 sm:grid-cols-2">
           <label className="block sm:col-span-2">
             <span className="mb-2 block text-sm font-semibold text-[#18181B]">제목 *</span>
