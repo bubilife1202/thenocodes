@@ -37,7 +37,7 @@ export async function getHackathons(filter?: HackathonStatus) {
     .limit(200);
 
   if (!filter || filter !== "ended") {
-    query = query.gte("ends_at", now.toISOString());
+    query = query.or(`ends_at.gte.${now.toISOString()},ends_at.is.null`);
   }
 
   const { data, error } = await query;
@@ -65,7 +65,7 @@ export async function getContests(filter?: HackathonStatus) {
     .limit(200);
 
   if (!filter || filter !== "ended") {
-    query = query.gte("ends_at", now.toISOString());
+    query = query.or(`ends_at.gte.${now.toISOString()},ends_at.is.null`);
   }
 
   const { data, error } = await query;
@@ -103,12 +103,12 @@ export async function getStats() {
       .from("hackathons")
       .select("*", { count: "exact", head: true })
       .eq("category", "hackathon")
-      .gte("ends_at", now),
+      .or(`ends_at.gte.${now},ends_at.is.null`),
     supabase
       .from("hackathons")
       .select("*", { count: "exact", head: true })
       .eq("category", "contest")
-      .gte("ends_at", now),
+      .or(`ends_at.gte.${now},ends_at.is.null`),
   ]);
 
   return {
