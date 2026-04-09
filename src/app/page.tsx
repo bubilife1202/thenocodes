@@ -37,7 +37,13 @@ async function HomeContent() {
     getHomeData(),
     getFeaturedMeetups(2),
   ]);
-  const opportunities = sortHackathons([...hackathons, ...contests]).slice(0, 6);
+  // Ensure at least 1 contest is shown when available
+  const sorted = sortHackathons([...hackathons, ...contests]);
+  const firstContest = sorted.find((item) => item.category === "contest");
+  const withoutFirstContest = firstContest ? sorted.filter((item) => item !== firstContest) : sorted;
+  const opportunities = firstContest
+    ? [...withoutFirstContest.slice(0, 5), firstContest].sort((a, b) => sorted.indexOf(a) - sorted.indexOf(b))
+    : sorted.slice(0, 6);
 
   return (
     <div className="space-y-14">

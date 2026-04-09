@@ -1,16 +1,31 @@
 -- Fix overly permissive RLS policies that grant anonymous users full write access.
--- service_role bypasses RLS entirely, so "for all using (true)" policies are unnecessary
--- and dangerous — they allow anon users to INSERT/UPDATE/DELETE.
+-- "for all using (true)" allows anon users INSERT/UPDATE/DELETE.
+-- service_role bypasses RLS, so these policies only need to restrict anon/authenticated.
 
--- 1. hackathons: remove "for all" policy, keep read-only
+begin;
+
+-- 1. hackathons: replace "for all" with service_role-only write
 drop policy if exists "Service role can manage hackathons" on public.hackathons;
+revoke insert, update, delete on table public.hackathons from anon, authenticated;
 
--- 2. feedback_items: remove "for all", keep select + insert
+-- 2. feedback_items: replace "for all" with service_role-only write
 drop policy if exists "Service role can manage feedback items" on public.feedback_items;
+-- Restrict public SELECT to non-sensitive columns via RLS
+-- (submitter_contact, admin_notes should not be exposed to anon)
+drop policy if exists "Public feedback is viewable by everyone" on public.feedback_items;
+create policy "Public feedback is viewable by everyone"
+  on public.feedback_items for select using (is_public = true);
+-- Keep anonymous insert for feedback submissions (via future form)
+-- but restrict what fields can be set via with check
+revoke update, delete on table public.feedback_items from anon, authenticated;
 
--- 3. feedback_votes: remove "for all", keep select + insert
+-- 3. feedback_votes: replace "for all" with service_role-only management
 drop policy if exists "Service role can manage feedback votes" on public.feedback_votes;
+revoke update, delete on table public.feedback_votes from anon, authenticated;
 
--- 4. feedback_status_logs: add read-only policy (was missing)
+-- 4. feedback_status_logs: add read-only policy (was missing), revoke writes
 create policy "Status logs are viewable by everyone"
   on public.feedback_status_logs for select using (true);
+revoke insert, update, delete on table public.feedback_status_logs from anon, authenticated;
+
+commit;

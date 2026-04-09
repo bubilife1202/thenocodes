@@ -14,20 +14,19 @@ export interface FeedbackItemRow {
   priority: FeedbackPriority;
   source: "community" | "operator" | "internal";
   submitter_name: string | null;
-  submitter_contact: string | null;
   related_url: string | null;
   screenshot_url: string | null;
   tags: string[];
   vote_count: number;
   is_public: boolean;
-  admin_notes: string | null;
   started_at: string | null;
   completed_at: string | null;
   created_at: string;
   updated_at: string;
 }
 
-const FIELDS = "id,slug,title,body,kind,status,priority,source,submitter_name,submitter_contact,related_url,screenshot_url,tags,vote_count,is_public,admin_notes,started_at,completed_at,created_at,updated_at" as const;
+// Exclude sensitive fields (submitter_contact, admin_notes) from public queries
+const FIELDS = "id,slug,title,body,kind,status,priority,source,submitter_name,related_url,screenshot_url,tags,vote_count,is_public,started_at,completed_at,created_at,updated_at" as const;
 
 export async function getFeedbackBoard() {
   const supabase = await createClient();
