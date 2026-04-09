@@ -4,13 +4,17 @@ import { createClient } from "@supabase/supabase-js";
 const SLACK_CHANNEL_ID = "C0AS5JSTU4R";
 const URL_REGEX = /https?:\/\/[^\s<>|)]+/g;
 
-// 진입 기준 키워드
+// 진입 기준 키워드 — URL, 제목, 설명에서 매칭
 const PASS_KEYWORDS = [
   "api", "sdk", "open source", "오픈소스", "launch", "release", "출시", "공개",
-  "beta", "베타", "ga ", "general availability", "model", "모델", "llm",
+  "beta", "베타", "general availability", "model", "모델", "llm",
   "agent", "에이전트", "platform", "플랫폼", "framework", "프레임워크",
   "huggingface", "github.com", "docs.", "documentation", "규제", "정책",
   "지원사업", "바우처", "공모", "오픈 베타",
+  "anthropic", "openai", "google ai", "gemini", "claude", "gpt",
+  "scaling", "deploy", "배포", "inference", "추론", "fine-tun", "파인튜닝",
+  "open weight", "tool", "도구", "runtime", "sandbox", "샌드박스",
+  "managed", "serverless", "cloud", "클라우드",
 ];
 
 const REJECT_KEYWORDS = [
@@ -98,12 +102,11 @@ async function processUrl(url: string, slackTs: string) {
     return;
   }
 
-  const passCount = PASS_KEYWORDS.filter((k) => fullText.includes(k)).length;
-  if (passCount < 2) {
+  const matchedKeywords = PASS_KEYWORDS.filter((k) => fullText.includes(k));
+  if (matchedKeywords.length === 0) {
     await postSlackMessage(
       `❌ 기준 미달: 빌더가 만드는 방식을 바꾸는 변화가 아닌 것 같습니다.\n` +
-      `제목: ${meta.title}\n` +
-      `매칭 키워드: ${passCount}개 (최소 2개 필요)`,
+      `제목: ${meta.title}`,
       slackTs
     );
     return;
@@ -186,7 +189,10 @@ export async function POST(request: Request) {
 
       if (urls && urls.length > 0) {
         const firstUrl = urls[0].replace(/[>|].*$/, "");
-        processUrl(firstUrl, event.ts).catch(console.error);
+        processUrl(firstUrl, event.ts).catch(async (err) => {
+          console.error("processUrl error:", err);
+          await postSlackMessage(`⚠️ 처리 중 에러: ${String(err)}`, event.ts);
+        });
       }
     }
   }
