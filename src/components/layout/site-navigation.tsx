@@ -30,7 +30,8 @@ const OPPORTUNITY_ITEMS: NavItem[] = [
 
 function isActive(pathname: string, href?: string) {
   if (!href) return false;
-  if (href.startsWith("/#")) return pathname === "/";
+  // Hash links (/#...) are never "active" — only the plain "/" home link is
+  if (href.startsWith("/#")) return false;
   return pathname === href || pathname.startsWith(`${href}?`);
 }
 

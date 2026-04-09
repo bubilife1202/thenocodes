@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { getHomeData } from "@/lib/data/hackathons";
+import { getHomeData, getStats } from "@/lib/data/hackathons";
 import { getFeaturedMeetups } from "@/lib/data/meetups";
-import { sortHackathons } from "@/lib/hackathons";
+import { getHackathonStatus, sortHackathons } from "@/lib/hackathons";
 import { EventCard } from "@/components/event-card";
 
 export const revalidate = 300;
@@ -33,10 +33,12 @@ function ProblemCard({
 }
 
 async function HomeContent() {
-  const [{ hackathons, contests }, meetups] = await Promise.all([
+  const [{ hackathons, contests }, meetups, stats] = await Promise.all([
     getHomeData(),
     getFeaturedMeetups(2),
+    getStats(),
   ]);
+
   // Ensure at least 1 contest is shown when available
   const sorted = sortHackathons([...hackathons, ...contests]);
   const firstContest = sorted.find((item) => item.category === "contest");
@@ -45,8 +47,47 @@ async function HomeContent() {
     ? [...withoutFirstContest.slice(0, 5), firstContest].sort((a, b) => sorted.indexOf(a) - sorted.indexOf(b))
     : sorted.slice(0, 6);
 
+  // Deadline soon: events ending within 7 days
+  const now = new Date();
+  const deadlineSoon = sorted.filter((item) => {
+    if (!item.ends_at || getHackathonStatus(item, now) !== "active") return false;
+    const daysLeft = Math.ceil((new Date(item.ends_at).getTime() - now.getTime()) / 86400000);
+    return daysLeft >= 0 && daysLeft <= 7;
+  });
+
   return (
     <div className="space-y-14">
+      {/* Stats bar */}
+      <div className="flex gap-3">
+        <div className="flex-1 rounded-xl border border-[#ECE7DF] bg-white p-4 text-center">
+          <p className="text-2xl font-black text-[#0F766E]">{stats.hackathons}</p>
+          <p className="text-xs text-[#71717A]">진행중 해커톤</p>
+        </div>
+        <div className="flex-1 rounded-xl border border-[#ECE7DF] bg-white p-4 text-center">
+          <p className="text-2xl font-black text-[#C46A1A]">{stats.contests}</p>
+          <p className="text-xs text-[#71717A]">모집중 공모전</p>
+        </div>
+        <div className="flex-1 rounded-xl border border-[#ECE7DF] bg-white p-4 text-center">
+          <p className="text-2xl font-black text-[#0F766E]">{stats.meetups}</p>
+          <p className="text-xs text-[#71717A]">밋업 / 세미나</p>
+        </div>
+      </div>
+
+      {/* Deadline soon */}
+      {deadlineSoon.length > 0 && (
+        <section className="scroll-mt-24">
+          <div className="mb-4 flex items-center gap-2">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
+            <h2 className="text-xs font-bold uppercase tracking-wider text-[#18181B]">마감 임박</h2>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {deadlineSoon.slice(0, 4).map((item) => (
+              <EventCard key={item.id} item={item} accent={item.category === "contest" ? "orange" : "teal"} />
+            ))}
+          </div>
+        </section>
+      )}
+
       <section id="opportunities" className="scroll-mt-24">
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>

@@ -47,6 +47,7 @@ export async function getFeedbackBoard() {
 
 export async function getFeedbackColumns() {
   const items = await getFeedbackBoard();
+  // "archived" is intentionally excluded from the public board — it's an internal-only status
   const order: FeedbackStatus[] = ["inbox", "queued", "in_progress", "review", "done"];
   return order.map((status) => ({
     status,

@@ -11,4 +11,5 @@ export interface Hackathon {
   starts_at: string | null;
   ends_at: string | null;
   location: string | null;
+  category?: "hackathon" | "contest" | "meetup";
 }

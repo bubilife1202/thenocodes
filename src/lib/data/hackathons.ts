@@ -26,14 +26,17 @@ export interface HackathonRow {
   category: string;
 }
 
-export async function getHackathons(filter?: HackathonStatus) {
+async function getEvents(
+  category: string,
+  filter?: HackathonStatus,
+): Promise<HackathonRow[]> {
   const supabase = await createClient();
   const now = new Date();
 
   let query = supabase
     .from("hackathons")
     .select(FIELDS)
-    .eq("category", "hackathon")
+    .eq("category", category)
     .limit(200);
 
   if (!filter || filter !== "ended") {
@@ -42,7 +45,7 @@ export async function getHackathons(filter?: HackathonStatus) {
 
   const { data, error } = await query;
   if (error) {
-    console.error("Failed to fetch hackathons:", error.message);
+    console.error(`Failed to fetch ${category}:`, error.message);
     return [];
   }
 
@@ -54,32 +57,16 @@ export async function getHackathons(filter?: HackathonStatus) {
   return sortHackathons(filteredRows, now, filter);
 }
 
+export async function getHackathons(filter?: HackathonStatus) {
+  return getEvents("hackathon", filter);
+}
+
 export async function getContests(filter?: HackathonStatus) {
-  const supabase = await createClient();
-  const now = new Date();
+  return getEvents("contest", filter);
+}
 
-  let query = supabase
-    .from("hackathons")
-    .select(FIELDS)
-    .eq("category", "contest")
-    .limit(200);
-
-  if (!filter || filter !== "ended") {
-    query = query.or(`ends_at.gte.${now.toISOString()},ends_at.is.null`);
-  }
-
-  const { data, error } = await query;
-  if (error) {
-    console.error("Failed to fetch contests:", error.message);
-    return [];
-  }
-
-  const rows = ((data ?? []) as HackathonRow[]).filter(isKoreanHackathon);
-  const filteredRows = filter
-    ? rows.filter((row) => getHackathonStatus(row, now) === filter)
-    : rows;
-
-  return sortHackathons(filteredRows, now, filter);
+export async function getMeetups(filter?: HackathonStatus) {
+  return getEvents("meetup", filter);
 }
 
 export async function getHomeData() {
@@ -88,31 +75,35 @@ export async function getHomeData() {
     getContests(),
   ]);
 
-  return {
-    hackathons,
-    contests,
-  };
+  return { hackathons, contests };
 }
 
 export async function getStats() {
   const supabase = await createClient();
   const now = new Date().toISOString();
 
-  const [{ count: hackathonCount }, { count: contestCount }] = await Promise.all([
-    supabase
-      .from("hackathons")
-      .select("*", { count: "exact", head: true })
-      .eq("category", "hackathon")
-      .or(`ends_at.gte.${now},ends_at.is.null`),
-    supabase
-      .from("hackathons")
-      .select("*", { count: "exact", head: true })
-      .eq("category", "contest")
-      .or(`ends_at.gte.${now},ends_at.is.null`),
-  ]);
+  const [{ count: hackathonCount }, { count: contestCount }, { count: meetupCount }] =
+    await Promise.all([
+      supabase
+        .from("hackathons")
+        .select("*", { count: "exact", head: true })
+        .eq("category", "hackathon")
+        .or(`ends_at.gte.${now},ends_at.is.null`),
+      supabase
+        .from("hackathons")
+        .select("*", { count: "exact", head: true })
+        .eq("category", "contest")
+        .or(`ends_at.gte.${now},ends_at.is.null`),
+      supabase
+        .from("hackathons")
+        .select("*", { count: "exact", head: true })
+        .eq("category", "meetup")
+        .or(`ends_at.gte.${now},ends_at.is.null`),
+    ]);
 
   return {
     hackathons: hackathonCount ?? 0,
     contests: contestCount ?? 0,
+    meetups: meetupCount ?? 0,
   };
 }

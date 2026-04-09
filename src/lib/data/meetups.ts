@@ -1,6 +1,9 @@
+import { getMeetups as getMeetupsFromDB } from "@/lib/data/hackathons";
 import { sortHackathons, type HackathonStatus } from "@/lib/hackathons";
 import type { HackathonRow } from "@/lib/data/hackathons";
 
+// Fallback curated meetups — used when DB has no meetup rows yet.
+// Remove this once Luma collector or manual DB entry is in place.
 const CURATED_MEETUPS: HackathonRow[] = [
   {
     id: "meetup-luma-cafe-lagrange-2026-04-15",
@@ -59,6 +62,11 @@ const CURATED_MEETUPS: HackathonRow[] = [
 ];
 
 export async function getMeetups(filter?: HackathonStatus) {
+  // Try DB first, fall back to curated list
+  const dbMeetups = await getMeetupsFromDB(filter);
+  if (dbMeetups.length > 0) return dbMeetups;
+
+  // Fallback: curated hardcoded meetups
   const now = new Date();
   const filtered = filter
     ? CURATED_MEETUPS.filter((row) => {
