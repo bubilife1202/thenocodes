@@ -57,6 +57,46 @@ export function SignalEditor({ initialPublishedAt }: { initialPublishedAt: strin
         </div>
       </div>
 
+      {/* 콘텐츠 진입 기준 가이드 */}
+      <div className="mb-8 rounded-2xl border border-[#E9DDFE] bg-[#FAF7FF] p-5">
+        <p className="mb-3 text-sm font-bold text-[#7C3AED]">진입 기준 — "이걸로 빌더가 만드는 방식이 바뀌는가?"</p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <p className="mb-2 text-xs font-bold text-[#22C55E]">넣는다 (O)</p>
+            <ul className="space-y-1 text-xs leading-relaxed text-[#5F5951]">
+              <li>• API/SDK 공개 — 바로 쓸 수 있음</li>
+              <li>• 오픈소스 모델 가중치 공개</li>
+              <li>• 빌더 도구/플랫폼 대규모 업데이트</li>
+              <li>• 한국 AI 정책/규제 변화</li>
+              <li>• 원본이 공식 발표 (블로그, 릴리즈 노트)</li>
+            </ul>
+          </div>
+          <div>
+            <p className="mb-2 text-xs font-bold text-[#EF4444]">안 넣는다 (X)</p>
+            <ul className="space-y-1 text-xs leading-relaxed text-[#5F5951]">
+              <li>• 투자/인수 가십</li>
+              <li>• 벤치마크만 있는 발표</li>
+              <li>• 추상적 비전 ("10년 로드맵")</li>
+              <li>• B2C 앱 출시 (API 없음)</li>
+              <li>• 마이너 패치/버그픽스</li>
+              <li>• 언론사 루머, 밈, 개인 의견</li>
+            </ul>
+          </div>
+        </div>
+        <div className="mt-3 rounded-xl border border-[#DDD6FE] bg-white p-3">
+          <p className="text-xs font-semibold text-[#7C3AED]">signal_type 분류</p>
+          <div className="mt-1 flex flex-wrap gap-2 text-[11px] text-[#5F5951]">
+            <span><strong>플랫폼</strong>: 새 managed service, 인프라</span>
+            <span>|</span>
+            <span><strong>API·도구</strong>: 새 API, SDK, 개발자 도구</span>
+            <span>|</span>
+            <span><strong>오픈소스</strong>: 모델 가중치 공개</span>
+            <span>|</span>
+            <span><strong>정책</strong>: 한국 AI 규제, 지원사업</span>
+          </div>
+        </div>
+      </div>
+
       <form action={formAction} className="space-y-6">
         <div className="grid gap-6 sm:grid-cols-2">
           <label className="block sm:col-span-2">
