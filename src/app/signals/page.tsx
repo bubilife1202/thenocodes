@@ -27,7 +27,7 @@ async function SignalList({ filter }: { filter?: SignalType }) {
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
+    <div className="grid gap-4 md:grid-cols-2">
       {signals.map((item) => (
         <SignalCard key={item.id} item={item} />
       ))}
@@ -71,7 +71,7 @@ export default async function SignalsPage({
 
       <Suspense
         fallback={
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
             {[1, 2, 3, 4].map((n) => (
               <div key={n} className="h-72 animate-pulse rounded-xl border border-[#ECE7DF] bg-white" />
             ))}
