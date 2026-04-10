@@ -19,6 +19,7 @@ const MAIN_ITEMS: NavItem[] = [
   { label: "해커톤", href: "/hackathons", tone: "teal", description: "AI · 데이터 · 노코드" },
   { label: "공모전", href: "/contests", tone: "orange", description: "경진대회 · 아이디어 공모" },
   { label: "밋업 / 세미나", href: "/meetups", tone: "teal", description: "서울 AI 오프라인 행사" },
+  { label: "AI로 딴짓", href: "/challenges", tone: "neutral", description: "심심할 때 눌러볼 것들" },
   { label: "흐름", href: "/signals", tone: "neutral", description: "빌더가 챙겨야 할 변화" },
 ];
 

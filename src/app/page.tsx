@@ -3,17 +3,20 @@ import Link from "next/link";
 import { getHomeData, getStats } from "@/lib/data/hackathons";
 import { getFeaturedMeetups } from "@/lib/data/meetups";
 import { getFeaturedSignals } from "@/lib/data/signals";
+import { getFeaturedChallenges } from "@/lib/data/challenges";
 import { getHackathonStatus, sortHackathons } from "@/lib/hackathons";
 import { EventCard } from "@/components/event-card";
 import { SignalCard } from "@/components/signal-card";
+import { ChallengeCard } from "@/components/challenge-card";
 
 export const revalidate = 300;
 
 async function HomeContent() {
-  const [{ hackathons, contests }, meetups, signals, stats] = await Promise.all([
+  const [{ hackathons, contests }, meetups, signals, challenges, stats] = await Promise.all([
     getHomeData(),
     getFeaturedMeetups(2),
-    getFeaturedSignals(3),
+    getFeaturedSignals(2),
+    getFeaturedChallenges(4),
     getStats(),
   ]);
 
@@ -125,9 +128,34 @@ async function HomeContent() {
               전체 흐름 보기
             </Link>
           </div>
-          <div className="grid gap-4 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             {signals.map((item) => (
               <SignalCard key={item.id} item={item} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* AI Side Quests */}
+      {challenges.length > 0 && (
+        <section className="scroll-mt-24">
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-xl font-black tracking-tight text-[#18181B]">AI로 딴짓</h2>
+              <p className="mt-1 text-sm text-[#71717A]">
+                심심할 때 눌러볼 만한 AI 사이트들만 가볍게 모아뒀습니다.
+              </p>
+            </div>
+            <Link
+              href="/challenges"
+              className="rounded-lg border border-[#E5E7EB] bg-white px-3 py-1.5 text-xs font-semibold text-[#18181B] hover:bg-[#F8F5F0]"
+            >
+              전체 보기
+            </Link>
+          </div>
+          <div className="grid gap-4 lg:grid-cols-2">
+            {challenges.map((item) => (
+              <ChallengeCard key={item.id} item={item} />
             ))}
           </div>
         </section>
