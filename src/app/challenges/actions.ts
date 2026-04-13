@@ -122,15 +122,15 @@ export async function submitChallengeReference(formData: FormData) {
     redirect(`${getSafePath(values.tool_id)}?status=reference-ok`);
   }
 
-  if (!getChallengeById(values.tool_id)) {
+  const tool = getChallengeById(values.tool_id);
+  if (!tool) {
     redirect("/challenges?status=invalid-tool");
   }
 
-  const tool = getChallengeById(values.tool_id);
   const supabase = createAdminClient();
   const { data: inserted, error } = await supabase.from("feedback_items").insert({
     title: values.title,
-    body: values.note || `${tool?.title ?? values.tool_id} 레퍼런스`,
+    body: values.note || `${tool.title} 레퍼런스`,
     kind: "content",
     status: "queued",
     priority: "medium",
@@ -335,14 +335,14 @@ export async function submitChallengeComment(formData: FormData) {
     redirect(`${getSafePath(values.tool_id)}?status=comment-ok`);
   }
 
-  if (!getChallengeById(values.tool_id)) {
+  const tool = getChallengeById(values.tool_id);
+  if (!tool) {
     redirect("/challenges?status=invalid-tool");
   }
 
-  const tool = getChallengeById(values.tool_id);
   const supabase = createAdminClient();
   const { data: inserted, error } = await supabase.from("feedback_items").insert({
-    title: `${tool?.title ?? values.tool_id} 코멘트`,
+    title: `${tool.title} 코멘트`,
     body: values.body,
     kind: "content",
     status: "queued",
