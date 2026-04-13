@@ -15,37 +15,54 @@ async function MeetupTable({ filter }: { filter?: HackathonStatus }) {
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-left text-sm">
-        <thead>
-          <tr className="border-b border-[#ECE7DF] text-[11px] font-bold text-[#A1A1AA]">
-            <th className="pb-2 pr-2">행사명</th>
-            <th className="hidden w-24 pb-2 pr-2 sm:table-cell">장소</th>
-            <th className="w-24 pb-2 pr-2 text-right">날짜</th>
-            <th className="hidden w-16 pb-2 sm:table-cell">출처</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-[#F3F0EB]">
-          {meetups.map((m) => {
-            const status = getHackathonStatus(m, now);
-            return (
-              <tr key={m.id} className="hover:bg-[#FCFBF8]">
-                <td className="py-2.5 pr-2">
-                  <a href={m.url} target="_blank" rel="noopener noreferrer" className="font-medium text-[#18181B] hover:underline">
-                    {m.title}
-                  </a>
-                  {status === "active" && <span className="ml-2 text-[10px] font-semibold text-[#0F766E]">진행중</span>}
-                </td>
-                <td className="hidden truncate py-2.5 pr-2 text-[#6B6760] sm:table-cell">{m.location || "서울"}</td>
-                <td className="py-2.5 pr-2 text-right text-[#6B6760]">
-                  {m.ends_at ? formatShortDate(m.ends_at) : m.starts_at ? formatShortDate(m.starts_at) : "—"}
-                </td>
-                <td className="hidden truncate py-2.5 text-[11px] text-[#A1A1AA] sm:table-cell">{m.source}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+    <div className="divide-y divide-[#F3F0EB]">
+      {meetups.map((m) => {
+        const status = getHackathonStatus(m, now);
+        const dateStr = m.ends_at
+          ? formatShortDate(m.ends_at)
+          : m.starts_at
+            ? formatShortDate(m.starts_at)
+            : null;
+
+        return (
+          <a
+            key={m.id}
+            href={m.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block py-3 hover:bg-[#FCFBF8]"
+          >
+            <div className="flex items-start gap-3">
+              {/* 날짜 블록 */}
+              <div className="w-14 shrink-0 pt-0.5 text-center">
+                {dateStr ? (
+                  <span className="text-sm font-bold text-[#18181B]">{dateStr}</span>
+                ) : (
+                  <span className="text-sm text-[#A1A1AA]">미정</span>
+                )}
+              </div>
+
+              {/* 내용 */}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-[#18181B]">{m.title}</h3>
+                  {status === "active" && (
+                    <span className="shrink-0 rounded bg-[#F3FBF9] px-1.5 py-0.5 text-[10px] font-bold text-[#0F766E]">진행중</span>
+                  )}
+                </div>
+                <div className="mt-1 flex flex-wrap items-center gap-x-3 text-[12px] text-[#6B6760]">
+                  {m.location && <span>{m.location}</span>}
+                  {m.organizer && <span>{m.organizer}</span>}
+                  <span className="text-[#A1A1AA]">{m.source}</span>
+                </div>
+                {m.description && (
+                  <p className="mt-1 line-clamp-1 text-[12px] text-[#A1A1AA]">{m.description}</p>
+                )}
+              </div>
+            </div>
+          </a>
+        );
+      })}
     </div>
   );
 }
