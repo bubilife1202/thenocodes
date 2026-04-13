@@ -1,28 +1,51 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { type HackathonStatus } from "@/lib/hackathons";
-import { EventCard } from "@/components/event-card";
 import { getMeetups } from "@/lib/data/meetups";
+import { getHackathonStatus, type HackathonStatus } from "@/lib/hackathons";
+import { formatShortDate } from "@/lib/utils/date";
 
 export const revalidate = 300;
 
-async function MeetupList({ filter }: { filter?: HackathonStatus }) {
+async function MeetupTable({ filter }: { filter?: HackathonStatus }) {
   const meetups = await getMeetups(filter);
+  const now = new Date();
 
   if (meetups.length === 0) {
-    return (
-      <div className="py-16 text-center text-[#A1A1AA]">
-        <p className="mb-1 font-bold">서울 AI 밋업/세미나가 없습니다</p>
-        <p className="text-sm">새로운 Luma 행사 확인 후 추가됩니다</p>
-      </div>
-    );
+    return <p className="py-12 text-center text-sm text-[#A1A1AA]">밋업이 없습니다</p>;
   }
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
-      {meetups.map((item) => (
-        <EventCard key={item.id} item={item} accent="teal" showTags />
-      ))}
+    <div className="overflow-x-auto">
+      <table className="w-full text-left text-sm">
+        <thead>
+          <tr className="border-b border-[#ECE7DF] text-[11px] font-bold text-[#A1A1AA]">
+            <th className="pb-2 pr-2">행사명</th>
+            <th className="hidden w-24 pb-2 pr-2 sm:table-cell">장소</th>
+            <th className="w-24 pb-2 pr-2 text-right">날짜</th>
+            <th className="hidden w-16 pb-2 sm:table-cell">출처</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-[#F3F0EB]">
+          {meetups.map((m) => {
+            const status = getHackathonStatus(m, now);
+            return (
+              <tr key={m.id} className="hover:bg-[#FCFBF8]">
+                <td className="py-2.5 pr-2">
+                  <a href={m.url} target="_blank" rel="noopener noreferrer" className="font-medium text-[#18181B] hover:underline">
+                    {m.title}
+                  </a>
+                  {status === "active" && <span className="ml-2 text-[10px] font-semibold text-[#0F766E]">진행중</span>}
+                </td>
+                <td className="hidden truncate py-2.5 pr-2 text-[#6B6760] sm:table-cell">{m.location || "서울"}</td>
+                <td className="py-2.5 pr-2 text-right text-[#6B6760]">
+                  {m.ends_at ? formatShortDate(m.ends_at) : m.starts_at ? formatShortDate(m.starts_at) : "—"}
+                </td>
+                <td className="hidden truncate py-2.5 text-[11px] text-[#A1A1AA] sm:table-cell">{m.source}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -42,40 +65,28 @@ export default async function MeetupsPage({
   ];
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
-      <div className="mb-8">
-        <h1 className="mb-1 text-2xl font-black tracking-tight">밋업 / 세미나</h1>
-        <p className="text-sm text-[#71717A]">
-          Luma에서 확인한 서울 AI 관련 밋업과 세미나를 선별해서 모아둡니다
-        </p>
+    <div className="mx-auto max-w-[900px] px-4 py-6 sm:px-6 sm:py-8">
+      <div className="mb-6 flex items-baseline gap-3">
+        <h1 className="text-xl font-black tracking-tight text-[#18181B]">밋업 / 세미나</h1>
+        <div className="flex gap-1.5">
+          {tabs.map((tab) => (
+            <Link
+              key={tab.label}
+              href={tab.value ? `/meetups?status=${tab.value}` : "/meetups"}
+              className={`rounded-md px-2.5 py-1 text-[11px] font-semibold ${
+                currentFilter === tab.value
+                  ? "bg-[#18181B] text-white"
+                  : "text-[#A1A1AA] hover:text-[#18181B]"
+              }`}
+            >
+              {tab.label}
+            </Link>
+          ))}
+        </div>
       </div>
 
-      <div className="mb-6 flex gap-2">
-        {tabs.map((tab) => (
-          <Link
-            key={tab.label}
-            href={tab.value ? `/meetups?status=${tab.value}` : "/meetups"}
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-              currentFilter === tab.value
-                ? "bg-[#18181B] text-white"
-                : "bg-gray-100 text-[#71717A] hover:bg-gray-200"
-            }`}
-          >
-            {tab.label}
-          </Link>
-        ))}
-      </div>
-
-      <Suspense
-        fallback={
-          <div className="grid gap-3 sm:grid-cols-2">
-            {[1, 2].map((n) => (
-              <div key={n} className="h-40 animate-pulse rounded-xl bg-gray-50" />
-            ))}
-          </div>
-        }
-      >
-        <MeetupList filter={currentFilter} />
+      <Suspense fallback={<div className="h-60 animate-pulse rounded-xl bg-gray-50" />}>
+        <MeetupTable filter={currentFilter} />
       </Suspense>
     </div>
   );
