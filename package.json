@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "seed:challenge-board": "tsx scripts/seed-challenge-board.ts",
+    "create:weekly-challenge": "tsx scripts/create-weekly-challenge.ts"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.18.0",

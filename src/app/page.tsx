@@ -3,8 +3,10 @@ import Link from "next/link";
 import { getHomeData, getStats } from "@/lib/data/hackathons";
 import { getFeaturedMeetups } from "@/lib/data/meetups";
 import { getFeaturedSignals } from "@/lib/data/signals";
-import { getFeaturedChallenges } from "@/lib/data/challenges";
+import { getFeaturedChallenges, getDailyChallenge } from "@/lib/data/challenges";
+import { getChallengeBoardPageData, getCommunityCountsForTool, getCurrentWeeklyChallenge } from "@/lib/data/challenge-board";
 import { getHackathonStatus, sortHackathons } from "@/lib/hackathons";
+import { formatShortDate } from "@/lib/utils/date";
 import { EventCard } from "@/components/event-card";
 import { SignalCard } from "@/components/signal-card";
 import { ChallengeCard } from "@/components/challenge-card";
@@ -12,13 +14,17 @@ import { ChallengeCard } from "@/components/challenge-card";
 export const revalidate = 300;
 
 async function HomeContent() {
-  const [{ hackathons, contests }, meetups, signals, challenges, stats] = await Promise.all([
+  const [{ hackathons, contests }, meetups, signals, challenges, stats, challengeBoard, weeklyChallenge] = await Promise.all([
     getHomeData(),
     getFeaturedMeetups(2),
     getFeaturedSignals(2),
     getFeaturedChallenges(4),
     getStats(),
+    getChallengeBoardPageData(),
+    getCurrentWeeklyChallenge(),
   ]);
+  const { item: dailyChallenge, recipe: dailyRecipe } = getDailyChallenge();
+  const hasChallengeActivity = challengeBoard.totals.references + challengeBoard.totals.comments + challengeBoard.totals.experimentLogs > 0;
 
   const sorted = sortHackathons([...hackathons, ...contests]);
   const firstContest = sorted.find((item) => item.category === "contest");
@@ -64,11 +70,11 @@ async function HomeContent() {
         <div className="rounded-[28px] border border-[#ECE7DF] bg-[linear-gradient(180deg,#FFFFFF_0%,#F8F5F0_100%)] p-6 shadow-[0_14px_34px_-30px_rgba(24,24,27,0.25)] sm:p-7">
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#A1A1AA]">Today Board</p>
           <h2 className="mt-3 text-2xl font-black tracking-tight text-[#18181B] sm:text-[30px]">
-            지금 바로 움직일 수 있는 판만 앞으로 뺐습니다.
+            지금 보면 좋은 판만 앞으로 뺐습니다.
           </h2>
           <p className="mt-3 max-w-lg text-sm leading-relaxed text-[#6B6760] sm:text-[15px]">
             더노코즈는 한국 AI 해커톤, 공모전, 밋업을 매일 추적합니다. 숫자는 현황이고, 아래 섹션은
-            행동 순서입니다.
+            둘러보기 쉽게 다시 정리한 보드입니다.
           </p>
         </div>
 
@@ -96,8 +102,7 @@ async function HomeContent() {
               </div>
               <h2 className="text-2xl font-black tracking-tight text-[#18181B]">마감 임박</h2>
               <p className="mt-2 text-sm leading-relaxed text-[#7F1D1D]">
-                홈에서 제일 먼저 보여야 하는 건 정보가 아니라 압박입니다. 이번 주 안에 닫히는 항목만
-                앞으로 뺐습니다.
+                이번 주 안에 닫히는 항목만 먼저 모아뒀습니다. 급한 것부터 가볍게 체크하면 됩니다.
               </p>
               <Link
                 href="/hackathons"
@@ -245,27 +250,110 @@ async function HomeContent() {
       )}
 
       {challenges.length > 0 && (
-        <section className="scroll-mt-24">
+        <section className="scroll-mt-24 rounded-[30px] border border-[#ECE7DF] bg-[linear-gradient(180deg,#FFFFFF_0%,#FAF7F2_100%)] p-5 shadow-[0_18px_40px_-34px_rgba(24,24,27,0.18)] sm:p-6">
           <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#A1A1AA]">Side Quest</p>
-              <h2 className="text-xl font-black tracking-tight text-[#18181B]">AI로 딴짓</h2>
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#A1A1AA]">Tool Shelf</p>
+              <h2 className="text-xl font-black tracking-tight text-[#18181B]">실험 도구</h2>
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#71717A]">
-                이건 메인 액션보다 한 단계 아래여야 합니다. 그래서 마지막에, 더 가볍고 더 촘촘하게 배치합니다.
+                업무 중 잠깐 테스트해볼 만한 생성형 도구들을 모아뒀다. 시안, 샘플, 내부 초안에 빠르게 쓰기 좋다.
               </p>
             </div>
             <Link
               href="/challenges"
               className="rounded-full border border-[#E5E7EB] bg-white px-4 py-2 text-sm font-semibold text-[#18181B] hover:bg-[#F8F5F0]"
             >
-              전체 보기
+              더 보러가기
             </Link>
           </div>
 
+          {hasChallengeActivity && (
+            <div className="mb-4 flex flex-wrap gap-2">
+              <span className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-[#6B6760]">
+                레퍼런스 {challengeBoard.totals.references}
+              </span>
+              <span className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-[#6B6760]">
+                코멘트 {challengeBoard.totals.comments}
+              </span>
+              <span className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-[#6B6760]">
+                실험 로그 {challengeBoard.totals.experimentLogs}
+              </span>
+              <span className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-[#6B6760]">
+                최근 7일 활동 {challengeBoard.totals.weeklyActivity}
+              </span>
+            </div>
+          )}
+
+          <div className="mb-5 flex flex-col gap-3 rounded-[24px] border border-[#E9E2D8] bg-white/85 p-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#A1A1AA]">오늘의 2분 레시피</p>
+              <p className="mt-1 text-sm font-semibold text-[#18181B]">{dailyRecipe.scenario}</p>
+              <p className="mt-1 text-sm text-[#6B6760]">{dailyChallenge.title} · {dailyRecipe.expectedTime} · {dailyRecipe.resultHint}</p>
+            </div>
+            <a
+              href={dailyChallenge.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center rounded-full bg-[#18181B] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#2A2A2A]"
+            >
+              {dailyChallenge.ctaLabel ?? "도구 열기 →"}
+            </a>
+          </div>
+
+          {weeklyChallenge && (
+            <div className="mb-5 flex flex-col gap-3 rounded-[24px] border border-[#E6DDFB] bg-[linear-gradient(180deg,#FFFFFF_0%,#FAF7FF_100%)] p-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-[#DDD6FE] bg-white/80 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[#7C3AED]">
+                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#7C3AED]" />
+                    이번 주 챌린지
+                  </span>
+                  <span className="text-[11px] text-[#938B81]">참여 {weeklyChallenge.entries.length}명</span>
+                </div>
+                <p className="mt-1 text-sm font-semibold text-[#18181B]">{weeklyChallenge.challenge.title}</p>
+                <p className="mt-0.5 text-[12px] text-[#6D28D9]">{weeklyChallenge.tool?.title} · 이번 주 안에 참여</p>
+              </div>
+              <Link
+                href="/challenges/weekly"
+                className="inline-flex items-center justify-center rounded-full bg-[#7C3AED] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#6D28D9]"
+              >
+                참여하기 →
+              </Link>
+            </div>
+          )}
+
+          {hasChallengeActivity && challengeBoard.recentReferences.length > 0 && (
+            <div className="mb-5 rounded-[24px] border border-[#ECE7DF] bg-white/85 p-4">
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#A1A1AA]">최근 올라온 레퍼런스</p>
+              <div className="mt-3 grid gap-3 md:grid-cols-2">
+                {challengeBoard.recentReferences.slice(0, 2).map((reference) => (
+                  <Link
+                    key={reference.id}
+                    href={`/challenges/${reference.tool_id}`}
+                    className="rounded-[20px] border border-[#ECE7DF] bg-[#FCFBF8] px-4 py-4 transition-colors hover:bg-[#F8F5F0]"
+                  >
+                    <p className="text-sm font-semibold text-[#18181B]">{reference.tool?.title ?? reference.tool_id}</p>
+                    <p className="mt-1 text-sm text-[#5F5951]">{reference.title}</p>
+                    <p className="mt-2 text-[11px] text-[#938B81]">{reference.submitted_name || "익명"} · {formatShortDate(reference.created_at)}</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {challenges.map((item) => (
-              <ChallengeCard key={item.id} item={item} />
-            ))}
+            {challenges.map((item) => {
+              const counts = getCommunityCountsForTool(challengeBoard.countsByTool, item.id);
+              return (
+                <ChallengeCard
+                  key={item.id}
+                  item={item}
+                  referenceCount={counts.referenceCount}
+                  commentCount={counts.commentCount}
+                  experimentLogCount={counts.experimentLogCount}
+                />
+              );
+            })}
           </div>
         </section>
       )}
@@ -289,11 +377,10 @@ export default function HomePage() {
             </div>
 
             <h1 className="max-w-3xl text-3xl font-black tracking-tight text-[#18181B] sm:text-5xl">
-              No Code, Only Action.
+              한국 AI 빌더를 위한 실전 보드
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[#6B6760] sm:text-base">
-              실행하는 메이커들의 아지트. 한국 AI 해커톤, 공모전, 밋업을 매일 자동으로 모아두고,
-              지금 움직여야 할 순서대로 다시 정렬합니다.
+              지원할 기회, 참석할 행사, 바로 써볼 도구를 한 화면에 모아 보기 편하게 정리합니다.
             </p>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -319,7 +406,7 @@ export default function HomePage() {
               <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#A1A1AA]">Focus</p>
               <p className="mt-2 text-sm font-semibold text-[#18181B]">마감, 지원, 참석.</p>
               <p className="mt-1 text-sm leading-relaxed text-[#71717A]">
-                홈은 읽는 곳이 아니라 바로 움직이는 곳이어야 합니다.
+                필요한 것부터 보고, 마음 가는 건 바로 눌러보면 됩니다.
               </p>
             </div>
             <div className="rounded-[24px] border border-[#D9EFEA] bg-[#F7FCFB] p-4">
