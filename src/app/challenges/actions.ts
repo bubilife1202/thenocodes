@@ -6,6 +6,82 @@ import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getChallengeById } from "@/lib/data/challenge-board";
 
+const COMMUNITY_CHANNEL = "C0AS5JSTU4R";
+
+async function notifyCommunitySlack(params: {
+  entryType: string;
+  toolTitle: string;
+  toolId: string;
+  body: string;
+  submitterName: string | null;
+  feedbackId?: string;
+}) {
+  const token = process.env.SLACK_BOT_TOKEN;
+  if (!token) return;
+
+  const typeLabels: Record<string, string> = {
+    reference: "레퍼런스",
+    comment: "코멘트",
+    "experiment-log": "실험 로그",
+    "challenge-entry": "챌린지 참여",
+  };
+
+  const label = typeLabels[params.entryType] ?? params.entryType;
+  const preview = params.body.length > 100 ? params.body.slice(0, 100) + "…" : params.body;
+
+  const blocks = [
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*새 ${label}*  ·  ${params.toolTitle}\n${preview}\n_${params.submitterName || "익명"}_`,
+      },
+    },
+    ...(params.feedbackId
+      ? [
+          {
+            type: "actions",
+            elements: [
+              {
+                type: "button",
+                text: { type: "plain_text", text: "승인" },
+                style: "primary",
+                action_id: "community_approve",
+                value: params.feedbackId,
+              },
+              {
+                type: "button",
+                text: { type: "plain_text", text: "반려" },
+                style: "danger",
+                action_id: "community_reject",
+                value: params.feedbackId,
+              },
+              {
+                type: "button",
+                text: { type: "plain_text", text: "보드 보기" },
+                url: `https://thenocodes.org/challenges/${params.toolId}`,
+              },
+            ],
+          },
+        ]
+      : []),
+  ];
+
+  try {
+    await fetch("https://slack.com/api/chat.postMessage", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        channel: COMMUNITY_CHANNEL,
+        text: `새 ${label}: ${params.toolTitle} — ${params.submitterName || "익명"}`,
+        blocks,
+      }),
+    });
+  } catch {
+    // 슬랙 알림 실패해도 제출 자체는 성공 처리
+  }
+}
+
 const referenceSchema = z.object({
   tool_id: z.string().trim().min(1),
   title: z.string().trim().min(3).max(120),
@@ -52,7 +128,7 @@ export async function submitChallengeReference(formData: FormData) {
 
   const tool = getChallengeById(values.tool_id);
   const supabase = createAdminClient();
-  const { error } = await supabase.from("feedback_items").insert({
+  const { data: inserted, error } = await supabase.from("feedback_items").insert({
     title: values.title,
     body: values.note || `${tool?.title ?? values.tool_id} 레퍼런스`,
     kind: "content",
@@ -63,12 +139,21 @@ export async function submitChallengeReference(formData: FormData) {
     related_url: values.url,
     is_public: false,
     tags: ["challenge-board", `challenge:${values.tool_id}`, "entry:reference"],
-  });
+  }).select("id").single();
 
   if (error) {
     console.error("Failed to submit challenge reference:", error.message);
     redirect(`${getSafePath(values.tool_id)}?status=reference-error`);
   }
+
+  await notifyCommunitySlack({
+    entryType: "reference",
+    toolTitle: tool?.title ?? values.tool_id,
+    toolId: values.tool_id,
+    body: `${values.title}\n${values.url}`,
+    submitterName: values.submitted_name || null,
+    feedbackId: inserted?.id,
+  });
 
   revalidatePath("/challenges");
   revalidatePath(getSafePath(values.tool_id));
@@ -112,7 +197,7 @@ export async function submitExperimentLog(formData: FormData) {
   }
 
   const supabase = createAdminClient();
-  const { error } = await supabase.from("feedback_items").insert({
+  const { data: inserted, error } = await supabase.from("feedback_items").insert({
     title: `${tool.title} 실험 로그`,
     body: `${values.result}\n${values.takeaway}`,
     kind: "content",
@@ -128,12 +213,21 @@ export async function submitExperimentLog(formData: FormData) {
       `time-spent:${values.time_spent}`,
       ...(values.scenario ? [`scenario:${values.scenario}`] : []),
     ],
-  });
+  }).select("id").single();
 
   if (error) {
     console.error("Failed to submit experiment log:", error.message);
     redirect(`${getSafePath(values.tool_id)}?status=log-error`);
   }
+
+  await notifyCommunitySlack({
+    entryType: "experiment-log",
+    toolTitle: tool.title,
+    toolId: values.tool_id,
+    body: `${values.result}\n${values.takeaway}`,
+    submitterName: values.submitted_name || null,
+    feedbackId: inserted?.id,
+  });
 
   revalidatePath("/challenges");
   revalidatePath(getSafePath(values.tool_id));
@@ -184,7 +278,7 @@ export async function submitWeeklyChallengeEntry(formData: FormData) {
     redirect("/challenges/weekly?status=entry-error");
   }
 
-  const { error } = await supabase.from("feedback_items").insert({
+  const { data: inserted, error } = await supabase.from("feedback_items").insert({
     title: `위클리 챌린지 참여 (${weekTag})`,
     body: `${values.result}\n${values.takeaway}`,
     kind: "content",
@@ -200,12 +294,22 @@ export async function submitWeeklyChallengeEntry(formData: FormData) {
       `week:${weekTag}`,
       `time-spent:${values.time_spent}`,
     ],
-  });
+  }).select("id").single();
 
   if (error) {
     console.error("Failed to submit weekly challenge entry:", error.message);
     redirect("/challenges/weekly?status=entry-error");
   }
+
+  const tool = getChallengeById(toolId);
+  await notifyCommunitySlack({
+    entryType: "challenge-entry",
+    toolTitle: tool?.title ?? toolId,
+    toolId,
+    body: `${values.result}\n${values.takeaway}`,
+    submitterName: values.submitted_name || null,
+    feedbackId: inserted?.id,
+  });
 
   revalidatePath("/challenges");
   revalidatePath(getSafePath(toolId));
@@ -237,7 +341,7 @@ export async function submitChallengeComment(formData: FormData) {
 
   const tool = getChallengeById(values.tool_id);
   const supabase = createAdminClient();
-  const { error } = await supabase.from("feedback_items").insert({
+  const { data: inserted, error } = await supabase.from("feedback_items").insert({
     title: `${tool?.title ?? values.tool_id} 코멘트`,
     body: values.body,
     kind: "content",
@@ -247,12 +351,21 @@ export async function submitChallengeComment(formData: FormData) {
     submitter_name: values.submitted_name || null,
     is_public: false,
     tags: ["challenge-board", `challenge:${values.tool_id}`, "entry:comment"],
-  });
+  }).select("id").single();
 
   if (error) {
     console.error("Failed to submit challenge comment:", error.message);
     redirect(`${getSafePath(values.tool_id)}?status=comment-error`);
   }
+
+  await notifyCommunitySlack({
+    entryType: "comment",
+    toolTitle: tool?.title ?? values.tool_id,
+    toolId: values.tool_id,
+    body: values.body,
+    submitterName: values.submitted_name || null,
+    feedbackId: inserted?.id,
+  });
 
   revalidatePath("/challenges");
   revalidatePath(getSafePath(values.tool_id));
