@@ -229,64 +229,28 @@ export async function POST(request: Request) {
     return NextResponse.json({ text: `반려 완료: ${result.title}`, response_type: "ephemeral" });
   }
 
-  if (action.action_id === "community_approve") {
+  if (action.action_id === "review_approve") {
     const feedbackId = action.value;
-    if (!feedbackId) {
-      return NextResponse.json({ text: "항목 ID가 없습니다.", response_type: "ephemeral" });
-    }
-
+    if (!feedbackId) return NextResponse.json({ text: "ID 누락", response_type: "ephemeral" });
     const supabase = createAdminClient();
-    const { data: item, error: fetchErr } = await supabase
-      .from("feedback_items")
-      .select("id,title,tags")
-      .eq("id", feedbackId)
-      .single();
-
-    if (fetchErr || !item) {
-      return NextResponse.json({ text: "항목을 찾지 못했습니다.", response_type: "ephemeral" });
-    }
-
-    const { error } = await supabase
-      .from("feedback_items")
-      .update({ status: "approved", is_public: true })
-      .eq("id", feedbackId);
-
-    if (error) {
-      return NextResponse.json({ text: `승인 실패: ${error.message}`, response_type: "ephemeral" });
-    }
-
+    const { data: item } = await supabase.from("feedback_items").select("id,title").eq("id", feedbackId).single();
+    if (!item) return NextResponse.json({ text: "항목 없음", response_type: "ephemeral" });
+    const { error } = await supabase.from("feedback_items").update({ status: "approved", is_public: true }).eq("id", feedbackId);
+    if (error) return NextResponse.json({ text: `승인 실패: ${error.message}`, response_type: "ephemeral" });
     await updateSlackMessage({ ts: messageTs, status: "approved", title: item.title });
-    return NextResponse.json({ text: `커뮤니티 콘텐츠 승인: ${item.title}`, response_type: "ephemeral" });
+    return NextResponse.json({ text: `후기 승인: ${item.title}`, response_type: "ephemeral" });
   }
 
-  if (action.action_id === "community_reject") {
+  if (action.action_id === "review_reject") {
     const feedbackId = action.value;
-    if (!feedbackId) {
-      return NextResponse.json({ text: "항목 ID가 없습니다.", response_type: "ephemeral" });
-    }
-
+    if (!feedbackId) return NextResponse.json({ text: "ID 누락", response_type: "ephemeral" });
     const supabase = createAdminClient();
-    const { data: item, error: fetchErr } = await supabase
-      .from("feedback_items")
-      .select("id,title")
-      .eq("id", feedbackId)
-      .single();
-
-    if (fetchErr || !item) {
-      return NextResponse.json({ text: "항목을 찾지 못했습니다.", response_type: "ephemeral" });
-    }
-
-    const { error } = await supabase
-      .from("feedback_items")
-      .update({ status: "rejected", is_public: false })
-      .eq("id", feedbackId);
-
-    if (error) {
-      return NextResponse.json({ text: `반려 실패: ${error.message}`, response_type: "ephemeral" });
-    }
-
+    const { data: item } = await supabase.from("feedback_items").select("id,title").eq("id", feedbackId).single();
+    if (!item) return NextResponse.json({ text: "항목 없음", response_type: "ephemeral" });
+    const { error } = await supabase.from("feedback_items").update({ status: "rejected", is_public: false }).eq("id", feedbackId);
+    if (error) return NextResponse.json({ text: `반려 실패: ${error.message}`, response_type: "ephemeral" });
     await updateSlackMessage({ ts: messageTs, status: "rejected", title: item.title });
-    return NextResponse.json({ text: `커뮤니티 콘텐츠 반려: ${item.title}`, response_type: "ephemeral" });
+    return NextResponse.json({ text: `후기 반려: ${item.title}`, response_type: "ephemeral" });
   }
 
   return NextResponse.json({ text: "알 수 없는 액션입니다.", response_type: "ephemeral" });

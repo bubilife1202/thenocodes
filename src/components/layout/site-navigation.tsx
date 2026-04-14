@@ -19,9 +19,9 @@ const MAIN_ITEMS: NavItem[] = [
   { label: "해커톤", href: "/hackathons", tone: "teal", description: "AI · 데이터 · 노코드" },
   { label: "공모전", href: "/contests", tone: "orange", description: "경진대회 · 아이디어 공모" },
   { label: "밋업 / 세미나", href: "/meetups", tone: "teal", description: "서울 AI 오프라인 행사" },
-  { label: "실험 도구", href: "/challenges", tone: "neutral", description: "업무 중 가볍게 볼 도구들" },
-  { label: "주간 챌린지", href: "/challenges/weekly", tone: "neutral", description: "매주 함께 실험하는 공동 챌린지" },
   { label: "흐름", href: "/signals", tone: "neutral", description: "빌더가 챙겨야 할 변화" },
+  { label: "OpenClaw", href: "/openclaw", tone: "teal" as NavTone, description: "개인 AI 에이전트 플랫폼 소식" },
+  { label: "사용 후기", href: "/reviews", tone: "orange" as NavTone, description: "도구·해커톤·강의 빌더 후기" },
 ];
 
 const COMMUNITY_ITEMS: NavItem[] = [

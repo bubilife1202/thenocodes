@@ -5,9 +5,9 @@ const PRIMARY_LINKS = [
   { href: "/hackathons", label: "해커톤" },
   { href: "/contests", label: "공모전" },
   { href: "/meetups", label: "밋업 / 세미나" },
-  { href: "/challenges", label: "실험 도구" },
-  { href: "/challenges/weekly", label: "주간 챌린지" },
   { href: "/signals", label: "흐름" },
+  { href: "/openclaw", label: "OpenClaw" },
+  { href: "/reviews", label: "사용 후기" },
   { href: "/feedback", label: "피드백 보드" },
 ];
 

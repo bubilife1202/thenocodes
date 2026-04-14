@@ -3,6 +3,7 @@ export const SIGNAL_TYPE_VALUES = [
   "api_tool",
   "open_model",
   "policy",
+  "research",
 ] as const;
 
 export type SignalType = (typeof SIGNAL_TYPE_VALUES)[number];

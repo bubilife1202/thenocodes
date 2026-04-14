@@ -11,6 +11,7 @@ const SIGNAL_TYPE_KO: Record<SignalType, string> = {
   api_tool: "API",
   open_model: "오픈모델",
   policy: "정책",
+  research: "연구",
 };
 
 const SIGNAL_TYPE_STYLE: Record<SignalType, string> = {
@@ -18,6 +19,7 @@ const SIGNAL_TYPE_STYLE: Record<SignalType, string> = {
   api_tool: "text-[#C46A1A]",
   open_model: "text-[#7C3AED]",
   policy: "text-[#B91C1C]",
+  research: "text-[#4B5563]",
 };
 
 const TABS: { label: string; value?: SignalType }[] = [
@@ -26,6 +28,7 @@ const TABS: { label: string; value?: SignalType }[] = [
   { label: "API", value: "api_tool" },
   { label: "오픈모델", value: "open_model" },
   { label: "정책", value: "policy" },
+  { label: "연구", value: "research" },
 ];
 
 async function SignalTable({ filter }: { filter?: SignalType }) {
@@ -56,9 +59,9 @@ async function SignalTable({ filter }: { filter?: SignalType }) {
               </td>
               <td className="py-2.5 pr-2">
                 <div>
-                  <a href={s.source_url} target="_blank" rel="noopener noreferrer" className="font-medium text-[#18181B] hover:underline">
+                  <Link href={`/signals/${s.slug}`} className="font-medium text-[#18181B] hover:underline">
                     {s.title}
-                  </a>
+                  </Link>
                   <p className="mt-0.5 line-clamp-1 text-[12px] text-[#6B6760]">{s.summary}</p>
                 </div>
               </td>

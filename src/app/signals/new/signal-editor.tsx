@@ -12,6 +12,7 @@ const SIGNAL_TYPE_LABELS: Record<SignalType, string> = {
   api_tool: "API / 도구",
   open_model: "오픈 모델",
   policy: "정책",
+  research: "연구",
 };
 
 function FieldError({ message }: { message?: string }) {

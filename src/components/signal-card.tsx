@@ -6,6 +6,7 @@ const SIGNAL_TYPE_LABELS: Record<SignalType, string> = {
   api_tool: "API·도구",
   open_model: "오픈소스",
   policy: "정책",
+  research: "연구",
 };
 
 const SIGNAL_TYPE_STYLES: Record<
@@ -79,6 +80,20 @@ const SIGNAL_TYPE_STYLES: Record<
     actionBody: "text-[#475569]",
     button: "hover:border-[#CBD5E1] hover:bg-[#F8FAFC]",
     footer: "border-[#EAECEF]",
+  },
+  research: {
+    shell:
+      "border-[#E5E7EB] bg-[linear-gradient(180deg,#FFFFFF_0%,#F9FAFB_100%)] sm:hover:border-[#D1D5DB] sm:hover:shadow-[0_18px_38px_-30px_rgba(75,85,99,0.28)]",
+    badge: "border-[#E5E7EB] bg-[#F9FAFB] text-[#4B5563]",
+    bar: "bg-[#4B5563]",
+    source: "text-[#4B5563]",
+    title: "group-hover:text-[#374151]",
+    summary: "text-[#5F5951]",
+    actionBox: "bg-[#F9FAFB]",
+    actionText: "text-[#4B5563]",
+    actionBody: "text-[#374151]",
+    button: "hover:border-[#D1D5DB] hover:bg-[#F9FAFB]",
+    footer: "border-[#E5E7EB]",
   },
 };
 
