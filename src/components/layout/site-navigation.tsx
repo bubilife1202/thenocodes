@@ -22,6 +22,7 @@ const MAIN_ITEMS: NavItem[] = [
   { label: "흐름", href: "/signals", tone: "neutral", description: "빌더가 챙겨야 할 변화" },
   { label: "OpenClaw", href: "/openclaw", tone: "teal" as NavTone, description: "개인 AI 에이전트 플랫폼 소식" },
   { label: "사용 후기", href: "/reviews", tone: "orange" as NavTone, description: "도구·해커톤·강의 빌더 후기" },
+  { label: "API 키", href: "/api-keys", tone: "neutral" as NavTone, description: "에이전트로 글 자동 등록" },
 ];
 
 const COMMUNITY_ITEMS: NavItem[] = [

@@ -12,6 +12,7 @@ const PRIMARY_LINKS = [
 ];
 
 const SECONDARY_LINKS = [
+  { href: "/api-keys", label: "API 키" },
   { href: "https://open.kakao.com/o/pSpn5mpi", label: "카카오 오픈채팅", external: true },
   { href: "mailto:hello@thenocodes.org", label: "문의하기", external: true },
 ];

@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"ls /Users/macmini_cozac/Code/thenocodes.org/src/app/api/slack/interactions/ && ls /Users/macmini_cozac/Code/thenocodes.org/src/app/api/slack/events/ && ls /Users/macmini_cozac/Code/thenoco...",
+  "error": "Exit code 1\nroute.ts\nroute.ts\nls: /Users/macmini_cozac/Code/thenocodes.org/src/app/api/slack/auth/: No such file or directory\n[rerun: b5]",
+  "timestamp": "2026-04-14T01:33:19.541Z",
+  "retry_count": 2
+}

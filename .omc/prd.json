@@ -1,0 +1,30 @@
+{
+  "prd": {
+    "id": "challenge-community-v1",
+    "title": "실험 도구 커뮤니티 강화",
+    "version": "1.1",
+    "created": "2026-04-13",
+    "objective": "Transform the static tool shelf into a living community platform with experiment logs, weekly challenges, builder profiles, Slack moderation, and bulletin board homepage."
+  },
+  "stories": [
+    { "id": "EL-01", "title": "실험 로그 데이터 모델 및 파서 확장", "priority": "P0", "passes": true },
+    { "id": "EL-02", "title": "실험 로그 제출 Server Action", "priority": "P0", "passes": true },
+    { "id": "EL-03", "title": "도구 상세 페이지에 실험 로그 폼 + 목록", "priority": "P0", "passes": true },
+    { "id": "EL-04", "title": "도구별 실험 로그 카운트 표시", "priority": "P1", "passes": true },
+    { "id": "WC-01", "title": "주간 챌린지 데이터 모델 및 조회 함수", "priority": "P0", "passes": true },
+    { "id": "WC-02", "title": "주간 챌린지 등록 스크립트", "priority": "P1", "passes": true },
+    { "id": "WC-03", "title": "주간 챌린지 참여 Server Action", "priority": "P0", "passes": true },
+    { "id": "WC-04", "title": "주간 챌린지 전용 페이지", "priority": "P1", "passes": true },
+    { "id": "WC-05", "title": "홈/목록에 주간 챌린지 배너 통합", "priority": "P1", "passes": true },
+    { "id": "CF-01", "title": "커뮤니티 활동 피드 컴포넌트", "priority": "P1", "passes": true },
+    { "id": "CF-02", "title": "도구별 트렌딩 정렬", "priority": "P2", "passes": true },
+    { "id": "SP-01", "title": "빌더 프로필 뷰", "priority": "P2", "passes": true },
+    { "id": "SP-02", "title": "활동 기여자 하이라이트", "priority": "P2", "passes": true },
+    { "id": "SP-03", "title": "도구 상세 참여자 수 + 최근 활동", "priority": "P1", "passes": true },
+    { "id": "UX-01", "title": "실험 로그 시드 데이터", "priority": "P1", "passes": true },
+    { "id": "UX-02", "title": "빈 상태 개선 + 참여 유도 카피", "priority": "P2", "passes": true },
+    { "id": "HP-01", "title": "홈페이지 게시판 형태 전환", "priority": "P0", "passes": true },
+    { "id": "SL-01", "title": "슬랙 커뮤니티 검수 워크플로우", "priority": "P0", "passes": true },
+    { "id": "DB-01", "title": "해커톤/공모전/시그널 데이터 업데이트", "priority": "P1", "passes": true }
+  ]
+}

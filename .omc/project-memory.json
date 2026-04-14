@@ -1,0 +1,488 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1776065285816,
+  "projectRoot": "/Users/macmini_cozac/Code/thenocodes.org",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "next",
+        "version": "16.2.2",
+        "category": "fullstack"
+      },
+      {
+        "name": "react",
+        "version": "19.2.4",
+        "category": "frontend"
+      },
+      {
+        "name": "react-dom",
+        "version": "19.2.4",
+        "category": "frontend"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": null,
+    "lintCommand": "npm run lint",
+    "devCommand": "npm run dev",
+    "scripts": {
+      "dev": "next dev",
+      "build": "next build --webpack",
+      "start": "next start",
+      "lint": "eslint",
+      "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+      "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": "type-based"
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "docs",
+      "public",
+      "scripts",
+      "src"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 0,
+      "lastAccessed": 1776065285798,
+      "keyFiles": []
+    },
+    "public": {
+      "path": "public",
+      "purpose": "Public files",
+      "fileCount": 5,
+      "lastAccessed": 1776065285800,
+      "keyFiles": [
+        "file.svg",
+        "globe.svg",
+        "next.svg",
+        "vercel.svg",
+        "window.svg"
+      ]
+    },
+    "scripts": {
+      "path": "scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 7,
+      "lastAccessed": 1776065285808,
+      "keyFiles": [
+        "add-signal.ts",
+        "collect-hackathons.ts",
+        "process-pending.ts",
+        "seed-hackathons.ts",
+        "setup-contests.ts"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 0,
+      "lastAccessed": 1776065285809,
+      "keyFiles": []
+    },
+    "supabase": {
+      "path": "supabase",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1776065285809,
+      "keyFiles": [
+        "config.toml"
+      ]
+    },
+    "thenocodes-secrets": {
+      "path": "thenocodes-secrets",
+      "purpose": null,
+      "fileCount": 3,
+      "lastAccessed": 1776065285810,
+      "keyFiles": [
+        "client_secret_330913397938-9ubhip86t24l7vncsbc3k4om76q3p9t7.apps.googleusercontent.com.json",
+        "env.local",
+        "github-recovery-codes.txt"
+      ]
+    },
+    "src/app": {
+      "path": "src/app",
+      "purpose": "Application code",
+      "fileCount": 5,
+      "lastAccessed": 1776065285814,
+      "keyFiles": [
+        "error.tsx",
+        "favicon.ico",
+        "globals.css"
+      ]
+    },
+    "src/components": {
+      "path": "src/components",
+      "purpose": "UI components",
+      "fileCount": 3,
+      "lastAccessed": 1776065285814,
+      "keyFiles": [
+        "challenge-card.tsx",
+        "event-card.tsx",
+        "signal-card.tsx"
+      ]
+    },
+    "src/lib": {
+      "path": "src/lib",
+      "purpose": "Library code",
+      "fileCount": 3,
+      "lastAccessed": 1776065285815,
+      "keyFiles": [
+        "hackathons.test.ts",
+        "hackathons.ts",
+        "types.ts"
+      ]
+    },
+    "supabase/migrations": {
+      "path": "supabase/migrations",
+      "purpose": "Database migrations",
+      "fileCount": 9,
+      "lastAccessed": 1776065285815,
+      "keyFiles": [
+        "00001_initial_schema.sql",
+        "00002_award_submission_points.sql",
+        "00003_hackathons.sql"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "src/app/page.tsx",
+      "accessCount": 49,
+      "lastAccessed": 1776128000474,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/data/challenge-board.ts",
+      "accessCount": 42,
+      "lastAccessed": 1776082495030,
+      "type": "file"
+    },
+    {
+      "path": "src/app/challenges/page.tsx",
+      "accessCount": 26,
+      "lastAccessed": 1776082476108,
+      "type": "file"
+    },
+    {
+      "path": "src/app/challenges/[id]/page.tsx",
+      "accessCount": 23,
+      "lastAccessed": 1776082476255,
+      "type": "file"
+    },
+    {
+      "path": "src/app/challenges/actions.ts",
+      "accessCount": 21,
+      "lastAccessed": 1776082587319,
+      "type": "file"
+    },
+    {
+      "path": "",
+      "accessCount": 17,
+      "lastAccessed": 1776082509704,
+      "type": "directory"
+    },
+    {
+      "path": "src/components/layout/site-navigation.tsx",
+      "accessCount": 13,
+      "lastAccessed": 1776130537422,
+      "type": "file"
+    },
+    {
+      "path": "src",
+      "accessCount": 12,
+      "lastAccessed": 1776079081712,
+      "type": "directory"
+    },
+    {
+      "path": "src/components/layout/footer.tsx",
+      "accessCount": 12,
+      "lastAccessed": 1776130540735,
+      "type": "file"
+    },
+    {
+      "path": "package.json",
+      "accessCount": 10,
+      "lastAccessed": 1776130389190,
+      "type": "file"
+    },
+    {
+      "path": "src/components/challenge-card.tsx",
+      "accessCount": 8,
+      "lastAccessed": 1776082481523,
+      "type": "file"
+    },
+    {
+      "path": "src/components/activity-feed.tsx",
+      "accessCount": 8,
+      "lastAccessed": 1776082482095,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/supabase/admin.ts",
+      "accessCount": 8,
+      "lastAccessed": 1776130388802,
+      "type": "file"
+    },
+    {
+      "path": "src/app/api/slack/interactions/route.ts",
+      "accessCount": 8,
+      "lastAccessed": 1776130402961,
+      "type": "file"
+    },
+    {
+      "path": "src/app/signals/page.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1776127977963,
+      "type": "file"
+    },
+    {
+      "path": "scripts/seed-challenge-board.ts",
+      "accessCount": 6,
+      "lastAccessed": 1776069396512,
+      "type": "file"
+    },
+    {
+      "path": "scripts/create-weekly-challenge.ts",
+      "accessCount": 6,
+      "lastAccessed": 1776082484902,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/data/challenge-board-seed.ts",
+      "accessCount": 6,
+      "lastAccessed": 1776082485503,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/utils/date.ts",
+      "accessCount": 6,
+      "lastAccessed": 1776128030848,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/data/signals.ts",
+      "accessCount": 6,
+      "lastAccessed": 1776128394771,
+      "type": "directory"
+    },
+    {
+      "path": "supabase/migrations/00005_feedback_board.sql",
+      "accessCount": 5,
+      "lastAccessed": 1776130427695,
+      "type": "file"
+    },
+    {
+      "path": "supabase/migrations/00009_challenge_board.sql",
+      "accessCount": 4,
+      "lastAccessed": 1776069393316,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/data/challenges.ts",
+      "accessCount": 4,
+      "lastAccessed": 1776069445635,
+      "type": "file"
+    },
+    {
+      "path": "src/app/challenges/weekly/page.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1776082484167,
+      "type": "file"
+    },
+    {
+      "path": "src/components/signal-card.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1776128019509,
+      "type": "directory"
+    },
+    {
+      "path": "supabase/migrations",
+      "accessCount": 4,
+      "lastAccessed": 1776130412948,
+      "type": "directory"
+    },
+    {
+      "path": "src/app/meetups/page.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1776083667222,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/data/hackathons.ts",
+      "accessCount": 3,
+      "lastAccessed": 1776086002522,
+      "type": "directory"
+    },
+    {
+      "path": "src/lib/signals/constants.ts",
+      "accessCount": 3,
+      "lastAccessed": 1776127954796,
+      "type": "file"
+    },
+    {
+      "path": "src/app/signals/new/signal-editor.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1776128776194,
+      "type": "file"
+    },
+    {
+      "path": "src/app/api/slack/events/route.ts",
+      "accessCount": 3,
+      "lastAccessed": 1776130403013,
+      "type": "file"
+    },
+    {
+      "path": "scripts",
+      "accessCount": 2,
+      "lastAccessed": 1776069702057,
+      "type": "directory"
+    },
+    {
+      "path": "src/app/hackathons/page.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1776083329937,
+      "type": "file"
+    },
+    {
+      "path": "src/app/contests/page.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1776083341021,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/signals",
+      "accessCount": 2,
+      "lastAccessed": 1776127469380,
+      "type": "directory"
+    },
+    {
+      "path": "src/app/signals/pending/pending-review-form.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1776128005024,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/data/feedback.ts",
+      "accessCount": 2,
+      "lastAccessed": 1776128026601,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/supabase",
+      "accessCount": 1,
+      "lastAccessed": 1776069459751,
+      "type": "directory"
+    },
+    {
+      "path": "supabase/migrations/00006_fix_rls_policies.sql",
+      "accessCount": 1,
+      "lastAccessed": 1776069477708,
+      "type": "file"
+    },
+    {
+      "path": "src/components/event-card.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1776069718488,
+      "type": "directory"
+    },
+    {
+      "path": "src/lib/utils",
+      "accessCount": 1,
+      "lastAccessed": 1776081374305,
+      "type": "directory"
+    },
+    {
+      "path": "src/lib/data",
+      "accessCount": 1,
+      "lastAccessed": 1776081644179,
+      "type": "directory"
+    },
+    {
+      "path": "src/lib/data/meetups.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776081648636,
+      "type": "directory"
+    },
+    {
+      "path": "src/lib",
+      "accessCount": 1,
+      "lastAccessed": 1776082502589,
+      "type": "directory"
+    },
+    {
+      "path": "scripts/collect-hackathons.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776086007559,
+      "type": "file"
+    },
+    {
+      "path": "scripts/validate-deadlines.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776086008903,
+      "type": "file"
+    },
+    {
+      "path": "scripts/daily-update.sh",
+      "accessCount": 1,
+      "lastAccessed": 1776086023826,
+      "type": "file"
+    },
+    {
+      "path": "src/app/signals/pending/[id]/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1776127949178,
+      "type": "file"
+    },
+    {
+      "path": "src/app/signals/[slug]/page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1776127984121,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/data/openclaw.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776127988220,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}
