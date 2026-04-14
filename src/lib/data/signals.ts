@@ -30,7 +30,6 @@ export async function getSignals(filter?: SignalType) {
   let query = supabase
     .from("builder_signals")
     .select(FIELDS)
-    .order("is_featured", { ascending: false })
     .order("published_at", { ascending: false })
     .limit(200);
 
