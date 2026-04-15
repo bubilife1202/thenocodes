@@ -23,11 +23,10 @@ alter table public.community_posts enable row level security;
 create policy "공개 글 읽기" on public.community_posts
   for select using (status = 'approved');
 
-create policy "누구나 글쓰기" on public.community_posts
-  for insert with check (true);
-
 create or replace function public.set_community_updated_at()
-returns trigger language plpgsql as $$
+returns trigger
+language plpgsql
+as $$
 begin
   new.updated_at = now();
   return new;
@@ -46,15 +45,33 @@ create table public.community_votes (
   unique(post_id, voter_hash)
 );
 
-alter table public.community_votes enable row level security;
-create policy "누구나 투표" on public.community_votes for insert with check (true);
-create policy "투표 읽기" on public.community_votes for select using (true);
+create index idx_community_votes_post on public.community_votes(post_id);
 
-create or replace function public.increment_community_vote(post_id uuid)
-returns void language plpgsql security definer as $$
+alter table public.community_votes enable row level security;
+
+create or replace function public.update_community_vote_count()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
 begin
-  update public.community_posts
-  set vote_count = vote_count + 1
-  where id = post_id and status = 'approved';
+  if TG_OP = 'INSERT' then
+    update public.community_posts
+    set vote_count = vote_count + 1
+    where id = NEW.post_id and status = 'approved';
+    return NEW;
+  elsif TG_OP = 'DELETE' then
+    update public.community_posts
+    set vote_count = greatest(vote_count - 1, 0)
+    where id = OLD.post_id and status = 'approved';
+    return OLD;
+  end if;
+
+  return null;
 end;
 $$;
+
+create trigger trg_community_vote_count
+  after insert or delete on public.community_votes
+  for each row execute function public.update_community_vote_count();

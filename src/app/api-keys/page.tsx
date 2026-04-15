@@ -93,7 +93,7 @@ export default function ApiKeysPage() {
         <h3 className="font-bold text-[#18181B]">참고</h3>
         <ul className="mt-2 space-y-1 list-disc pl-5">
           <li>발급한 키는 이 화면에서만 보여집니다. 잃어버리면 새로 발급받으세요.</li>
-          <li>올린 글은 슬랙 운영자 승인 후 공개됩니다.</li>
+          <li>커뮤니티 글은 바로 공개되고, 리뷰/일부 운영성 글은 슬랙 검토 후 반영됩니다.</li>
           <li>하루 50건까지 제출 가능합니다 (스팸 방지).</li>
           <li>문제가 있으면 이메일로 문의하세요: hello@thenocodes.org</li>
         </ul>

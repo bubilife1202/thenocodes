@@ -47,8 +47,8 @@ export default function CommunityGuidePage() {
             <div className="rounded-2xl border border-[#F3F0EB] bg-white p-4">
               <p className="text-sm font-semibold text-[#7C3AED]">질문있어요</p>
               <p className="mt-1 text-[13px] text-[#6B6760]">
-                막히는 부분, 궁금한 점을 물어보세요. 다른 빌더들이 답해줄 거예요.
-                구체적으로 쓸수록 좋은 답을 받을 수 있습니다.
+                막히는 부분, 궁금한 점을 물어보세요. 다른 빌더들도 보고 답을 달 수 있게,
+                배경과 시도한 내용을 구체적으로 적는 편이 좋습니다.
               </p>
               <p className="mt-2 text-[12px] text-[#A1A1AA]">
                 예: &ldquo;RAG 파이프라인 청킹 전략 추천&rdquo;, &ldquo;Supabase vs Firebase 뭐가 나아요?&rdquo;
@@ -68,11 +68,10 @@ export default function CommunityGuidePage() {
 
         {/* 이달의 빌더 */}
         <section>
-          <h2 className="text-sm font-bold text-[#18181B]">이달의 빌더</h2>
+          <h2 className="text-sm font-bold text-[#18181B]">이번 달 많이 추천된 글</h2>
           <p className="mt-2 text-[13px] leading-relaxed text-[#6B6760]">
-            매달 가장 많은 추천을 받은 글의 작성자를 &ldquo;이달의 빌더&rdquo;로 선정합니다.
-            선정되신 분께는 스타벅스 커피 쿠폰을 드립니다.
-            명예의 전당에 영구 기록됩니다.
+            이번 달 추천이 많이 모인 글과 작성자는 커뮤니티 상단에서 다시 소개합니다.
+            최근에 추천을 많이 받은 글도 함께 정리해두기 때문에, 사람들이 어떤 글에 반응하는지 빠르게 볼 수 있습니다.
           </p>
         </section>
 
