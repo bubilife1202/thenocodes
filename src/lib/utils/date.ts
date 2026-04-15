@@ -29,6 +29,26 @@ export function relativeTime(dateStr: string): string {
   }).format(new Date(dateStr));
 }
 
+export function getDateLabel(dateStr: string): string {
+  const seoul = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  const postDate = seoul.format(new Date(dateStr));
+  const today = seoul.format(new Date());
+  if (postDate === today) return "오늘";
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  if (postDate === seoul.format(yesterday)) return "어제";
+  return new Intl.DateTimeFormat("ko-KR", {
+    month: "long",
+    day: "numeric",
+    timeZone: "Asia/Seoul",
+  }).format(new Date(dateStr));
+}
+
 export function formatShortDate(value: string) {
   return new Intl.DateTimeFormat("ko-KR", {
     month: "short",

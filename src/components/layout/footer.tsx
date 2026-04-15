@@ -8,6 +8,7 @@ const PRIMARY_LINKS = [
   { href: "/signals", label: "흐름" },
   { href: "/openclaw", label: "OpenClaw" },
   { href: "/reviews", label: "사용 후기" },
+  { href: "/community", label: "커뮤니티" },
   { href: "/feedback", label: "피드백 보드" },
 ];
 
