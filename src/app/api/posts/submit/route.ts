@@ -3,6 +3,17 @@ import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { hashToken } from "@/lib/auth/api-token";
 
+type ApiTokenQuotaRow = {
+  id: string;
+  name: string;
+  email: string | null;
+  revoked_at: string | null;
+  post_count: number | null;
+  last_used_at: string | null;
+  created_at: string;
+  quota_claimed: boolean;
+};
+
 const postSchema = z.object({
   board: z.enum(["signals", "openclaw", "reviews", "community"]),
   title: z.string().trim().min(3).max(200),
@@ -23,10 +34,28 @@ const postSchema = z.object({
   post_type: z.enum(["used_it", "found_it", "question"]).optional(),
   author_name: z.string().trim().max(40).optional(),
   link_url: z.string().trim().url().optional(),
-}).refine(
-  (data) => data.board !== "community" || data.post_type !== "found_it" || (data.link_url && data.link_url.length > 0),
-  { message: "found_it posts require link_url", path: ["link_url"] },
-);
+}).superRefine((data, ctx) => {
+  if (data.board === "community" && !data.post_type) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "community posts require post_type",
+      path: ["post_type"],
+    });
+  }
+
+  if (
+    data.board === "community" &&
+    data.post_type === "found_it" &&
+    !(data.link_url && data.link_url.length > 0) &&
+    !(data.source_url && data.source_url.length > 0)
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "found_it posts require link_url",
+      path: ["link_url"],
+    });
+  }
+});
 
 async function notifySlack(params: { board: string; title: string; author: string; feedbackId?: string; url?: string }) {
   const token = process.env.SLACK_BOT_TOKEN;
@@ -45,42 +74,14 @@ async function notifySlack(params: { board: string; title: string; author: strin
 }
 
 export async function POST(request: Request) {
-  // 1. Auth
   const authHeader = request.headers.get("authorization");
   if (!authHeader?.startsWith("Bearer ")) {
     return NextResponse.json({ error: "Missing Bearer token" }, { status: 401 });
   }
+
   const token = authHeader.slice("Bearer ".length).trim();
   const hash = await hashToken(token);
 
-  const supabase = createAdminClient();
-  const { data: tokenRow } = await supabase
-    .from("api_tokens")
-    .select("id,name,email,revoked_at,post_count")
-    .eq("token_hash", hash)
-    .maybeSingle();
-
-  if (!tokenRow || tokenRow.revoked_at) {
-    return NextResponse.json({ error: "Invalid or revoked token" }, { status: 401 });
-  }
-
-  // Rate limit: 50 posts per rolling 24h window
-  const since = new Date(Date.now() - 86400000).toISOString();
-  const { count: recentCount } = await supabase
-    .from("community_posts")
-    .select("id", { count: "exact", head: true })
-    .eq("author_name", tokenRow.name)
-    .gte("created_at", since);
-  const { count: signalCount } = await supabase
-    .from("builder_signals")
-    .select("id", { count: "exact", head: true })
-    .eq("source_name", tokenRow.name)
-    .gte("created_at", since);
-  if (((recentCount ?? 0) + (signalCount ?? 0)) >= 50) {
-    return NextResponse.json({ error: "Daily rate limit exceeded (50/day)" }, { status: 429 });
-  }
-
-  // 2. Validate body
   const body = await request.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
 
@@ -90,12 +91,42 @@ export async function POST(request: Request) {
   }
 
   const values = parsed.data;
+  const supabase = createAdminClient();
+  const { data: claimedRows, error: claimError } = await supabase.rpc("claim_api_token_quota", {
+    p_token_hash: hash,
+  });
+
+  if (claimError) {
+    console.error("Failed to claim token quota:", claimError.message);
+    return NextResponse.json({ error: "Failed to validate token quota" }, { status: 500 });
+  }
+
+  const tokenRow = (Array.isArray(claimedRows) ? claimedRows[0] : claimedRows) as ApiTokenQuotaRow | null;
+
+  if (!tokenRow || tokenRow.revoked_at) {
+    return NextResponse.json({ error: "Invalid or revoked token" }, { status: 401 });
+  }
+
+  if (!tokenRow.quota_claimed) {
+    return NextResponse.json({ error: "Daily rate limit exceeded (50/day)" }, { status: 429 });
+  }
+
+  const tokenId = tokenRow.id;
+
+  async function revertQuotaClaim() {
+    const { error } = await supabase.rpc("revert_api_token_quota", {
+      p_token_id: tokenId,
+    });
+
+    if (error) {
+      console.error("Failed to revert token quota:", error.message);
+    }
+  }
+
   let insertedId: string | undefined;
   let postUrl: string | undefined;
 
-  // 3. Route by board
   if (values.board === "signals" || values.board === "openclaw") {
-    // Both go to builder_signals, openclaw has extra tag
     const slug = values.title.toLowerCase().replace(/[^a-z0-9가-힣]+/g, "-").slice(0, 60) + "-" + Date.now().toString(36);
     const tags = [...(values.tags ?? [])];
     if (values.board === "openclaw") {
@@ -117,14 +148,15 @@ export async function POST(request: Request) {
     }).select("id").single();
 
     if (error || !inserted) {
+      await revertQuotaClaim();
       return NextResponse.json({ error: `Failed to insert: ${error?.message}` }, { status: 500 });
     }
+
     insertedId = inserted.id;
     postUrl = `https://thenocodes.org/${values.board === "openclaw" ? "openclaw" : `signals/${slug}`}`;
   } else if (values.board === "community") {
-    const pt = values.post_type ?? "found_it";
     const { data: inserted, error } = await supabase.from("community_posts").insert({
-      post_type: pt,
+      post_type: values.post_type ?? "found_it",
       title: values.title,
       body: values.body,
       link_url: values.link_url ?? values.source_url ?? null,
@@ -133,10 +165,12 @@ export async function POST(request: Request) {
     }).select("id").single();
 
     if (error || !inserted) {
+      await revertQuotaClaim();
       return NextResponse.json({ error: `Failed to insert: ${error?.message}` }, { status: 500 });
     }
+
     insertedId = inserted.id;
-    postUrl = `https://thenocodes.org/community`;
+    postUrl = `https://thenocodes.org/community/${inserted.id}`;
   } else if (values.board === "reviews") {
     const cat = values.review_category ?? "etc";
     const { data: inserted, error } = await supabase.from("feedback_items").insert({
@@ -153,19 +187,14 @@ export async function POST(request: Request) {
     }).select("id").single();
 
     if (error || !inserted) {
+      await revertQuotaClaim();
       return NextResponse.json({ error: `Failed to insert: ${error?.message}` }, { status: 500 });
     }
+
     insertedId = inserted.id;
     postUrl = `https://thenocodes.org/reviews`;
   }
 
-  // 4. Update token usage
-  await supabase.from("api_tokens").update({
-    last_used_at: new Date().toISOString(),
-    post_count: (tokenRow.post_count ?? 0) + 1,
-  }).eq("id", tokenRow.id);
-
-  // 5. Slack notify
   await notifySlack({
     board: values.board,
     title: values.title,

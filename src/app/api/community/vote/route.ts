@@ -37,13 +37,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "vote failed" }, { status: 500 });
   }
 
-  const { error: rpcError } = await supabase.rpc("increment_community_vote", {
-    post_id: parsed.data.post_id,
-  });
+  const { data: post, error: postError } = await supabase
+    .from("community_posts")
+    .select("vote_count")
+    .eq("id", parsed.data.post_id)
+    .maybeSingle();
 
-  if (rpcError) {
-    console.error("Failed to increment vote:", rpcError.message);
+  if (postError) {
+    console.error("Failed to read updated vote count:", postError.message);
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, vote_count: post?.vote_count ?? null });
 }

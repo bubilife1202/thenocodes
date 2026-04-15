@@ -72,7 +72,8 @@ export async function submitCommunityPost(formData: FormData) {
   });
 
   if (!parsed.success) {
-    redirect("/community/new?status=error");
+    const hasLinkError = parsed.error.issues.some((issue) => issue.path.includes("link_url"));
+    redirect(`/community/new?status=${hasLinkError ? "missing-link" : "validation"}`);
   }
 
   const values = parsed.data;
