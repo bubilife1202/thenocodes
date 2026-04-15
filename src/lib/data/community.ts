@@ -30,6 +30,7 @@ export async function getCommunityPosts(filter?: CommunityPostType): Promise<Com
   let query = supabase
     .from("community_posts")
     .select("id,post_type,title,body,link_url,author_name,vote_count,created_at")
+    .eq("status", "approved")
     .order("created_at", { ascending: false })
     .limit(200);
 

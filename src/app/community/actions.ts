@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { POST_TYPE_KO } from "@/lib/data/community";
 
 const communityPostSchema = z
   .object({
@@ -19,11 +20,7 @@ const communityPostSchema = z
     { message: "발견했어요 글에는 링크가 필요합니다", path: ["link_url"] },
   );
 
-const POST_TYPE_LABEL: Record<string, string> = {
-  used_it: "써봤어요",
-  found_it: "발견했어요",
-  question: "질문있어요",
-};
+const POST_TYPE_LABEL: Record<string, string> = POST_TYPE_KO;
 
 async function notifyCommunitySlack(params: {
   title: string;
@@ -59,8 +56,8 @@ async function notifyCommunitySlack(params: {
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       body: JSON.stringify({ channel: "C0AS5JSTU4R", text: `새 커뮤니티 글: ${params.title}`, blocks }),
     });
-  } catch {
-    /* ignore */
+  } catch (e) {
+    console.warn("Slack notification failed:", e);
   }
 }
 

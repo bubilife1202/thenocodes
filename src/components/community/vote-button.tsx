@@ -38,11 +38,15 @@ export function VoteButton({ postId, initialCount }: { postId: string; initialCo
     addVotedId(postId);
 
     try {
-      await fetch("/api/community/vote", {
+      const res = await fetch("/api/community/vote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ post_id: postId }),
       });
+      if (!res.ok) {
+        setCount((c) => c - 1);
+        setVoted(false);
+      }
     } catch {
       setCount((c) => c - 1);
       setVoted(false);
