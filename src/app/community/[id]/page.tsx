@@ -61,6 +61,7 @@ export default async function CommunityPostPage({
               {POST_TYPE_KO[post.post_type]}
             </span>
             <span className="text-[11px] text-[#A1A1AA]">
+              {post.source === "api" && <span className="mr-1" title="에이전트가 올린 글">🤖</span>}
               {post.author_name || "익명"} · {relativeTime(post.created_at)}
             </span>
           </div>

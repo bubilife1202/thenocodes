@@ -10,6 +10,7 @@ export interface CommunityPost {
   link_url: string | null;
   author_name: string | null;
   vote_count: number;
+  source: "web" | "api";
   created_at: string;
 }
 
@@ -29,7 +30,7 @@ export async function getCommunityPosts(filter?: CommunityPostType): Promise<Com
   const supabase = await createClient();
   let query = supabase
     .from("community_posts")
-    .select("id,post_type,title,body,link_url,author_name,vote_count,created_at")
+    .select("id,post_type,title,body,link_url,author_name,vote_count,source,created_at")
     .eq("status", "approved")
     .order("created_at", { ascending: false })
     .limit(200);
@@ -47,11 +48,43 @@ export async function getCommunityPosts(filter?: CommunityPostType): Promise<Com
   return (data ?? []) as CommunityPost[];
 }
 
+function hnScore(votes: number, hoursAgo: number): number {
+  return votes / Math.pow(hoursAgo + 2, 1.5);
+}
+
+export async function getRankedCommunityPosts(filter?: CommunityPostType): Promise<CommunityPost[]> {
+  const posts = await getCommunityPosts(filter);
+  const now = Date.now();
+  return posts.sort((a, b) => {
+    const hoursA = (now - new Date(a.created_at).getTime()) / 3600000;
+    const hoursB = (now - new Date(b.created_at).getTime()) / 3600000;
+    return hnScore(b.vote_count, hoursB) - hnScore(a.vote_count, hoursA);
+  });
+}
+
+export async function getWeeklyTop(limit = 5): Promise<CommunityPost[]> {
+  const since = new Date(Date.now() - 7 * 86400000).toISOString();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("community_posts")
+    .select("id,post_type,title,body,link_url,author_name,vote_count,source,created_at")
+    .eq("status", "approved")
+    .gte("created_at", since)
+    .order("vote_count", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("Failed to fetch weekly top:", error.message);
+    return [];
+  }
+  return (data ?? []) as CommunityPost[];
+}
+
 export async function getCommunityPostById(id: string): Promise<CommunityPost | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("community_posts")
-    .select("id,post_type,title,body,link_url,author_name,vote_count,created_at")
+    .select("id,post_type,title,body,link_url,author_name,vote_count,source,created_at")
     .eq("id", id)
     .eq("status", "approved")
     .maybeSingle();
@@ -67,7 +100,7 @@ export async function getMonthlyTopPost(year: number, month: number): Promise<Co
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("community_posts")
-    .select("id,post_type,title,body,link_url,author_name,vote_count,created_at")
+    .select("id,post_type,title,body,link_url,author_name,vote_count,source,created_at")
     .eq("status", "approved")
     .gte("created_at", start)
     .lt("created_at", end)
@@ -88,7 +121,7 @@ export async function getHallOfFame(): Promise<{ year: number; month: number; po
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("community_posts")
-    .select("id,post_type,title,body,link_url,author_name,vote_count,created_at")
+    .select("id,post_type,title,body,link_url,author_name,vote_count,source,created_at")
     .eq("status", "approved")
     .gte("created_at", start)
     .lt("created_at", end)
