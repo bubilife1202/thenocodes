@@ -30,6 +30,8 @@ export async function getSignals(filter?: SignalType) {
   let query = supabase
     .from("builder_signals")
     .select(FIELDS)
+    .not("tags", "ov", "{openclaw}")
+    .not("tags", "ov", "{hermes-agent}")
     .order("published_at", { ascending: false })
     .limit(200);
 
@@ -52,6 +54,8 @@ export async function getFeaturedSignals(limit = 3) {
   const { data, error } = await supabase
     .from("builder_signals")
     .select(FIELDS)
+    .not("tags", "ov", "{openclaw}")
+    .not("tags", "ov", "{hermes-agent}")
     .order("is_featured", { ascending: false })
     .order("published_at", { ascending: false })
     .limit(limit);
