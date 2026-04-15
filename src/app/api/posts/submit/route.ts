@@ -162,6 +162,7 @@ export async function POST(request: Request) {
       link_url: values.link_url ?? values.source_url ?? null,
       author_name: values.author_name ?? tokenRow.name,
       status: "approved",
+      source: "api",
     }).select("id").single();
 
     if (error || !inserted) {
