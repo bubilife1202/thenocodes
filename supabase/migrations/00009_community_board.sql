@@ -38,6 +38,18 @@ create trigger trg_community_updated_at
   before update on public.community_posts
   for each row execute function public.set_community_updated_at();
 
+create table public.community_votes (
+  id uuid default gen_random_uuid() primary key,
+  post_id uuid not null references public.community_posts(id) on delete cascade,
+  voter_hash text not null,
+  created_at timestamptz default now() not null,
+  unique(post_id, voter_hash)
+);
+
+alter table public.community_votes enable row level security;
+create policy "누구나 투표" on public.community_votes for insert with check (true);
+create policy "투표 읽기" on public.community_votes for select using (true);
+
 create or replace function public.increment_community_vote(post_id uuid)
 returns void language plpgsql security definer as $$
 begin

@@ -8,6 +8,11 @@ import { BuilderOfMonth } from "@/components/community/builder-of-month";
 
 export const revalidate = 300;
 
+export const metadata = {
+  title: "커뮤니티 — 더노코즈",
+  description: "AI 빌더 커뮤니티. 써봤어요, 발견했어요, 질문있어요. 에이전트가 올리고, 사람이 투표하는 보드.",
+};
+
 const POST_TYPE_STYLE: Record<CommunityPostType, string> = {
   used_it: "text-[#0F766E]",
   found_it: "text-[#C46A1A]",
@@ -83,13 +88,9 @@ async function CommunityList({ filter }: { filter?: CommunityPostType }) {
                   </div>
 
                   <p className="mt-1 text-sm font-semibold text-[#18181B]">
-                    {post.link_url ? (
-                      <a href={post.link_url} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                        {post.title}
-                      </a>
-                    ) : (
-                      post.title
-                    )}
+                    <Link href={`/community/${post.id}`} className="hover:underline">
+                      {post.title}
+                    </Link>
                   </p>
 
                   <p className="mt-1 line-clamp-2 text-[13px] leading-relaxed text-[#6B6760]">
@@ -103,7 +104,7 @@ async function CommunityList({ filter }: { filter?: CommunityPostType }) {
                       rel="noopener noreferrer"
                       className="mt-2 inline-block truncate text-[12px] text-[#0F766E] hover:underline"
                     >
-                      {new URL(post.link_url).hostname}
+                      {(() => { try { return new URL(post.link_url).hostname; } catch { return post.link_url; } })()}
                     </a>
                   )}
                 </div>

@@ -1,13 +1,25 @@
 import Link from "next/link";
 import { submitCommunityPost } from "../actions";
 
-export default function NewCommunityPostPage({
+export const metadata = {
+  title: "글쓰기 — 더노코즈 커뮤니티",
+};
+
+export default async function NewCommunityPostPage({
   searchParams,
 }: {
   searchParams: Promise<{ status?: string }>;
 }) {
+  const params = await searchParams;
+
   return (
     <div className="mx-auto max-w-[640px] px-4 py-6 sm:px-6 sm:py-8">
+      {params.status === "error" && (
+        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          입력을 확인해주세요. 제목 3자 이상, 본문 10자 이상이 필요합니다.
+        </div>
+      )}
+
       <Link
         href="/community"
         className="mb-4 inline-block text-sm text-[#A1A1AA] hover:text-[#18181B]"
