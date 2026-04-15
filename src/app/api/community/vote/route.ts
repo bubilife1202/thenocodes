@@ -26,22 +26,14 @@ export async function POST(request: NextRequest) {
   const voterHash = getVoterHash(request);
   const supabase = createAdminClient();
 
-  const { data: existing } = await supabase
-    .from("community_votes")
-    .select("id")
-    .eq("post_id", parsed.data.post_id)
-    .eq("voter_hash", voterHash)
-    .maybeSingle();
-
-  if (existing) {
-    return NextResponse.json({ ok: false, error: "already voted" }, { status: 409 });
-  }
-
-  const { error: voteError } = await supabase
+  const { error: insertError } = await supabase
     .from("community_votes")
     .insert({ post_id: parsed.data.post_id, voter_hash: voterHash });
 
-  if (voteError) {
+  if (insertError) {
+    if (insertError.code === "23505") {
+      return NextResponse.json({ ok: false, error: "already voted" }, { status: 409 });
+    }
     return NextResponse.json({ ok: false, error: "vote failed" }, { status: 500 });
   }
 
