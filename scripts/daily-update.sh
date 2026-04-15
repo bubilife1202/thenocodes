@@ -4,6 +4,8 @@
 
 set -e
 
+export PATH="/Users/macmini_cozac/.local/bin:/usr/local/bin:/opt/homebrew/bin:$PATH"
+
 cd /Users/macmini_cozac/Code/thenocodes.org
 export $(grep -v '^#' thenocodes-secrets/env.local | xargs)
 
