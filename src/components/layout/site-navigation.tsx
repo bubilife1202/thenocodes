@@ -26,6 +26,7 @@ const MAIN_ITEMS: NavItem[] = [
 ];
 
 const COMMUNITY_ITEMS: NavItem[] = [
+  { label: "커뮤니티", href: "/community", tone: "teal", description: "써봤어요 · 발견했어요 · 질문" },
   { label: "피드백 보드", href: "/feedback", tone: "neutral", description: "대기중 · 진행중 · 완료" },
 ];
 
