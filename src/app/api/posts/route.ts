@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
   const limit = Math.min(Number(url.searchParams.get("limit")) || 50, 200);
   const offset = Number(url.searchParams.get("offset")) || 0;
   const type = url.searchParams.get("type");
+  const search = url.searchParams.get("q");
 
   const supabase = createAdminClient();
 
@@ -19,6 +20,7 @@ export async function GET(request: NextRequest) {
       .range(offset, offset + limit - 1);
 
     if (type) query = query.eq("post_type", type);
+    if (search) query = query.or(`title.ilike.%${search}%,body.ilike.%${search}%`);
 
     const { data, error } = await query;
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -35,6 +37,7 @@ export async function GET(request: NextRequest) {
       .range(offset, offset + limit - 1);
 
     if (type) query = query.eq("signal_type", type);
+    if (search) query = query.or(`title.ilike.%${search}%,summary.ilike.%${search}%`);
 
     const { data, error } = await query;
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });

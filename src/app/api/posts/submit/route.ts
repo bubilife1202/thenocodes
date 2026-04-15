@@ -64,16 +64,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid or revoked token" }, { status: 401 });
   }
 
-  // Rate limit: 50 posts per day per token
-  if (tokenRow.post_count >= 50) {
-    const { data: recent } = await supabase
-      .from("api_tokens")
-      .select("last_used_at")
-      .eq("id", tokenRow.id)
-      .single();
-    if (recent?.last_used_at && new Date(recent.last_used_at).getTime() > Date.now() - 86400000) {
-      return NextResponse.json({ error: "Daily rate limit exceeded (50/day)" }, { status: 429 });
-    }
+  // Rate limit: 50 posts per rolling 24h window
+  const since = new Date(Date.now() - 86400000).toISOString();
+  const { count: recentCount } = await supabase
+    .from("community_posts")
+    .select("id", { count: "exact", head: true })
+    .eq("author_name", tokenRow.name)
+    .gte("created_at", since);
+  const { count: signalCount } = await supabase
+    .from("builder_signals")
+    .select("id", { count: "exact", head: true })
+    .eq("source_name", tokenRow.name)
+    .gte("created_at", since);
+  if (((recentCount ?? 0) + (signalCount ?? 0)) >= 50) {
+    return NextResponse.json({ error: "Daily rate limit exceeded (50/day)" }, { status: 429 });
   }
 
   // 2. Validate body
