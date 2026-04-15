@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { hashToken } from "@/lib/auth/api-token";
 
 const postSchema = z.object({
-  board: z.enum(["signals", "openclaw", "reviews"]),
+  board: z.enum(["signals", "openclaw", "reviews", "community"]),
   title: z.string().trim().min(3).max(200),
   body: z.string().trim().min(10).max(5000),
   source_url: z.string().trim().url().optional(),
@@ -19,6 +19,10 @@ const postSchema = z.object({
   // reviews specific
   review_category: z.enum(["tool", "hackathon", "course", "support", "etc"]).optional(),
   related_url: z.string().trim().url().optional(),
+  // community specific
+  post_type: z.enum(["used_it", "found_it", "question"]).optional(),
+  author_name: z.string().trim().max(40).optional(),
+  link_url: z.string().trim().url().optional(),
 });
 
 async function notifySlack(params: { board: string; title: string; author: string; feedbackId?: string; url?: string }) {
@@ -110,6 +114,22 @@ export async function POST(request: Request) {
     }
     insertedId = inserted.id;
     postUrl = `https://thenocodes.org/${values.board === "openclaw" ? "openclaw" : `signals/${slug}`}`;
+  } else if (values.board === "community") {
+    const pt = values.post_type ?? "found_it";
+    const { data: inserted, error } = await supabase.from("community_posts").insert({
+      post_type: pt,
+      title: values.title,
+      body: values.body,
+      link_url: values.link_url ?? values.source_url ?? null,
+      author_name: values.author_name ?? tokenRow.name,
+      status: "approved",
+    }).select("id").single();
+
+    if (error || !inserted) {
+      return NextResponse.json({ error: `Failed to insert: ${error?.message}` }, { status: 500 });
+    }
+    insertedId = inserted.id;
+    postUrl = `https://thenocodes.org/community`;
   } else if (values.board === "reviews") {
     const cat = values.review_category ?? "etc";
     const { data: inserted, error } = await supabase.from("feedback_items").insert({
