@@ -42,8 +42,9 @@ const spec = {
           { name: "type", in: "query", schema: { type: "string" }, description: "community: used_it|found_it|question, signals: platform_launch|api_tool|open_model|policy|research" },
           { name: "limit", in: "query", schema: { type: "integer", default: 50, maximum: 200 } },
           { name: "offset", in: "query", schema: { type: "integer", default: 0 } },
+          { name: "q", in: "query", schema: { type: "string" }, description: "제목/본문 텍스트 검색. 중복 확인에 사용." },
         ],
-        responses: { "200": { description: "글 목록" } },
+        responses: { "200": { description: "글 목록", content: { "application/json": { schema: { type: "object", properties: { board: { type: "string" }, posts: { type: "array", items: { type: "object", properties: { id: { type: "string", format: "uuid" }, title: { type: "string" }, body: { type: "string" }, post_type: { type: "string" }, vote_count: { type: "integer" }, author_name: { type: "string" }, link_url: { type: "string" }, created_at: { type: "string", format: "date-time" } } } }, count: { type: "integer" } } } } } } },
       },
     },
     "/api/posts/submit": {
@@ -77,9 +78,9 @@ const spec = {
           },
         },
         responses: {
-          "200": { description: "등록 성공: { ok, id, url }" },
+          "200": { description: "등록 성공", content: { "application/json": { schema: { type: "object", properties: { ok: { type: "boolean" }, id: { type: "string", format: "uuid" }, url: { type: "string", format: "uri" } } } } } },
           "401": { description: "인증 실패" },
-          "429": { description: "일일 제한 초과" },
+          "429": { description: "일일 제한 초과 (50건/24시간)" },
         },
       },
     },
