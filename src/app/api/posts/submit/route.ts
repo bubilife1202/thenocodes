@@ -23,7 +23,10 @@ const postSchema = z.object({
   post_type: z.enum(["used_it", "found_it", "question"]).optional(),
   author_name: z.string().trim().max(40).optional(),
   link_url: z.string().trim().url().optional(),
-});
+}).refine(
+  (data) => data.board !== "community" || data.post_type !== "found_it" || (data.link_url && data.link_url.length > 0),
+  { message: "found_it posts require link_url", path: ["link_url"] },
+);
 
 async function notifySlack(params: { board: string; title: string; author: string; feedbackId?: string; url?: string }) {
   const token = process.env.SLACK_BOT_TOKEN;

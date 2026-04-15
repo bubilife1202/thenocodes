@@ -46,6 +46,19 @@ export async function getCommunityPosts(filter?: CommunityPostType): Promise<Com
   return (data ?? []) as CommunityPost[];
 }
 
+export async function getCommunityPostById(id: string): Promise<CommunityPost | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("community_posts")
+    .select("id,post_type,title,body,link_url,author_name,vote_count,created_at")
+    .eq("id", id)
+    .eq("status", "approved")
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return data as CommunityPost;
+}
+
 export async function getMonthlyTopPost(year: number, month: number): Promise<CommunityPost | null> {
   const start = new Date(year, month - 1, 1).toISOString();
   const end = new Date(year, month, 1).toISOString();
@@ -54,25 +67,47 @@ export async function getMonthlyTopPost(year: number, month: number): Promise<Co
   const { data, error } = await supabase
     .from("community_posts")
     .select("id,post_type,title,body,link_url,author_name,vote_count,created_at")
+    .eq("status", "approved")
     .gte("created_at", start)
     .lt("created_at", end)
+    .gt("vote_count", 0)
     .order("vote_count", { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  if (error || !data || data.vote_count === 0) return null;
+  if (error || !data) return null;
   return data as CommunityPost;
 }
 
 export async function getHallOfFame(): Promise<{ year: number; month: number; post: CommunityPost }[]> {
   const now = new Date();
-  const results: { year: number; month: number; post: CommunityPost }[] = [];
+  const start = new Date(now.getFullYear(), now.getMonth() - 12, 1).toISOString();
+  const end = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
-  for (let i = 1; i <= 12; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const post = await getMonthlyTopPost(d.getFullYear(), d.getMonth() + 1);
-    if (post) results.push({ year: d.getFullYear(), month: d.getMonth() + 1, post });
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("community_posts")
+    .select("id,post_type,title,body,link_url,author_name,vote_count,created_at")
+    .eq("status", "approved")
+    .gte("created_at", start)
+    .lt("created_at", end)
+    .gt("vote_count", 0)
+    .order("vote_count", { ascending: false })
+    .limit(50);
+
+  if (error || !data) return [];
+
+  const byMonth = new Map<string, CommunityPost>();
+  for (const post of data as CommunityPost[]) {
+    const d = new Date(post.created_at);
+    const key = `${d.getFullYear()}-${d.getMonth() + 1}`;
+    if (!byMonth.has(key)) byMonth.set(key, post);
   }
 
-  return results;
+  const results: { year: number; month: number; post: CommunityPost }[] = [];
+  for (const [key, post] of byMonth) {
+    const [y, m] = key.split("-").map(Number);
+    results.push({ year: y, month: m, post });
+  }
+  return results.sort((a, b) => b.year * 100 + b.month - (a.year * 100 + a.month));
 }
