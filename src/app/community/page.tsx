@@ -155,12 +155,20 @@ export default async function CommunityPage({
           ))}
         </div>
 
-        <Link
-          href="/community/new"
-          className="ml-auto rounded-xl bg-[#0F766E] px-3.5 py-1.5 text-[12px] font-semibold text-white hover:bg-[#0B5F58]"
-        >
-          글쓰기
-        </Link>
+        <div className="ml-auto flex gap-2">
+          <Link
+            href="/community/guide"
+            className="rounded-xl border border-[#ECE7DF] px-3 py-1.5 text-[12px] font-semibold text-[#6B6760] hover:text-[#18181B]"
+          >
+            가이드
+          </Link>
+          <Link
+            href="/community/new"
+            className="rounded-xl bg-[#0F766E] px-3.5 py-1.5 text-[12px] font-semibold text-white hover:bg-[#0B5F58]"
+          >
+            글쓰기
+          </Link>
+        </div>
       </div>
 
       <Suspense fallback={<div className="h-60 animate-pulse rounded-xl bg-gray-50" />}>

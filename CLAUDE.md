@@ -1,5 +1,30 @@
 @AGENTS.md
 
+# 배포 가이드
+
+## Cloudflare Workers (OpenNextJS)
+
+```bash
+# 메인 레포에서 실행 (worktree 아님)
+cd /Users/macmini_cozac/Code/thenocodes.org
+npm run deploy
+```
+
+`npm run deploy`는 `opennextjs-cloudflare build && opennextjs-cloudflare deploy`를 실행한다.
+- 빌드: Next.js → Cloudflare Workers 번들로 변환
+- 배포: Cloudflare Workers에 업로드
+- 배포 URL: https://thenocodes.bubilife.workers.dev (커스텀 도메인: thenocodes.org)
+
+## 배포 전 체크리스트
+1. `npm run build` 통과 확인
+2. DB 마이그레이션이 필요하면 **배포 전에** Supabase Studio > SQL Editor에서 실행
+3. worktree가 아닌 **메인 레포**에서 `npm run deploy` 실행
+4. 메인 레포에 로컬 변경사항이 있으면 `git stash` → `git pull` → 배포 → `git stash pop`
+
+## GitHub Actions
+- 자동 배포 없음 (수동 배포)
+- `collect-hackathons.yml`: 매일 UTC 00:00 해커톤 수집 cron만 있음
+
 # 흐름(Signal) 추가 워크플로우
 
 ## 절대 원칙
