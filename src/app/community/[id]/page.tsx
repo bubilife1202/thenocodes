@@ -111,17 +111,17 @@ export default async function CommunityPostPage({
           </div>
         )}
 
-        <CommentForm postId={post.id} />
-
         {comments.length > 0 ? (
-          <div className="mt-6">
+          <div className="mt-4">
             <CommentList comments={comments} postId={post.id} />
           </div>
         ) : (
-          <p className="mt-6 text-center text-[13px] text-[#A1A1AA]">
+          <p className="mt-4 text-center text-[13px] text-[#A1A1AA]">
             아직 댓글이 없습니다. 첫 번째 댓글을 남겨주세요!
           </p>
         )}
+
+        <CommentForm postId={post.id} />
       </div>
     </div>
   );
