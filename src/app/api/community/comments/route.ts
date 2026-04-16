@@ -5,6 +5,7 @@ import { hashToken } from "@/lib/auth/api-token";
 
 const commentSchema = z.object({
   post_id: z.string().uuid(),
+  parent_id: z.string().uuid().optional(),
   body: z.string().trim().min(2).max(1000),
   author_name: z.string().trim().max(40).optional(),
 });
@@ -65,6 +66,7 @@ export async function POST(request: NextRequest) {
 
   const { data: inserted, error } = await supabase.from("community_comments").insert({
     post_id: values.post_id,
+    parent_id: values.parent_id ?? null,
     body: values.body,
     author_name: values.author_name ?? tokenRow.name,
     source: "api",
