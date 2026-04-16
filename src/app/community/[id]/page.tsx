@@ -32,10 +32,13 @@ export async function generateMetadata({
 
 export default async function CommunityPostPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ comment?: string }>;
 }) {
   const { id } = await params;
+  const sp = await searchParams;
   const [post, comments] = await Promise.all([
     getCommunityPostById(id),
     getCommentsByPostId(id),
@@ -97,12 +100,27 @@ export default async function CommunityPostPage({
           댓글 {comments.length > 0 && <span className="font-normal text-[#A1A1AA]">{comments.length}</span>}
         </h2>
 
+        {sp.comment === "ok" && (
+          <div className="mt-3 rounded-xl border border-[#D9EFEA] bg-[#F3FBF9] px-4 py-2.5 text-sm text-[#0F766E]">
+            댓글이 등록되었습니다.
+          </div>
+        )}
+        {sp.comment === "error" && (
+          <div className="mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+            댓글 등록에 실패했습니다. 다시 시도해주세요.
+          </div>
+        )}
+
         <CommentForm postId={post.id} />
 
-        {comments.length > 0 && (
+        {comments.length > 0 ? (
           <div className="mt-6">
             <CommentList comments={comments} />
           </div>
+        ) : (
+          <p className="mt-6 text-center text-[13px] text-[#A1A1AA]">
+            아직 댓글이 없습니다. 첫 번째 댓글을 남겨주세요!
+          </p>
         )}
       </div>
     </div>

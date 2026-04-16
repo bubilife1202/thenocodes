@@ -1,6 +1,20 @@
 "use client";
 
+import { useFormStatus } from "react-dom";
 import { submitComment } from "@/app/community/[id]/actions";
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className={`rounded-xl bg-[#18181B] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#2D2D30] ${pending ? "cursor-wait opacity-60" : ""}`}
+    >
+      {pending ? "등록 중..." : "등록"}
+    </button>
+  );
+}
 
 export function CommentForm({ postId }: { postId: string }) {
   return (
@@ -26,12 +40,7 @@ export function CommentForm({ postId }: { postId: string }) {
           placeholder="닉네임 (선택)"
           className="w-40 rounded-xl border border-[#E7E0D7] bg-white px-3 py-2 text-sm text-[#18181B] placeholder:text-[#C4BDB4]"
         />
-        <button
-          type="submit"
-          className="rounded-xl bg-[#18181B] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#2D2D30]"
-        >
-          등록
-        </button>
+        <SubmitButton />
       </div>
     </form>
   );
