@@ -87,6 +87,7 @@ export interface CommunityComment {
   parent_id: string | null;
   body: string;
   author_name: string | null;
+  like_count: number;
   source: "web" | "api";
   created_at: string;
 }
@@ -95,7 +96,7 @@ export async function getCommentsByPostId(postId: string): Promise<CommunityComm
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("community_comments")
-    .select("id,post_id,parent_id,body,author_name,source,created_at")
+    .select("id,post_id,parent_id,body,author_name,like_count,source,created_at")
     .eq("post_id", postId)
     .order("created_at", { ascending: true })
     .limit(100);

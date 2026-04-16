@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { CommunityComment } from "@/lib/data/community";
 import { relativeTime } from "@/lib/utils/date";
 import { CommentForm } from "./comment-form";
+import { CommentLikeButton } from "./comment-like-button";
 
 function buildTree(comments: CommunityComment[]) {
   const roots: CommunityComment[] = [];
@@ -50,15 +51,18 @@ function CommentNode({
         <p className="mt-1.5 whitespace-pre-wrap text-[13px] leading-relaxed text-[#4A4640]">
           {comment.body}
         </p>
-        {depth < 2 && (
-          <button
-            type="button"
-            onClick={() => setShowReply(!showReply)}
-            className="mt-2 text-[11px] font-semibold text-[#A1A1AA] hover:text-[#0F766E]"
-          >
-            {showReply ? "취소" : "답글"}
-          </button>
-        )}
+        <div className="mt-2 flex items-center gap-3">
+          <CommentLikeButton commentId={comment.id} initialCount={comment.like_count} />
+          {depth < 2 && (
+            <button
+              type="button"
+              onClick={() => setShowReply(!showReply)}
+              className="text-[11px] font-semibold text-[#A1A1AA] hover:text-[#0F766E]"
+            >
+              {showReply ? "취소" : "답글"}
+            </button>
+          )}
+        </div>
       </div>
 
       {showReply && (
