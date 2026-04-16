@@ -44,7 +44,7 @@ function groupByDate<T extends { created_at: string }>(posts: T[]) {
   return groups;
 }
 
-function PostCard({ post, rank }: { post: { id: string; post_type: CommunityPostType; title: string; body: string; link_url: string | null; author_name: string | null; vote_count: number; source: string; created_at: string }; rank?: number }) {
+function PostCard({ post, rank }: { post: { id: string; post_type: CommunityPostType; title: string; body: string; link_url: string | null; author_name: string | null; vote_count: number; comment_count: number; source: string; created_at: string }; rank?: number }) {
   return (
     <div className="flex gap-3 rounded-2xl border border-[#F3F0EB] bg-white p-4 transition-colors hover:border-[#ECE7DF]">
       <div className="flex flex-col items-center gap-1">
@@ -75,16 +75,23 @@ function PostCard({ post, rank }: { post: { id: string; post_type: CommunityPost
           {post.body}
         </p>
 
-        {post.link_url && (
-          <a
-            href={post.link_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 inline-block truncate text-[12px] text-[#0F766E] hover:underline"
-          >
-            {(() => { try { return new URL(post.link_url).hostname; } catch { return post.link_url; } })()}
-          </a>
-        )}
+        <div className="mt-2 flex items-center gap-3">
+          {post.link_url && (
+            <a
+              href={post.link_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="truncate text-[12px] text-[#0F766E] hover:underline"
+            >
+              {(() => { try { return new URL(post.link_url).hostname; } catch { return post.link_url; } })()}
+            </a>
+          )}
+          {post.comment_count > 0 && (
+            <Link href={`/community/${post.id}`} className="text-[12px] text-[#A1A1AA] hover:text-[#18181B]">
+              💬 {post.comment_count}
+            </Link>
+          )}
+        </div>
       </div>
     </div>
   );

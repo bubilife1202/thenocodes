@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getCommunityPostById, POST_TYPE_KO } from "@/lib/data/community";
+import { getCommunityPostById, getCommentsByPostId, POST_TYPE_KO } from "@/lib/data/community";
+import { CommentList } from "@/components/community/comment-list";
+import { CommentForm } from "@/components/community/comment-form";
 import { relativeTime } from "@/lib/utils/date";
 import { VoteButton } from "@/components/community/vote-button";
 
@@ -34,7 +36,10 @@ export default async function CommunityPostPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const post = await getCommunityPostById(id);
+  const [post, comments] = await Promise.all([
+    getCommunityPostById(id),
+    getCommentsByPostId(id),
+  ]);
   if (!post) notFound();
 
   const typeColor: Record<string, string> = {
@@ -84,6 +89,21 @@ export default async function CommunityPostPage({
             </a>
           )}
         </div>
+      </div>
+
+      {/* 댓글 섹션 */}
+      <div className="mt-8 border-t border-[#ECE7DF] pt-6">
+        <h2 className="text-sm font-bold text-[#18181B]">
+          댓글 {comments.length > 0 && <span className="font-normal text-[#A1A1AA]">{comments.length}</span>}
+        </h2>
+
+        <CommentForm postId={post.id} />
+
+        {comments.length > 0 && (
+          <div className="mt-6">
+            <CommentList comments={comments} />
+          </div>
+        )}
       </div>
     </div>
   );

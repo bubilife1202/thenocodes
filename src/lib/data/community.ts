@@ -10,6 +10,7 @@ export interface CommunityPost {
   link_url: string | null;
   author_name: string | null;
   vote_count: number;
+  comment_count: number;
   source: "web" | "api";
   created_at: string;
 }
@@ -30,7 +31,7 @@ export async function getCommunityPosts(filter?: CommunityPostType): Promise<Com
   const supabase = await createClient();
   let query = supabase
     .from("community_posts")
-    .select("id,post_type,title,body,link_url,author_name,vote_count,source,created_at")
+    .select("id,post_type,title,body,link_url,author_name,vote_count,comment_count,source,created_at")
     .eq("status", "approved")
     .order("created_at", { ascending: false })
     .limit(200);
@@ -67,7 +68,7 @@ export async function getWeeklyTop(limit = 5): Promise<CommunityPost[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("community_posts")
-    .select("id,post_type,title,body,link_url,author_name,vote_count,source,created_at")
+    .select("id,post_type,title,body,link_url,author_name,vote_count,comment_count,source,created_at")
     .eq("status", "approved")
     .gte("created_at", since)
     .order("vote_count", { ascending: false })
@@ -80,11 +81,36 @@ export async function getWeeklyTop(limit = 5): Promise<CommunityPost[]> {
   return (data ?? []) as CommunityPost[];
 }
 
+export interface CommunityComment {
+  id: string;
+  post_id: string;
+  body: string;
+  author_name: string | null;
+  source: "web" | "api";
+  created_at: string;
+}
+
+export async function getCommentsByPostId(postId: string): Promise<CommunityComment[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("community_comments")
+    .select("id,post_id,body,author_name,source,created_at")
+    .eq("post_id", postId)
+    .order("created_at", { ascending: true })
+    .limit(100);
+
+  if (error) {
+    console.error("Failed to fetch comments:", error.message);
+    return [];
+  }
+  return (data ?? []) as CommunityComment[];
+}
+
 export async function getCommunityPostById(id: string): Promise<CommunityPost | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("community_posts")
-    .select("id,post_type,title,body,link_url,author_name,vote_count,source,created_at")
+    .select("id,post_type,title,body,link_url,author_name,vote_count,comment_count,source,created_at")
     .eq("id", id)
     .eq("status", "approved")
     .maybeSingle();
@@ -100,7 +126,7 @@ export async function getMonthlyTopPost(year: number, month: number): Promise<Co
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("community_posts")
-    .select("id,post_type,title,body,link_url,author_name,vote_count,source,created_at")
+    .select("id,post_type,title,body,link_url,author_name,vote_count,comment_count,source,created_at")
     .eq("status", "approved")
     .gte("created_at", start)
     .lt("created_at", end)
@@ -121,7 +147,7 @@ export async function getHallOfFame(): Promise<{ year: number; month: number; po
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("community_posts")
-    .select("id,post_type,title,body,link_url,author_name,vote_count,source,created_at")
+    .select("id,post_type,title,body,link_url,author_name,vote_count,comment_count,source,created_at")
     .eq("status", "approved")
     .gte("created_at", start)
     .lt("created_at", end)
