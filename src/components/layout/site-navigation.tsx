@@ -16,6 +16,7 @@ type NavItem = {
 
 const MAIN_ITEMS: NavItem[] = [
   { label: "홈", href: "/", tone: "neutral", description: "더노코즈 메인" },
+  { label: "커뮤니티", href: "/community", tone: "teal", description: "써봤어요 · 발견했어요 · 질문" },
   { label: "해커톤", href: "/hackathons", tone: "teal", description: "AI · 데이터 · 노코드" },
   { label: "공모전", href: "/contests", tone: "orange", description: "경진대회 · 아이디어 공모" },
   { label: "밋업 / 세미나", href: "/meetups", tone: "teal", description: "서울 AI 오프라인 행사" },
@@ -26,7 +27,6 @@ const MAIN_ITEMS: NavItem[] = [
 ];
 
 const COMMUNITY_ITEMS: NavItem[] = [
-  { label: "커뮤니티", href: "/community", tone: "teal", description: "써봤어요 · 발견했어요 · 질문" },
   { label: "피드백 보드", href: "/feedback", tone: "neutral", description: "대기중 · 진행중 · 완료" },
 ];
 

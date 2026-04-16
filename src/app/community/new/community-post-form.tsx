@@ -5,8 +5,13 @@ import { useFormStatus } from "react-dom";
 import { submitCommunityPost } from "../actions";
 import type { CommunityPostType } from "@/lib/data/community";
 
-const INITIAL_POST_TYPE: CommunityPostType = "used_it";
 const NICKNAME_KEY = "community_nickname";
+
+const POST_TYPES: { value: CommunityPostType; label: string; desc: string; color: string }[] = [
+  { value: "used_it", label: "써봤어요", desc: "도구/에이전트 사용 후기", color: "border-[#0F766E] bg-[#F3FBF9] text-[#0F766E]" },
+  { value: "found_it", label: "발견했어요", desc: "링크 공유", color: "border-[#C46A1A] bg-[#FFF8ED] text-[#C46A1A]" },
+  { value: "question", label: "질문있어요", desc: "Q&A", color: "border-[#7C3AED] bg-[#F6F0FF] text-[#7C3AED]" },
+];
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -22,7 +27,7 @@ function SubmitButton() {
 }
 
 export function CommunityPostForm() {
-  const [postType, setPostType] = useState<CommunityPostType>(INITIAL_POST_TYPE);
+  const [postType, setPostType] = useState<CommunityPostType>("used_it");
   const [nickname, setNickname] = useState("");
   const linkRequired = postType === "found_it";
 
@@ -44,20 +49,32 @@ export function CommunityPostForm() {
       <input type="text" name="website" className="hidden" tabIndex={-1} autoComplete="off" />
 
       <div>
-        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-[#A1A1AA]">
+        <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.14em] text-[#A1A1AA]">
           분류
         </label>
-        <select
-          name="post_type"
-          required
-          value={postType}
-          onChange={(event) => setPostType(event.target.value as CommunityPostType)}
-          className="w-full rounded-xl border border-[#E7E0D7] bg-white px-3 py-2.5 text-sm text-[#18181B]"
-        >
-          <option value="used_it">써봤어요 — 도구/에이전트 사용 후기</option>
-          <option value="found_it">발견했어요 — 링크 공유</option>
-          <option value="question">질문있어요 — Q&amp;A</option>
-        </select>
+        <div className="flex gap-2">
+          {POST_TYPES.map((t) => (
+            <label
+              key={t.value}
+              className={`flex-1 cursor-pointer rounded-xl border-2 px-3 py-2.5 text-center transition-colors ${
+                postType === t.value
+                  ? t.color
+                  : "border-[#ECE7DF] bg-white text-[#A1A1AA] hover:border-[#D7D0C7]"
+              }`}
+            >
+              <input
+                type="radio"
+                name="post_type"
+                value={t.value}
+                checked={postType === t.value}
+                onChange={() => setPostType(t.value)}
+                className="sr-only"
+              />
+              <span className="block text-sm font-semibold">{t.label}</span>
+              <span className="block text-[11px] opacity-70">{t.desc}</span>
+            </label>
+          ))}
+        </div>
       </div>
 
       <div>
