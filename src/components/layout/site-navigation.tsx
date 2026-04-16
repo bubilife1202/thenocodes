@@ -16,9 +16,11 @@ type NavItem = {
 
 const MAIN_ITEMS: NavItem[] = [
   { label: "홈", href: "/", tone: "neutral", description: "더노코즈 메인" },
+  { label: "커뮤니티", href: "/community", tone: "teal", description: "써봤어요 · 발견했어요 · 질문" },
   { label: "해커톤", href: "/hackathons", tone: "teal", description: "AI · 데이터 · 노코드" },
   { label: "공모전", href: "/contests", tone: "orange", description: "경진대회 · 아이디어 공모" },
   { label: "밋업 / 세미나", href: "/meetups", tone: "teal", description: "서울 AI 오프라인 행사" },
+  { label: "문제은행", href: "/problem-bank", tone: "neutral", description: "오리지널 알고리즘 문제" },
   { label: "흐름", href: "/signals", tone: "neutral", description: "빌더가 챙겨야 할 변화" },
   { label: "OpenClaw", href: "/openclaw", tone: "teal" as NavTone, description: "개인 AI 에이전트 플랫폼 소식" },
   { label: "사용 후기", href: "/reviews", tone: "orange" as NavTone, description: "도구·해커톤·강의 빌더 후기" },
@@ -26,7 +28,6 @@ const MAIN_ITEMS: NavItem[] = [
 ];
 
 const COMMUNITY_ITEMS: NavItem[] = [
-  { label: "커뮤니티", href: "/community", tone: "teal", description: "써봤어요 · 발견했어요 · 질문" },
   { label: "피드백 보드", href: "/feedback", tone: "neutral", description: "대기중 · 진행중 · 완료" },
 ];
 
