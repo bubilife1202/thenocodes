@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("community_comments")
-    .select("id,post_id,parent_id,body,author_name,source,created_at")
+    .select("id,post_id,parent_id,body,author_name,like_count,source,created_at")
     .eq("post_id", postId)
     .order("created_at", { ascending: true })
     .limit(100);
