@@ -46,5 +46,6 @@ export async function submitComment(formData: FormData) {
   }
 
   revalidatePath(`/community/${values.post_id}`);
+  revalidatePath("/community");
   redirect(`/community/${values.post_id}?comment=ok`);
 }
