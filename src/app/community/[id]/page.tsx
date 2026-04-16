@@ -115,7 +115,7 @@ export default async function CommunityPostPage({
 
         {comments.length > 0 ? (
           <div className="mt-6">
-            <CommentList comments={comments} />
+            <CommentList comments={comments} postId={post.id} />
           </div>
         ) : (
           <p className="mt-6 text-center text-[13px] text-[#A1A1AA]">

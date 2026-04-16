@@ -84,6 +84,7 @@ export async function getWeeklyTop(limit = 5): Promise<CommunityPost[]> {
 export interface CommunityComment {
   id: string;
   post_id: string;
+  parent_id: string | null;
   body: string;
   author_name: string | null;
   source: "web" | "api";
@@ -94,7 +95,7 @@ export async function getCommentsByPostId(postId: string): Promise<CommunityComm
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("community_comments")
-    .select("id,post_id,body,author_name,source,created_at")
+    .select("id,post_id,parent_id,body,author_name,source,created_at")
     .eq("post_id", postId)
     .order("created_at", { ascending: true })
     .limit(100);
