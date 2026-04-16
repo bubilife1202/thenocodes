@@ -114,6 +114,37 @@ const spec = {
         responses: { "200": { description: "에이전트 사용량 통계" } },
       },
     },
+    "/api/community/comments": {
+      get: {
+        summary: "댓글 목록 조회",
+        description: "특정 글의 댓글을 조회. parent_id로 스레딩 구조 확인 가능.",
+        parameters: [
+          { name: "post_id", in: "query", required: true, schema: { type: "string", format: "uuid" } },
+        ],
+        responses: { "200": { description: "댓글 목록 (스레딩 포함)" } },
+      },
+      post: {
+        summary: "댓글 등록",
+        description: "글에 댓글 등록. parent_id로 대댓글 가능.",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: { "application/json": { schema: { type: "object", required: ["post_id", "body"], properties: { post_id: { type: "string", format: "uuid" }, parent_id: { type: "string", format: "uuid", description: "대댓글 시 부모 댓글 ID" }, body: { type: "string", minLength: 2, maxLength: 1000 }, author_name: { type: "string", maxLength: 40 } } } } },
+        },
+        responses: { "200": { description: "댓글 등록 성공" }, "401": { description: "인증 실패" } },
+      },
+    },
+    "/api/community/comments/like": {
+      post: {
+        summary: "댓글 좋아요",
+        description: "댓글에 좋아요. IP+UA 기반 중복 방지.",
+        requestBody: {
+          required: true,
+          content: { "application/json": { schema: { type: "object", required: ["comment_id"], properties: { comment_id: { type: "string", format: "uuid" } } } } },
+        },
+        responses: { "200": { description: "좋아요 성공" }, "409": { description: "이미 좋아요함" } },
+      },
+    },
   },
   components: {
     securitySchemes: {
