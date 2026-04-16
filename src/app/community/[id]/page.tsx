@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { getCommunityPostById, getCommentsByPostId, POST_TYPE_KO } from "@/lib/data/community";
 import { CommentList } from "@/components/community/comment-list";
 import { CommentForm } from "@/components/community/comment-form";
+import { ShareButtons } from "@/components/community/share-buttons";
 import { relativeTime } from "@/lib/utils/date";
 import { VoteButton } from "@/components/community/vote-button";
 
@@ -91,6 +92,9 @@ export default async function CommunityPostPage({
               <span aria-hidden>→</span>
             </a>
           )}
+          <div className="mt-4">
+            <ShareButtons postId={post.id} title={post.title} />
+          </div>
         </div>
       </div>
 
