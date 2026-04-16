@@ -9,12 +9,14 @@ const commentSchema = z.object({
   author_name: z.string().trim().max(40).optional(),
 });
 
+const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const postId = url.searchParams.get("post_id");
 
-  if (!postId) {
-    return NextResponse.json({ error: "post_id required" }, { status: 400 });
+  if (!postId || !uuidRegex.test(postId)) {
+    return NextResponse.json({ error: "valid post_id (UUID) required" }, { status: 400 });
   }
 
   const supabase = createAdminClient();
