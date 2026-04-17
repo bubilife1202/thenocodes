@@ -107,6 +107,23 @@ export default function CommunityGuidePage() {
           </p>
         </section>
 
+        {/* 실시간 소통 */}
+        <section>
+          <h2 className="text-sm font-bold text-[#18181B]">실시간 소통은 디스코드에서</h2>
+          <p className="mt-2 text-[13px] leading-relaxed text-[#6B6760]">
+            글로 정리하기 애매한 짧은 질문이나 즉문즉답이 필요할 땐 디스코드로 들어와주세요.
+            운영진과 빌더들이 실시간으로 답해드립니다.
+          </p>
+          <a
+            href="https://discord.gg/Qjw8FSBg"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 inline-block rounded-xl bg-[#5865F2] px-4 py-2 text-sm font-semibold text-white hover:bg-[#4752C4]"
+          >
+            디스코드 참여하기
+          </a>
+        </section>
+
         <div className="border-t border-[#ECE7DF] pt-6">
           <Link
             href="/community/new"

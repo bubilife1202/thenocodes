@@ -129,16 +129,26 @@ function SidebarBody({ pathname, onNavigate }: { pathname: string; onNavigate?: 
       </div>
 
       <div className="mt-auto rounded-[20px] border border-[#D9EFEA] bg-[linear-gradient(180deg,#F6FCFB_0%,#EEF8F6_100%)] p-4">
-        <p className="text-sm font-bold text-[#123B38]">카카오 오픈채팅</p>
+        <p className="text-sm font-bold text-[#123B38]">실시간 소통</p>
         <p className="mt-1 text-[11px] leading-relaxed text-[#5C7D78]">제보 · 운영 의견은 여기서 바로 받아요.</p>
-        <a
-          href="https://open.kakao.com/o/pSpn5mpi"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="relative z-10 mt-4 inline-flex w-full cursor-pointer items-center justify-center rounded-xl bg-[#0F766E] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#0B5F58]"
-        >
-          오픈채팅 들어가기
-        </a>
+        <div className="mt-3 space-y-2">
+          <a
+            href="https://discord.gg/Qjw8FSBg"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="relative z-10 inline-flex w-full cursor-pointer items-center justify-center rounded-xl bg-[#5865F2] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#4752C4]"
+          >
+            디스코드 들어가기
+          </a>
+          <a
+            href="https://open.kakao.com/o/pSpn5mpi"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="relative z-10 inline-flex w-full cursor-pointer items-center justify-center rounded-xl bg-[#0F766E] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#0B5F58]"
+          >
+            카카오 오픈채팅
+          </a>
+        </div>
       </div>
     </div>
   );
