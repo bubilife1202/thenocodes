@@ -3,6 +3,8 @@ import Link from "next/link";
 
 export const revalidate = 300;
 
+const SCENARIO_01_DOWNLOAD_PATH = "/downloads/scenario-01-timezone.zip";
+
 export const metadata: Metadata = {
   title: "시나리오 #1 — flaky timezone test · 더노코즈",
 };
@@ -65,26 +67,77 @@ export default function Scenario01Page() {
           </ol>
         </div>
 
+        {/* 시작 방법 */}
+        <div className="py-8">
+          <h2 className="mb-3 text-sm font-bold text-[#18181B]">시작 방법 (How to start)</h2>
+          <div className="rounded-xl border border-[#D9EFEA] bg-[#F5FCFA] p-4">
+            <p className="text-sm leading-6 text-[#6B6760]">
+              현재는 더노코즈 사이트에서 ZIP으로 배포합니다. GitHub 공개 리포는 Gate 2에서 엽니다.
+              ZIP에는 스타터 코드와 과제 문서만 들어 있고, <code className="rounded bg-white px-1 font-mono text-xs">SOLUTIONS.md</code>는 포함되지 않습니다.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <a
+                href={SCENARIO_01_DOWNLOAD_PATH}
+                download
+                className="rounded-lg bg-[#0F766E] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0B5F58]"
+              >
+                스타터 ZIP 다운로드
+              </a>
+              <Link
+                href="/scenarios/rubric"
+                className="rounded-lg border border-[#BFE7E0] bg-white px-4 py-2 text-sm font-semibold text-[#0F766E] hover:bg-[#F1FCFA]"
+              >
+                루브릭 같이 보기
+              </Link>
+            </div>
+            <ol className="mt-5 space-y-2 text-sm text-[#18181B]">
+              <li className="flex gap-2">
+                <span className="shrink-0 font-semibold text-[#0F766E]">1.</span>
+                <span>ZIP을 내려받고 압축을 풉니다.</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="shrink-0 font-semibold text-[#0F766E]">2.</span>
+                <span><code className="rounded bg-white px-1 font-mono text-xs">npm ci</code>로 의존성을 설치합니다.</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="shrink-0 font-semibold text-[#0F766E]">3.</span>
+                <span><code className="rounded bg-white px-1 font-mono text-xs">npm test</code>를 실행합니다. 시작 상태에서는 3개 중 1개가 의도적으로 실패해야 합니다.</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="shrink-0 font-semibold text-[#0F766E]">4.</span>
+                <span>실패 원인을 고친 뒤, 통과 중인 테스트가 가리고 있는 숨은 경계 버그를 찾아 회귀 테스트를 추가합니다.</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="shrink-0 font-semibold text-[#0F766E]">5.</span>
+                <span><code className="rounded bg-white px-1 font-mono text-xs">PROMPT_LOG_TEMPLATE.md</code>를 채워 AI 협업·검증·수정 과정을 함께 제출합니다.</span>
+              </li>
+            </ol>
+          </div>
+        </div>
+
         {/* 제출 방법 */}
         <div className="py-8">
           <h2 className="mb-3 text-sm font-bold text-[#18181B]">제출 방법 (How to submit)</h2>
           <div className="space-y-2 text-sm text-[#6B6760]">
-            <p className="text-xs font-medium text-[#A1A1AA] uppercase tracking-wide">출시 전 — 수동 제출</p>
+            <p className="text-xs font-medium text-[#A1A1AA] uppercase tracking-wide">Gate 1 — 수동 제출</p>
             <ol className="space-y-2 pl-1">
               <li className="flex gap-2">
                 <span className="shrink-0 font-semibold text-[#18181B]">1.</span>
-                Gumroad 사전 구매 확정 이메일을 받은 뒤 제출 창구가 열립니다.
+                <span>완성한 변경사항을 <code className="rounded bg-[#F8F5F0] px-1 font-mono text-xs">git diff &gt; scenario-01-timezone.patch</code>로 저장하거나, 본인 GitHub에 올린 PR 링크를 준비합니다.</span>
               </li>
               <li className="flex gap-2">
                 <span className="shrink-0 font-semibold text-[#18181B]">2.</span>
-                PR diff (<code className="rounded bg-[#F8F5F0] px-1 font-mono text-xs">.patch</code> 또는 GitHub PR 링크) + 회고록 + 프롬프트 로그를 이메일 첨부로 보냅니다.
+                <span>
+                  <code className="rounded bg-[#F8F5F0] px-1 font-mono text-xs">git diff</code>를 저장한{" "}
+                  <code className="rounded bg-[#F8F5F0] px-1 font-mono text-xs">.patch</code>, GitHub PR 링크(본인 fork를 사용한 경우), 회고록, 프롬프트 로그를 함께 보냅니다.
+                </span>
               </li>
               <li className="flex gap-2">
                 <span className="shrink-0 font-semibold text-[#18181B]">3.</span>
-                채점 결과는 이메일로 회신됩니다.
+                <span>제출/문의 주소는 <a href="mailto:hello@thenocodes.org" className="text-[#0F766E] hover:underline">hello@thenocodes.org</a> 입니다. 채점 결과는 이메일로 회신됩니다.</span>
               </li>
             </ol>
-            <p className="mt-2 text-xs text-[#A1A1AA]">출시 후 제출 파이프라인 구축 예정.</p>
+            <p className="mt-2 text-xs text-[#A1A1AA]">GitHub 공개 리포와 제출 대시보드는 Gate 2 이후 별도 구현 예정.</p>
           </div>
         </div>
 
@@ -178,9 +231,9 @@ export default function Scenario01Page() {
         <div className="py-8">
           <h2 className="mb-3 text-sm font-bold text-[#18181B]">참고</h2>
           <p className="text-sm text-[#6B6760]">
-            이 리포는 현재 더노코즈 메인 레포의{" "}
+            현재 스타터는 더노코즈 메인 레포의{" "}
             <code className="rounded bg-[#F8F5F0] px-1 font-mono text-xs">scenarios/scenario-01-timezone/</code>{" "}
-            서브트리에 있습니다. 향후 standalone 리포로 이전 예정입니다.
+            서브트리에서 생성한 ZIP으로 배포합니다. GitHub 공개 리포는 별도 Gate 2 작업에서 실제 소유자와 경로가 확정된 뒤 연결합니다.
           </p>
         </div>
 
@@ -194,10 +247,11 @@ export default function Scenario01Page() {
               ← /scenarios 돌아가기
             </Link>
             <a
-              href="/scenarios#waitlist"
+              href={SCENARIO_01_DOWNLOAD_PATH}
+              download
               className="rounded-lg bg-[#0F766E] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0B5F58]"
             >
-              사전 구매하기
+              스타터 ZIP 다운로드
             </a>
           </div>
         </div>

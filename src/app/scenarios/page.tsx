@@ -4,6 +4,8 @@ import { submitWaitlist } from "./actions";
 
 export const revalidate = 300;
 
+const SCENARIO_01_DOWNLOAD_PATH = "/downloads/scenario-01-timezone.zip";
+
 export const metadata: Metadata = {
   title: "AI-Assisted Scenario · 더노코즈",
   description:
@@ -126,16 +128,16 @@ export default async function ScenariosPage({ searchParams }: Props) {
               >
                 시나리오 자세히 보기
               </Link>
-              {/* TN-V2-P5: 이 리포는 현재 더노코즈 메인 레포의 scenarios/scenario-01-timezone/ 서브트리에 있습니다.
-                  향후 standalone 리포 이전 후 아래 href를 실제 GitHub URL로 교체하세요. */}
               <a
-                href="https://github.com/thenocodes/scenario-01-timezone"
-                target="_blank"
-                rel="noopener noreferrer"
+                href={SCENARIO_01_DOWNLOAD_PATH}
+                download
                 className="rounded-lg border border-[#ECE7DF] px-3 py-1.5 text-sm font-medium text-[#18181B] hover:bg-[#F8F5F0]"
               >
-                GitHub에서 보기
+                스타터 ZIP 받기
               </a>
+              <span className="rounded-lg border border-dashed border-[#D9D4CC] px-3 py-1.5 text-sm font-medium text-[#8A8278]">
+                GitHub 공개 리포는 Gate 2에서 오픈
+              </span>
             </div>
           </div>
         </div>
@@ -243,7 +245,7 @@ export default async function ScenariosPage({ searchParams }: Props) {
             <ul className="mt-4 space-y-1.5 text-sm text-[#6B6760]">
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 text-[#0F766E]">•</span>
-                시나리오 #1 저장소 접근권 + 루브릭
+                시나리오 #1 스타터 ZIP + 루브릭
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-0.5 text-[#0F766E]">•</span>

@@ -12,7 +12,11 @@ const checks: Array<{ file: string; includes: string[] }> = [
   },
   {
     file: "src/app/scenarios/page.tsx",
-    includes: ["실제 풀이 대화는 이렇게 남깁니다", "Verification", "Revision", "라이브 채팅 UI가 아니라"],
+    includes: ["실제 풀이 대화는 이렇게 남깁니다", "Verification", "Revision", "라이브 채팅 UI가 아니라", "/downloads/scenario-01-timezone.zip", "GitHub 공개 리포는 Gate 2"],
+  },
+  {
+    file: "src/app/scenarios/scenario-01-timezone/page.tsx",
+    includes: ["시작 방법 (How to start)", "스타터 ZIP 다운로드", "npm ci", "hello@thenocodes.org", "/downloads/scenario-01-timezone.zip"],
   },
   {
     file: "src/app/scenarios/walkthrough/page.tsx",
@@ -53,6 +57,13 @@ for (const check of checks) {
       failures += 1;
     }
   }
+}
+
+const scenariosPage = readFileSync(join(process.cwd(), "src/app/scenarios/page.tsx"), "utf8");
+const removedScenarioRepoUrl = ["github.com", "thenocodes", "scenario-01-timezone"].join("/");
+if (scenariosPage.includes(removedScenarioRepoUrl)) {
+  console.error("FAIL src/app/scenarios/page.tsx: fake GitHub scenario link remains");
+  failures += 1;
 }
 
 if (failures > 0) {

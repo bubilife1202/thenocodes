@@ -9,7 +9,9 @@
     "lint": "eslint",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "test": "tsx scripts/verify-ui-redesign.ts"
+    "test": "tsx scripts/verify-ui-redesign.ts",
+    "scenario:package": "tsx scripts/package-scenario.ts",
+    "scenario:verify-package": "tsx scripts/verify-scenario-package.ts"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.18.0",
