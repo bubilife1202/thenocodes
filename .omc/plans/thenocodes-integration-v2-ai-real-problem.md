@@ -287,6 +287,7 @@ Content lane kicks off at Rev4's TN-P2 (`/scenarios` page scaffold) and blocks T
    - Hero: "**AI와 함께 실전 시나리오를 풀고, 어떻게 함께 풀었는지 평가받습니다.**" (subtitle: "언러닝 시대의 새로운 실력 — AI를 지휘하고, 검증하고, 개선하는 능력을 훈련합니다.")
    - Scenario #1 preview card (no paywall): link to SCENARIO.md or GitHub.
    - Rubric summary: 3 axes, 1-paragraph each, link to RUBRIC.md.
+   - Dialogue bubble proof: 3-5 static speech bubbles showing learner prompt -> AI answer -> learner verification -> learner correction. This must make "how you worked with AI" visible before the reader opens the full walkthrough.
    - Graded walkthrough excerpt from GRADED_WALKTHROUGH.md with "see full" expander.
    - Pricing: 19,900원 pre-order, "N/10 spots" counter (server-rendered from Supabase count if possible, else hardcoded initial).
    - FAQ: includes "왜 LLM이 채점하지 않나요?" (S2 P4-as-feature framing).
@@ -297,7 +298,36 @@ Content lane kicks off at Rev4's TN-P2 (`/scenarios` page scaffold) and blocks T
 **Acceptance (F6, unified with S3):**
 - Page renders on `npm run dev` + `npm run preview`.
 - **5-second test (unified with S3 trigger):** ≥2 of 3 outside readers give a recognizable answer to "what do you get for 19,900원?" in one sentence. **<2 of 3 triggers S3 mitigation (rewrite hero + sample before launch).**
+- Speech bubbles are visible on the landing page and are clearly labeled by role: `Learner`, `AI`, `Verification`, `Revision`. They are static excerpts, not a live chatbot.
 - No residual "simulator" / "실무 시뮬레이션" / "Real Problem" / "진짜 문제" copy except as deliberate reference to old framing.
+
+### TN-V2-P4B — Static dialogue bubble layer (post-launch planning addendum)
+**Objective:** Make the product's differentiator legible at a glance: the buyer sees not only the final answer, but the conversation moves that produced it.
+
+**Positioning rule:** These bubbles are evidence excerpts, not decoration and not a chat feature. They should answer: "What does good AI collaboration look like in this course?"
+
+**Primary surfaces:**
+1. `/scenarios` hero-adjacent proof block: 4 bubbles, max 2 lines each, before pricing.
+2. `/scenarios/walkthrough`: full annotated transcript section with 8-12 bubbles grouped by rubric axis.
+3. Future graded feedback PDF/doc: same visual grammar reused so the public page and paid feedback feel like one product.
+
+**Bubble grammar:**
+- `Learner` bubble, left aligned, white background: asks a constrained prompt with source/test context.
+- `AI` bubble, right aligned, pale teal background: proposes a diagnosis or patch.
+- `Verification` bubble, left aligned, amber-tint border: learner checks test output, diff, or edge case.
+- `Revision` bubble, left aligned, green-tint border: learner feeds verification back into the next prompt or patch.
+
+**Content rules:**
+- Each bubble must map to one rubric axis (`Collaboration`, `Verification`, or `Improvement`).
+- Do not show long raw chat logs on the landing page. Use compressed excerpts; link to full walkthrough for detail.
+- Do not imply the system provides an in-browser AI tutor. Copy should say "실제 풀이 대화 예시" or "대화 로그 발췌", not "대화해보기".
+- Every bubble cluster must contain at least one learner correction after AI gets something incomplete or wrong. Otherwise the product reads like generic prompt tips.
+
+**Acceptance:**
+- A reader can identify in 5 seconds that the product evaluates the AI collaboration process, not only the final code.
+- No horizontal overflow on mobile; bubbles wrap within the content column and preserve left/right role contrast.
+- `npm run build` passes after implementation.
+- Live verification includes `/scenarios` and `/scenarios/walkthrough` rendered on `thenocodes.org`.
 
 ### TN-V2-P5 — Gumroad SKU swap (coordinates with Rev4 TN-P6)
 **Objective:** Replace Rev4 TN-P6's planned SKU with pivot SKU.
