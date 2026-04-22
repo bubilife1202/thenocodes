@@ -7,19 +7,15 @@ import { formatShortDate } from "@/lib/utils/date";
 export const revalidate = 300;
 
 function StatusBadge({ status }: { status: HackathonStatus }) {
-  if (status === "active") return <span className="w-12 text-[11px] font-semibold text-[#C46A1A]">모집중</span>;
-  if (status === "upcoming") return <span className="w-12 text-[11px] font-semibold text-[#6366F1]">예정</span>;
-  return <span className="w-12 text-[11px] text-[#A1A1AA]">마감</span>;
+  if (status === "active") return <span className="rounded-full bg-[#FFF7ED] px-2 py-1 text-[11px] font-black text-[#C46A1A]">모집중</span>;
+  if (status === "upcoming") return <span className="rounded-full bg-[#F4F8FE] px-2 py-1 text-[11px] font-black text-[#315E9B]">예정</span>;
+  return <span className="rounded-full bg-[#F4F1ED] px-2 py-1 text-[11px] text-[#A1A1AA]">마감</span>;
 }
 
 async function ContestTable({ filter }: { filter?: HackathonStatus }) {
   const contests = await getContests(filter);
   const now = new Date();
-
-  if (contests.length === 0) {
-    return <p className="py-12 text-center text-sm text-[#A1A1AA]">공모전이 없습니다</p>;
-  }
-
+  if (contests.length === 0) return <p className="py-12 text-center text-sm text-[#A1A1AA]">공모전이 없습니다</p>;
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left text-sm">
@@ -29,6 +25,7 @@ async function ContestTable({ filter }: { filter?: HackathonStatus }) {
             <th className="pb-2 pr-2">제목</th>
             <th className="hidden w-28 pb-2 pr-2 sm:table-cell">주최</th>
             <th className="w-24 pb-2 pr-2 text-right">마감</th>
+            <th className="hidden w-20 pb-2 text-right md:table-cell">소스</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-[#F3F0EB]">
@@ -51,6 +48,7 @@ async function ContestTable({ filter }: { filter?: HackathonStatus }) {
                     </span>
                   ) : <span className="text-[#A1A1AA]">—</span>}
                 </td>
+                <td className="hidden truncate py-2.5 text-right text-[11px] text-[#A1A1AA] md:table-cell">{c.source}</td>
               </tr>
             );
           })}
@@ -60,24 +58,22 @@ async function ContestTable({ filter }: { filter?: HackathonStatus }) {
   );
 }
 
-export default async function ContestsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ status?: string }>;
-}) {
+export default async function ContestsPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
   const params = await searchParams;
   const currentFilter = (params.status as HackathonStatus) ?? undefined;
-
   const tabs: { label: string; value: HackathonStatus | undefined }[] = [
     { label: "전체", value: undefined },
     { label: "모집중", value: "active" },
     { label: "예정", value: "upcoming" },
   ];
-
   return (
-    <div className="mx-auto max-w-[900px] px-4 py-6 sm:px-6 sm:py-8">
-      <div className="mb-6 flex items-baseline gap-3">
-        <h1 className="text-xl font-black tracking-tight text-[#18181B]">공모전</h1>
+    <div className="mx-auto max-w-[1120px] px-4 py-6 sm:px-6 sm:py-8">
+      <div className="mb-6 rounded-[28px] border border-[#ECE7DF] bg-white p-5">
+        <div className="flex flex-wrap items-center gap-3">
+          <div>
+            <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#C46A1A]">opportunity comparison</p>
+            <h1 className="mt-1 text-2xl font-black tracking-tight text-[#18181B]">공모전</h1>
+          </div>
         <div className="flex gap-1.5">
           {tabs.map((tab) => (
             <Link
@@ -93,11 +89,14 @@ export default async function ContestsPage({
             </Link>
           ))}
         </div>
+        </div>
       </div>
 
-      <Suspense fallback={<div className="h-60 animate-pulse rounded-xl bg-gray-50" />}>
-        <ContestTable filter={currentFilter} />
-      </Suspense>
+      <div className="rounded-[28px] border border-[#ECE7DF] bg-white p-5">
+        <Suspense fallback={<div className="h-60 animate-pulse rounded-xl bg-gray-50" />}>
+          <ContestTable filter={currentFilter} />
+        </Suspense>
+      </div>
     </div>
   );
 }

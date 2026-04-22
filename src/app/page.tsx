@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { getHomeData, getStats } from "@/lib/data/hackathons";
+import { getHomeData, getStats, type HackathonRow } from "@/lib/data/hackathons";
 import { getFeaturedMeetups } from "@/lib/data/meetups";
-import { getFeaturedSignals } from "@/lib/data/signals";
+import { getFeaturedSignals, type SignalRow } from "@/lib/data/signals";
 import { getHackathonStatus, sortHackathons } from "@/lib/hackathons";
 import { formatShortDate } from "@/lib/utils/date";
 import type { SignalType } from "@/lib/signals/constants";
@@ -17,13 +17,67 @@ const SIGNAL_TYPE_KO: Record<SignalType, string> = {
   research: "연구",
 };
 
+function deadlineLabel(item: HackathonRow, now: Date) {
+  if (!item.ends_at) return "상시";
+  const daysLeft = Math.ceil((new Date(item.ends_at).getTime() - now.getTime()) / 86400000);
+  if (daysLeft <= 0) return "오늘";
+  if (daysLeft <= 7) return `D-${daysLeft}`;
+  return formatShortDate(item.ends_at);
+}
+
+function OpportunityRow({ item, now }: { item: HackathonRow; now: Date }) {
+  const isContest = item.category === "contest";
+  return (
+    <a
+      href={item.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="grid gap-2 rounded-2xl border border-[#F1EAE0] bg-white px-4 py-3 transition-colors hover:border-[#D9EFEA] hover:bg-[#FBFEFD] sm:grid-cols-[72px_minmax(0,1fr)_96px_112px] sm:items-center"
+    >
+      <span className={`text-[11px] font-black ${isContest ? "text-[#C46A1A]" : "text-[#0F766E]"}`}>
+        {isContest ? "공모전" : "해커톤"}
+      </span>
+      <span className="min-w-0 text-sm font-bold text-[#18181B] sm:truncate">{item.title}</span>
+      <span className="text-xs font-semibold text-[#6B6760] sm:text-right">{deadlineLabel(item, now)}</span>
+      <span className="min-w-0 text-xs text-[#A1A1AA] sm:truncate sm:text-right">{item.organizer || item.source}</span>
+    </a>
+  );
+}
+
+function MeetupRow({ item }: { item: HackathonRow }) {
+  return (
+    <a
+      href={item.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="grid gap-2 rounded-2xl border border-[#F1EAE0] bg-white px-4 py-3 transition-colors hover:border-[#D9EFEA] hover:bg-[#FBFEFD] sm:grid-cols-[72px_minmax(0,1fr)_96px_112px] sm:items-center"
+    >
+      <span className="text-[11px] font-black text-[#0F766E]">밋업</span>
+      <span className="min-w-0 text-sm font-bold text-[#18181B] sm:truncate">{item.title}</span>
+      <span className="text-xs font-semibold text-[#6B6760] sm:text-right">{item.starts_at ? formatShortDate(item.starts_at) : "일정 미정"}</span>
+      <span className="min-w-0 text-xs text-[#A1A1AA] sm:truncate sm:text-right">{item.organizer || item.location || item.source}</span>
+    </a>
+  );
+}
+
+function SignalRowLink({ item }: { item: SignalRow }) {
+  return (
+    <a
+      href={item.source_url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="grid gap-2 rounded-2xl border border-[#F1EAE0] bg-white px-4 py-3 transition-colors hover:border-[#D9EFEA] hover:bg-[#FBFEFD] sm:grid-cols-[72px_minmax(0,1fr)_96px_112px] sm:items-center"
+    >
+      <span className="text-[11px] font-black text-[#0F766E]">{SIGNAL_TYPE_KO[item.signal_type]}</span>
+      <span className="min-w-0 text-sm font-bold text-[#18181B] sm:truncate">{item.title}</span>
+      <span className="text-xs font-semibold text-[#6B6760] sm:text-right">{formatShortDate(item.published_at)}</span>
+      <span className="min-w-0 text-xs text-[#A1A1AA] sm:truncate sm:text-right">{item.source_name || "source"}</span>
+    </a>
+  );
+}
+
 async function HomeContent() {
-  const [
-    { hackathons, contests },
-    meetups,
-    signals,
-    stats,
-  ] = await Promise.all([
+  const [{ hackathons, contests }, meetups, signals, stats] = await Promise.all([
     getHomeData(),
     getFeaturedMeetups(4),
     getFeaturedSignals(4),
@@ -36,255 +90,137 @@ async function HomeContent() {
   const now = new Date();
   const deadlineSoon = sorted.filter((item) => {
     if (!item.ends_at || getHackathonStatus(item, now) !== "active") return false;
-    const daysLeft = Math.ceil(
-      (new Date(item.ends_at).getTime() - now.getTime()) / 86400000
-    );
+    const daysLeft = Math.ceil((new Date(item.ends_at).getTime() - now.getTime()) / 86400000);
     return daysLeft >= 0 && daysLeft <= 7;
   });
 
   return (
-    <div className="divide-y divide-[#ECE7DF]">
+    <div className="space-y-6">
+      <section className="rounded-[32px] border border-[#ECE7DF] bg-[linear-gradient(135deg,#FFFFFF_0%,#F8FFFD_52%,#FFF8EF_100%)] p-5 shadow-[0_24px_60px_-42px_rgba(24,24,27,0.32)] sm:p-7">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-end">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-[#0F766E]">AI builder dashboard</p>
+            <h1 className="mt-3 max-w-3xl text-3xl font-black tracking-tight text-[#18181B] sm:text-5xl">
+              실전 시나리오로 훈련하고, 오늘 열린 기회로 바로 실행하세요.
+            </h1>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#6B6760]">
+              더노코즈는 AI 협업·검증·개선 역량을 보여주는 훈련 경로와 해커톤, 공모전, 밋업, 빌더 흐름을 한 화면에서 비교하는 운영 보드입니다.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Link href="/scenarios" className="rounded-2xl bg-[#0F766E] px-5 py-3 text-sm font-black text-white transition-colors hover:bg-[#0B5F58]">
+                실전 시나리오 시작하기
+              </Link>
+              <Link href="/hackathons" className="rounded-2xl border border-[#E6DED4] bg-white px-5 py-3 text-sm font-bold text-[#18181B] transition-colors hover:bg-[#F8F5F0]">
+                기회 보드 보기
+              </Link>
+            </div>
+          </div>
 
-      {/* 헤더 */}
-      <div className="pb-6">
-        <div className="flex flex-wrap items-baseline gap-2">
-          <h1 className="text-xl font-black tracking-tight text-[#18181B]">
-            더노코즈<span className="text-[#0F766E]">.</span>
-          </h1>
-          <span className="text-sm text-[#A1A1AA]">
-            해커톤 {stats.hackathons} · 공모전 {stats.contests} · 밋업 {stats.meetups}
-          </span>
+          <div className="rounded-[26px] border border-[#D9EFEA] bg-white/85 p-4">
+            <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#5C7D78]">live inventory</p>
+            <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+              <div className="rounded-2xl bg-[#F3FBF9] p-3">
+                <p className="text-2xl font-black text-[#0F766E]">{stats.hackathons}</p>
+                <p className="text-[11px] font-bold text-[#5C7D78]">해커톤</p>
+              </div>
+              <div className="rounded-2xl bg-[#FFF6ED] p-3">
+                <p className="text-2xl font-black text-[#C46A1A]">{stats.contests}</p>
+                <p className="text-[11px] font-bold text-[#8A6A4A]">공모전</p>
+              </div>
+              <div className="rounded-2xl bg-[#F8F5F0] p-3">
+                <p className="text-2xl font-black text-[#18181B]">{stats.meetups}</p>
+                <p className="text-[11px] font-bold text-[#8A8278]">밋업</p>
+              </div>
+            </div>
+            <Link href="/community" className="mt-4 flex items-center justify-between rounded-2xl border border-[#ECE7DF] px-4 py-3 text-sm font-bold text-[#18181B] hover:bg-[#F8F5F0]">
+              커뮤니티 신호 모으기 <span className="text-[#0F766E]">→</span>
+            </Link>
+          </div>
         </div>
-        <p className="mt-1 text-sm text-[#6B6760]">
-          한국 AI 빌더용 해커톤·공모전·밋업 보드. 매일 업데이트.
-        </p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <Link
-            href="/hackathons"
-            className="rounded-lg bg-[#0F766E] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#0B5F58]"
-          >
-            해커톤 보기
-          </Link>
-          <a
-            href="https://open.kakao.com/o/pSpn5mpi"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-lg border border-[#ECE7DF] px-3 py-1.5 text-sm font-medium text-[#18181B] hover:bg-[#F8F5F0]"
-          >
-            오픈채팅
-          </a>
-        </div>
-      </div>
+      </section>
 
-      {/* 마감 임박 */}
-      {deadlineSoon.length > 0 && (
-        <div className="py-5">
+      <section className="grid gap-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(280px,0.75fr)]">
+        <div className="rounded-[28px] border border-[#D9EFEA] bg-[#F6FCFB] p-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#0F766E]">featured path</p>
+              <h2 className="mt-2 text-xl font-black text-[#123B38]">실전 시나리오 #1 · flaky timezone test</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#5C7D78]">
+                AI에게 맡기는 실력이 아니라, AI를 지휘하고 검증하며 결과를 개선하는 과정을 정적 증거로 남깁니다. 제출 후 사람 채점 워크스루로 Collaboration · Verification · Improvement를 확인합니다.
+              </p>
+            </div>
+            <span className="rounded-full bg-white px-3 py-1 text-[11px] font-black text-[#0F766E]">L1-L4 rubric</span>
+          </div>
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            {["시나리오 저장소", "정적 대화 증거", "사람 채점 워크스루"].map((label, i) => (
+              <div key={label} className="rounded-2xl border border-[#D9EFEA] bg-white px-4 py-3">
+                <p className="text-[11px] font-black text-[#0F766E]">0{i + 1}</p>
+                <p className="mt-1 text-sm font-bold text-[#18181B]">{label}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Link href="/scenarios" className="rounded-xl bg-[#0F766E] px-4 py-2 text-sm font-bold text-white hover:bg-[#0B5F58]">실전 시나리오 보기</Link>
+            <Link href="/scenarios/walkthrough" className="rounded-xl border border-[#D9EFEA] bg-white px-4 py-2 text-sm font-bold text-[#123B38] hover:bg-[#F3FBF9]">채점 예시 보기</Link>
+          </div>
+        </div>
+
+        <div className="rounded-[28px] border border-[#ECD9C7] bg-[#FFFBF7] p-5">
           <div className="mb-3 flex items-center gap-2">
             <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
-            <h2 className="text-sm font-bold text-[#18181B]">마감 임박</h2>
-            <Link
-              href="/hackathons"
-              className="ml-auto text-xs text-[#A1A1AA] hover:text-[#18181B]"
-            >
-              전체 보기 →
-            </Link>
+            <h2 className="text-sm font-black text-[#18181B]">마감 임박</h2>
+            <Link href="/hackathons" className="ml-auto text-xs font-bold text-[#A1A1AA] hover:text-[#18181B]">전체 보기 →</Link>
           </div>
-          <div className="divide-y divide-[#F3F0EB]">
-            {deadlineSoon.slice(0, 5).map((item) => {
-              const daysLeft = item.ends_at
-                ? Math.ceil(
-                    (new Date(item.ends_at).getTime() - now.getTime()) / 86400000
-                  )
-                : null;
-              return (
-                <a
-                  key={item.id}
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="-mx-2 flex items-baseline gap-3 rounded px-2 py-2 hover:bg-[#FCFBF8]"
-                >
-                  <span
-                    className={`w-10 shrink-0 text-[11px] font-semibold ${item.category === "contest" ? "text-[#C46A1A]" : "text-[#0F766E]"}`}
-                  >
-                    {item.category === "contest" ? "공모전" : "해커톤"}
-                  </span>
-                  <span className="flex-1 truncate text-sm text-[#18181B]">
-                    {item.title}
-                  </span>
-                  <span className="shrink-0 text-xs font-semibold text-red-600">
-                    {daysLeft === 0
-                      ? "오늘 마감"
-                      : daysLeft === 1
-                        ? "내일 마감"
-                        : `${formatShortDate(item.ends_at!)} 마감`}
-                  </span>
-                  {item.organizer && (
-                    <span className="hidden shrink-0 text-xs text-[#A1A1AA] sm:block">
-                      {item.organizer}
-                    </span>
-                  )}
-                </a>
-              );
-            })}
+          <div className="space-y-2">
+            {deadlineSoon.length > 0 ? deadlineSoon.slice(0, 4).map((item) => (
+              <OpportunityRow key={item.id} item={item} now={now} />
+            )) : (
+              <p className="rounded-2xl bg-white px-4 py-6 text-center text-sm text-[#A1A1AA]">이번 주 마감 임박 항목이 없습니다.</p>
+            )}
           </div>
         </div>
-      )}
+      </section>
 
-      {/* 해커톤 · 공모전 */}
-      <div className="py-5">
-        <div className="mb-3 flex flex-wrap items-center gap-3">
-          <h2 className="text-sm font-bold text-[#18181B]">해커톤 · 공모전</h2>
-          <Link
-            href="/hackathons"
-            className="text-xs text-[#A1A1AA] hover:text-[#0F766E]"
-          >
-            해커톤 전체 →
-          </Link>
-          <Link
-            href="/contests"
-            className="text-xs text-[#A1A1AA] hover:text-[#C46A1A]"
-          >
-            공모전 전체 →
-          </Link>
+      <section className="rounded-[28px] border border-[#ECE7DF] bg-white p-5">
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <h2 className="text-sm font-black text-[#18181B]">해커톤 · 공모전 비교</h2>
+          <Link href="/hackathons" className="text-xs font-bold text-[#0F766E] hover:underline">해커톤 전체 →</Link>
+          <Link href="/contests" className="text-xs font-bold text-[#C46A1A] hover:underline">공모전 전체 →</Link>
         </div>
         {opportunities.length > 0 ? (
-          <div className="divide-y divide-[#F3F0EB]">
-            {opportunities.map((item) => (
-              <a
-                key={item.id}
-                href={item.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="-mx-2 flex items-baseline gap-3 rounded px-2 py-2 hover:bg-[#FCFBF8]"
-              >
-                <span
-                  className={`w-10 shrink-0 text-[11px] font-semibold ${item.category === "contest" ? "text-[#C46A1A]" : "text-[#0F766E]"}`}
-                >
-                  {item.category === "contest" ? "공모전" : "해커톤"}
-                </span>
-                <span className="flex-1 truncate text-sm text-[#18181B]">
-                  {item.title}
-                </span>
-                {item.ends_at && (
-                  <span className="shrink-0 text-xs text-[#A1A1AA]">
-                    {formatShortDate(item.ends_at)} 마감
-                  </span>
-                )}
-                {item.organizer && (
-                  <span className="hidden shrink-0 text-xs text-[#A1A1AA] sm:block">
-                    {item.organizer}
-                  </span>
-                )}
-              </a>
-            ))}
+          <div className="space-y-2">
+            {opportunities.map((item) => <OpportunityRow key={item.id} item={item} now={now} />)}
           </div>
         ) : (
-          <p className="text-sm text-[#A1A1AA]">
-            등록된 항목이 없습니다. 매일 업데이트됩니다.
-          </p>
+          <p className="py-10 text-center text-sm text-[#A1A1AA]">등록된 항목이 없습니다. 매일 업데이트됩니다.</p>
         )}
+      </section>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <section className="rounded-[28px] border border-[#ECE7DF] bg-white p-5">
+          <div className="mb-4 flex items-center gap-3">
+            <h2 className="text-sm font-black text-[#18181B]">서울 밋업</h2>
+            <Link href="/meetups" className="text-xs font-bold text-[#0F766E] hover:underline">전체 보기 →</Link>
+          </div>
+          {meetups.length > 0 ? <div className="space-y-2">{meetups.map((item) => <MeetupRow key={item.id} item={item} />)}</div> : <p className="py-10 text-center text-sm text-[#A1A1AA]">등록된 밋업이 없습니다.</p>}
+        </section>
+
+        <section className="rounded-[28px] border border-[#ECE7DF] bg-white p-5">
+          <div className="mb-4 flex items-center gap-3">
+            <h2 className="text-sm font-black text-[#18181B]">흐름</h2>
+            <Link href="/signals" className="text-xs font-bold text-[#0F766E] hover:underline">전체 보기 →</Link>
+          </div>
+          {signals.length > 0 ? <div className="space-y-2">{signals.map((item) => <SignalRowLink key={item.id} item={item} />)}</div> : <p className="py-10 text-center text-sm text-[#A1A1AA]">등록된 흐름이 없습니다.</p>}
+        </section>
       </div>
-
-      {/* 서울 밋업 */}
-      {meetups.length > 0 && (
-        <div className="py-5">
-          <div className="mb-3 flex items-center gap-3">
-            <h2 className="text-sm font-bold text-[#18181B]">서울 밋업</h2>
-            <Link
-              href="/meetups"
-              className="text-xs text-[#A1A1AA] hover:text-[#0F766E]"
-            >
-              전체 보기 →
-            </Link>
-          </div>
-          <div className="divide-y divide-[#F3F0EB]">
-            {meetups.map((item) => (
-              <a
-                key={item.id}
-                href={item.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="-mx-2 flex items-baseline gap-3 rounded px-2 py-2 hover:bg-[#FCFBF8]"
-              >
-                <span className="w-10 shrink-0 text-[11px] font-semibold text-[#0F766E]">
-                  밋업
-                </span>
-                <span className="flex-1 truncate text-sm text-[#18181B]">
-                  {item.title}
-                </span>
-                {item.starts_at && (
-                  <span className="shrink-0 text-xs text-[#A1A1AA]">
-                    {formatShortDate(item.starts_at)}
-                  </span>
-                )}
-                {item.organizer && (
-                  <span className="hidden shrink-0 text-xs text-[#A1A1AA] sm:block">
-                    {item.organizer}
-                  </span>
-                )}
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 흐름 */}
-      {signals.length > 0 && (
-        <div className="py-5">
-          <div className="mb-3 flex items-center gap-3">
-            <h2 className="text-sm font-bold text-[#18181B]">흐름</h2>
-            <Link
-              href="/signals"
-              className="text-xs text-[#A1A1AA] hover:text-[#0F766E]"
-            >
-              전체 보기 →
-            </Link>
-          </div>
-          <div className="divide-y divide-[#F3F0EB]">
-            {signals.map((item) => (
-              <a
-                key={item.id}
-                href={item.source_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="-mx-2 flex items-baseline gap-3 rounded px-2 py-2 hover:bg-[#FCFBF8]"
-              >
-                <span className="w-14 shrink-0 text-[11px] font-semibold text-[#0F766E]">
-                  {SIGNAL_TYPE_KO[item.signal_type]}
-                </span>
-                <span className="flex-1 truncate text-sm text-[#18181B]">
-                  {item.title}
-                </span>
-                <span className="shrink-0 text-xs text-[#A1A1AA]">
-                  {formatShortDate(item.published_at)}
-                </span>
-                {item.source_name && (
-                  <span className="hidden shrink-0 text-xs text-[#A1A1AA] sm:block">
-                    {item.source_name}
-                  </span>
-                )}
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
 
 export default function HomePage() {
   return (
-    <div className="mx-auto max-w-[860px] px-4 py-8 sm:px-6 sm:py-10">
-      <Suspense
-        fallback={
-          <div className="space-y-3">
-            {[1, 2, 3, 4, 5, 6].map((n) => (
-              <div key={n} className="h-7 animate-pulse rounded bg-gray-100" />
-            ))}
-          </div>
-        }
-      >
+    <div className="mx-auto max-w-[1120px] px-4 py-8 sm:px-6 sm:py-10">
+      <Suspense fallback={<div className="space-y-3">{[1, 2, 3, 4, 5, 6].map((n) => <div key={n} className="h-16 animate-pulse rounded-3xl bg-gray-100" />)}</div>}>
         <HomeContent />
       </Suspense>
     </div>

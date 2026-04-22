@@ -7,10 +7,90 @@ export const metadata: Metadata = {
   title: "채점된 워크스루 — 시나리오 #1 · 더노코즈",
 };
 
+const SCORE_ITEMS = [
+  { axis: "Collaboration", ko: "협업", level: "L3", note: "목표와 제약을 붙이고, 원인 파악과 숨은 버그 탐색을 분리" },
+  { axis: "Verification", ko: "검증", level: "L3", note: "테스트 통과 후 rawHour 경계와 소스를 직접 추적" },
+  { axis: "Improvement", ko: "개선", level: "L3", note: "두 버그를 합쳐 수정하고 Bug B 회귀 테스트 추가" },
+] as const;
+
+const TRANSCRIPT_CLUSTERS = [
+  {
+    axis: "Collaboration",
+    level: "L3",
+    bubbles: [
+      ["Learner", "테스트 3개 중 마지막 1개가 실패한다. 나머지 두 테스트는 계속 통과해야 하고, 코드를 바꾸기 전에 실패 원인을 먼저 설명해라."],
+      ["Grader", "god-prompt를 피하고 원인 파악과 수정 조건을 분리했다. 다만 시작 전에 전체 3단계 계획을 선언하지는 않았다."],
+    ],
+  },
+  {
+    axis: "Verification",
+    level: "L3",
+    bubbles: [
+      ["Learner", "테스트는 3/3 통과했다. 하지만 rawHour가 정확히 24가 되는 케이스를 UTC 0~23 전체 범위에서 다시 추적해달라."],
+      ["Grader", "테스트 통과를 그대로 믿지 않고 숨은 Bug B를 찾았다. 같은 모델 재검토에 머문 점 때문에 L4가 아니라 L3다."],
+    ],
+  },
+  {
+    axis: "Improvement",
+    level: "L3",
+    bubbles: [
+      ["Learner", "weekday를 advancedDate에서 읽고, dayOverflow를 >= 24로 고치고, Bug B 회귀 테스트를 추가해달라."],
+      ["Grader", "최종 diff는 단일 응답 채택이 아니라 두 검증 사이클을 통합한 개선이다. 회귀 테스트가 발견 이후 추가되어 L3다."],
+    ],
+  },
+] as const;
+
+function ScoreRail() {
+  return (
+    <div className="rounded-[24px] border border-[#D9EFEA] bg-white p-5 shadow-[0_18px_36px_-32px_rgba(15,118,110,0.36)]">
+      <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#0F766E]">Rubric score rail</p>
+      <p className="mt-2 text-3xl font-black tracking-tight text-[#18181B]">L9 / L12</p>
+      <p className="mt-1 text-sm text-[#6B6760]">운영자 도그푸드 제출물 기준</p>
+      <div className="mt-4 space-y-3">
+        {SCORE_ITEMS.map((item) => (
+          <div key={item.axis} className="rounded-2xl border border-[#F3F0EB] bg-[#FCFBF8] p-3">
+            <div className="flex items-center gap-2">
+              <span className="rounded-full bg-[#0F766E] px-2 py-0.5 text-[11px] font-black text-white">{item.level}</span>
+              <p className="text-sm font-black text-[#18181B]">{item.axis}</p>
+              <span className="ml-auto text-xs text-[#A1A1AA]">{item.ko}</span>
+            </div>
+            <p className="mt-2 text-xs leading-5 text-[#6B6760]">{item.note}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TranscriptCluster({ cluster }: { cluster: (typeof TRANSCRIPT_CLUSTERS)[number] }) {
+  return (
+    <div className="rounded-[24px] border border-[#ECE7DF] bg-white p-4">
+      <div className="mb-4 flex items-baseline gap-2">
+        <p className="text-sm font-black text-[#18181B]">{cluster.axis}</p>
+        <span className="rounded-full bg-[#F3FBF9] px-2 py-0.5 text-[11px] font-black text-[#0F766E]">{cluster.level}</span>
+      </div>
+      <div className="space-y-3">
+        {cluster.bubbles.map(([role, text], index) => (
+          <div key={role} className={`flex ${index % 2 === 0 ? "justify-start" : "justify-end"}`}>
+            <div className={`max-w-[620px] rounded-[20px] border px-4 py-3 ${index % 2 === 0 ? "border-[#ECE7DF] bg-[#FCFBF8]" : "border-[#D9EFEA] bg-[#F3FBF9]"}`}>
+              <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#6B6760]">{role}</p>
+              <p className="mt-1 text-sm leading-6 text-[#18181B]">{text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function WalkthroughPage() {
   return (
-    <div className="mx-auto max-w-[860px] px-4 py-8 sm:px-6 sm:py-10">
-      <div className="divide-y divide-[#ECE7DF]">
+    <div className="mx-auto max-w-[1120px] px-4 py-8 sm:px-6 sm:py-10">
+      <div className="mb-6 lg:hidden">
+        <ScoreRail />
+      </div>
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+      <div className="min-w-0 divide-y divide-[#ECE7DF]">
 
         {/* Header */}
         <div className="pb-8">
@@ -68,6 +148,20 @@ export default function WalkthroughPage() {
           <div className="mt-3 space-y-1 text-sm">
             <p className="text-[#6B6760]"><strong className="text-[#18181B]">핵심 성과:</strong> 실패 테스트(Bug A)와 숨은 버그(Bug B) 모두 수정. Bug B 회귀 테스트 포함.</p>
             <p className="text-[#6B6760]"><strong className="text-[#18181B]">아쉬운 지점:</strong> 수정 후 검증을 같은 모델에게 맡겼다. 회귀 테스트를 Bug B 발견 이전에 예방적으로 추가하지 않았다.</p>
+          </div>
+        </div>
+
+        {/* Section 1.5 — transcript evidence */}
+        <div className="py-8">
+          <p className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-[#0F766E]">Transcript evidence</p>
+          <h2 className="mb-2 text-sm font-bold text-[#18181B]">평가 근거를 대화 버블과 채점 해석으로 분리</h2>
+          <p className="mb-5 text-sm leading-6 text-[#6B6760]">
+            아래 버블은 라이브 채팅이 아니라 제출 로그에서 발췌한 정적 증거입니다. 왼쪽은 학습자/AI 상호작용, 오른쪽은 채점자가 읽은 해석입니다.
+          </p>
+          <div className="space-y-4">
+            {TRANSCRIPT_CLUSTERS.map((cluster) => (
+              <TranscriptCluster key={cluster.axis} cluster={cluster} />
+            ))}
           </div>
         </div>
 
@@ -345,7 +439,7 @@ vitest 에러 메시지:
               단일 AI 응답을 그대로 채택하지 않았다. 1차 응답(Bug A) → 소스 직접 독해 → 2차 프롬프트(Bug B 추적) → 3차 프롬프트(통합 수정 + 회귀 테스트)라는 3라운드 반복을 거쳤다. 최종 diff는 두 버그 모두 수정 + 회귀 테스트 포함으로 Improvement-L3 앵커에 매핑된다.
             </p>
             <div className="mt-3 space-y-1 text-xs text-[#6B6760]">
-              <p><strong className="text-[#18181B]">L2로 내려갔을 조건:</strong> 최종 diff가 Bug A만 포함하고 Bug B는 <code className="rounded bg-[#F8F5F0] px-1 font-mono text-xs">// TODO</code> 주석으로 남겼다면 L2였다.</p>
+              <p><strong className="text-[#18181B]">L2로 내려갔을 조건:</strong> 최종 diff가 Bug A만 포함하고 Bug B는 <code className="rounded bg-[#F8F5F0] px-1 font-mono text-xs">{"// TODO"}</code> 주석으로 남겼다면 L2였다.</p>
               <p><strong className="text-[#18181B]">L4로 올라갔을 조건:</strong> Bug B 회귀 테스트를 발견 이전에 — TDD 흐름으로 먼저 실패를 확인한 뒤 수정 — 추가했다면 L4였다.</p>
             </div>
           </div>
@@ -375,6 +469,10 @@ vitest 에러 메시지:
           </div>
         </div>
 
+      </div>
+      <aside className="hidden lg:block lg:sticky lg:top-6 lg:self-start">
+        <ScoreRail />
+      </aside>
       </div>
     </div>
   );

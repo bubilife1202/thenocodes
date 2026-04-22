@@ -16,15 +16,16 @@ type NavItem = {
 
 const MAIN_ITEMS: NavItem[] = [
   { label: "홈", href: "/", tone: "neutral", description: "더노코즈 메인" },
+  { label: "실전 시나리오", href: "/scenarios", badge: "훈련", tone: "teal", description: "AI 협업 · 검증 · 개선 훈련" },
   { label: "커뮤니티", href: "/community", tone: "teal", description: "사람 · 에이전트가 함께 쌓는 후기 · 링크 · 질문" },
   { label: "해커톤", href: "/hackathons", tone: "teal", description: "AI · 데이터 · 노코드" },
   { label: "공모전", href: "/contests", tone: "orange", description: "경진대회 · 아이디어 공모" },
   { label: "밋업 / 세미나", href: "/meetups", tone: "teal", description: "서울 AI 오프라인 행사" },
   { label: "문제은행", href: "/problem-bank", tone: "neutral", description: "오리지널 알고리즘 문제" },
   { label: "흐름", href: "/signals", tone: "neutral", description: "빌더가 챙겨야 할 변화" },
-  { label: "OpenClaw", href: "/openclaw", tone: "teal" as NavTone, description: "개인 AI 에이전트 플랫폼 소식" },
-  { label: "사용 후기", href: "/reviews", tone: "orange" as NavTone, description: "도구·해커톤·강의 빌더 후기" },
-  { label: "API 키", href: "/api-keys", tone: "neutral" as NavTone, description: "에이전트로 글 자동 등록" },
+  { label: "OpenClaw", href: "/openclaw", tone: "teal", description: "개인 AI 에이전트 플랫폼 소식" },
+  { label: "사용 후기", href: "/reviews", tone: "orange", description: "도구·해커톤·강의 빌더 후기" },
+  { label: "API 키", href: "/api-keys", tone: "neutral", description: "에이전트로 글 자동 등록" },
 ];
 
 const COMMUNITY_ITEMS: NavItem[] = [
@@ -33,9 +34,10 @@ const COMMUNITY_ITEMS: NavItem[] = [
 
 function isActive(pathname: string, href?: string) {
   if (!href) return false;
+  if (href === "/") return pathname === "/";
   // Hash links (/#...) are never "active" — only the plain "/" home link is
   if (href.startsWith("/#")) return false;
-  return pathname === href || pathname.startsWith(`${href}?`);
+  return pathname === href || pathname.startsWith(`${href}/`) || pathname.startsWith(`${href}?`);
 }
 
 function accentBar(tone: NavTone = "neutral") {
@@ -46,7 +48,7 @@ function accentBar(tone: NavTone = "neutral") {
 
 function rowClasses(active: boolean) {
   return active
-    ? "bg-[#F7F4EE] text-[#18181B]"
+    ? "bg-[#F7F4EE] text-[#18181B] shadow-[inset_0_0_0_1px_rgba(15,118,110,0.08)]"
     : "text-[#5F5951] hover:bg-[#F8F5F0] hover:text-[#18181B]";
 }
 
@@ -83,7 +85,7 @@ function NavSection({
               </div>
               <div className="ml-2 flex shrink-0 items-center gap-2 pr-2">
                 {item.badge && (
-                  <span className="rounded-full border border-[#E7E0D7] bg-white px-2 py-0.5 text-[10px] font-bold text-[#8A8278]">
+                  <span className="rounded-full border border-[#CFE8E3] bg-[#F3FBF9] px-2 py-0.5 text-[10px] font-bold text-[#0F766E]">
                     {item.badge}
                   </span>
                 )}
@@ -120,8 +122,16 @@ function SidebarBody({ pathname, onNavigate }: { pathname: string; onNavigate?: 
           더노코즈<span className="text-[#14B8A6]">.</span>
         </Link>
         <p className="mt-2 text-sm leading-relaxed text-[#71717A]">
-          해커톤, 공모전, AI 밋업을 매일 자동으로 모아둡니다.
+          실전 시나리오로 AI 빌더 역량을 훈련하고, 해커톤·공모전·밋업 기회를 매일 모읍니다.
         </p>
+        <Link
+          href="/scenarios"
+          onClick={onNavigate}
+          className="mt-3 inline-flex w-full items-center justify-between rounded-xl border border-[#CFE8E3] bg-[#F3FBF9] px-3 py-2 text-xs font-bold text-[#0F766E] hover:bg-[#E7F6F3]"
+        >
+          실전 시나리오 시작
+          <span aria-hidden>→</span>
+        </Link>
       </div>
 
       <div className="mt-5 space-y-6">
@@ -130,8 +140,8 @@ function SidebarBody({ pathname, onNavigate }: { pathname: string; onNavigate?: 
       </div>
 
       <div className="mt-auto rounded-[20px] border border-[#D9EFEA] bg-[linear-gradient(180deg,#F6FCFB_0%,#EEF8F6_100%)] p-4">
-        <p className="text-sm font-bold text-[#123B38]">실시간 소통</p>
-        <p className="mt-1 text-[11px] leading-relaxed text-[#5C7D78]">제보 · 운영 의견은 여기서 바로 받아요.</p>
+        <p className="text-sm font-bold text-[#123B38]">실전 빌더 라운지</p>
+        <p className="mt-1 text-[11px] leading-relaxed text-[#5C7D78]">시나리오 제보 · 운영 의견 · 기회 추천을 여기서 받아요.</p>
         <div className="mt-3 space-y-2">
           <a
             href="https://discord.gg/Qjw8FSBg"
@@ -165,6 +175,9 @@ export function SiteNavigation() {
         <div className="flex items-center justify-between px-4 py-3">
           <Link href="/" className="text-sm font-black tracking-tight text-[#18181B]">
             더노코즈<span className="text-[#14B8A6]">.</span>
+          </Link>
+          <Link href="/scenarios" className="ml-auto mr-2 rounded-full bg-[#0F766E] px-3 py-1 text-[11px] font-bold text-white">
+            실전 시나리오
           </Link>
           <button
             type="button"

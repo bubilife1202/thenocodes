@@ -14,6 +14,50 @@ type Props = {
   searchParams: Promise<{ waitlist?: string }>;
 };
 
+const PROOF_BUBBLES = [
+  {
+    role: "Learner",
+    tone: "learner",
+    text: "테스트 3개 중 마지막 1개가 실패합니다. 먼저 실패 원인을 설명하고, 나머지 두 테스트는 계속 통과해야 합니다.",
+  },
+  {
+    role: "AI",
+    tone: "ai",
+    text: "UTC 기준 요일을 그대로 읽고 있어 Seoul 기준으로 날짜가 넘어간 케이스의 요일이 틀립니다. weekday를 advancedDate에서 읽어야 합니다.",
+  },
+  {
+    role: "Verification",
+    tone: "verification",
+    text: "테스트는 통과했지만 rawHour === 24 경계를 다시 추적했습니다. UTC 15:xx → Seoul 00:xx에서 날짜가 넘어가지 않는 숨은 버그가 남았습니다.",
+  },
+  {
+    role: "Revision",
+    tone: "revision",
+    text: "weekday 소스 변경과 dayOverflow >= 24 수정, Bug B 회귀 테스트를 함께 반영했습니다. 최종 제출은 두 번의 검증 사이클을 거친 합성입니다.",
+  },
+] as const;
+
+function ProofBubble({ bubble }: { bubble: (typeof PROOF_BUBBLES)[number] }) {
+  const isRight = bubble.tone === "ai";
+  const toneClass =
+    bubble.tone === "ai"
+      ? "border-[#BFE7E0] bg-[#F1FCFA]"
+      : bubble.tone === "verification"
+        ? "border-[#F4D8A8] bg-[#FFF8EC]"
+        : bubble.tone === "revision"
+          ? "border-[#CDE8CF] bg-[#F5FCF4]"
+          : "border-[#ECE7DF] bg-white";
+
+  return (
+    <div className={`flex ${isRight ? "justify-end" : "justify-start"}`}>
+      <div className={`max-w-[680px] rounded-[22px] border px-4 py-3 shadow-sm ${toneClass}`}>
+        <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#6B6760]">{bubble.role}</p>
+        <p className="mt-1 text-sm leading-6 text-[#18181B]">{bubble.text}</p>
+      </div>
+    </div>
+  );
+}
+
 export default async function ScenariosPage({ searchParams }: Props) {
   const params = await searchParams;
   const waitlistStatus = params.waitlist;
@@ -41,6 +85,26 @@ export default async function ScenariosPage({ searchParams }: Props) {
             <p>
               왜 19,900원인가, 왜 LLM이 채점하지 않는가 — 아래 FAQ를 참고해주세요.
             </p>
+          </div>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              href="/scenarios/scenario-01-timezone"
+              className="rounded-xl bg-[#0F766E] px-4 py-2.5 text-sm font-black text-white hover:bg-[#0B5F58]"
+            >
+              시나리오 #1 보기
+            </Link>
+            <Link
+              href="/scenarios/walkthrough"
+              className="rounded-xl border border-[#ECE7DF] bg-white px-4 py-2.5 text-sm font-bold text-[#18181B] hover:bg-[#F8F5F0]"
+            >
+              채점된 워크스루
+            </Link>
+            <Link
+              href="/scenarios/rubric"
+              className="rounded-xl border border-[#ECE7DF] bg-white px-4 py-2.5 text-sm font-bold text-[#18181B] hover:bg-[#F8F5F0]"
+            >
+              루브릭 확인
+            </Link>
           </div>
         </div>
 
@@ -72,6 +136,23 @@ export default async function ScenariosPage({ searchParams }: Props) {
               >
                 GitHub에서 보기
               </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 2.5 — Static proof bubbles */}
+        <div className="py-8">
+          <div className="rounded-[28px] border border-[#D9EFEA] bg-[linear-gradient(180deg,#FFFFFF_0%,#F5FCFA_100%)] p-4 sm:p-6">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-[#0F766E]">Static evidence excerpts</p>
+            <h2 className="mt-2 text-lg font-black text-[#18181B]">실제 풀이 대화는 이렇게 남깁니다</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6B6760]">
+              아래 버블은 라이브 채팅 UI가 아니라, 제출자가 남긴 프롬프트 로그와 검증 기록을 요약한 정적 증거 예시입니다.
+              더노코즈는 이 증거를 바탕으로 사람이 Collaboration, Verification, Revision 흐름을 채점합니다.
+            </p>
+            <div className="mt-5 space-y-3">
+              {PROOF_BUBBLES.map((bubble) => (
+                <ProofBubble key={bubble.role} bubble={bubble} />
+              ))}
             </div>
           </div>
         </div>
