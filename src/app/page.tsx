@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getHomeData, getStats, type HackathonRow } from "@/lib/data/hackathons";
 import { getFeaturedMeetups } from "@/lib/data/meetups";
 import { getFeaturedSignals, type SignalRow } from "@/lib/data/signals";
+import { getFeaturedInfographics, type InfographicRow } from "@/lib/data/infographics";
 import { getHackathonStatus, sortHackathons } from "@/lib/hackathons";
 import { formatShortDate } from "@/lib/utils/date";
 import type { SignalType } from "@/lib/signals/constants";
@@ -34,11 +35,11 @@ function OpportunityRow({ item, now }: { item: HackathonRow; now: Date }) {
       rel="noopener noreferrer"
       className="grid gap-2 rounded-2xl border border-[#F1EAE0] bg-white px-4 py-3 transition-colors hover:border-[#D9EFEA] hover:bg-[#FBFEFD] sm:grid-cols-[72px_minmax(0,1fr)_96px_112px] sm:items-center"
     >
-      <span className={`text-[11px] font-black ${isContest ? "text-[#C46A1A]" : "text-[#0F766E]"}`}>
+      <span className={`whitespace-nowrap text-[11px] font-black ${isContest ? "text-[#C46A1A]" : "text-[#0F766E]"}`}>
         {isContest ? "공모전" : "해커톤"}
       </span>
       <span className="min-w-0 text-sm font-bold text-[#18181B] sm:truncate">{item.title}</span>
-      <span className="text-xs font-semibold text-[#6B6760] sm:text-right">{deadlineLabel(item, now)}</span>
+      <span className="whitespace-nowrap text-xs font-semibold text-[#6B6760] sm:text-right">{deadlineLabel(item, now)}</span>
       <span className="min-w-0 text-xs text-[#A1A1AA] sm:truncate sm:text-right">{item.organizer || item.source}</span>
     </a>
   );
@@ -52,9 +53,9 @@ function MeetupRow({ item }: { item: HackathonRow }) {
       rel="noopener noreferrer"
       className="grid gap-2 rounded-2xl border border-[#F1EAE0] bg-white px-4 py-3 transition-colors hover:border-[#D9EFEA] hover:bg-[#FBFEFD] sm:grid-cols-[72px_minmax(0,1fr)_96px_112px] sm:items-center"
     >
-      <span className="text-[11px] font-black text-[#0F766E]">밋업</span>
+      <span className="whitespace-nowrap text-[11px] font-black text-[#0F766E]">밋업</span>
       <span className="min-w-0 text-sm font-bold text-[#18181B] sm:truncate">{item.title}</span>
-      <span className="text-xs font-semibold text-[#6B6760] sm:text-right">{item.starts_at ? formatShortDate(item.starts_at) : "일정 미정"}</span>
+      <span className="whitespace-nowrap text-xs font-semibold text-[#6B6760] sm:text-right">{item.starts_at ? formatShortDate(item.starts_at) : "일정 미정"}</span>
       <span className="min-w-0 text-xs text-[#A1A1AA] sm:truncate sm:text-right">{item.organizer || item.location || item.source}</span>
     </a>
   );
@@ -68,19 +69,41 @@ function SignalRowLink({ item }: { item: SignalRow }) {
       rel="noopener noreferrer"
       className="grid gap-2 rounded-2xl border border-[#F1EAE0] bg-white px-4 py-3 transition-colors hover:border-[#D9EFEA] hover:bg-[#FBFEFD] sm:grid-cols-[72px_minmax(0,1fr)_96px_112px] sm:items-center"
     >
-      <span className="text-[11px] font-black text-[#0F766E]">{SIGNAL_TYPE_KO[item.signal_type]}</span>
+      <span className="whitespace-nowrap text-[11px] font-black text-[#0F766E]">{SIGNAL_TYPE_KO[item.signal_type]}</span>
       <span className="min-w-0 text-sm font-bold text-[#18181B] sm:truncate">{item.title}</span>
-      <span className="text-xs font-semibold text-[#6B6760] sm:text-right">{formatShortDate(item.published_at)}</span>
+      <span className="whitespace-nowrap text-xs font-semibold text-[#6B6760] sm:text-right">{formatShortDate(item.published_at)}</span>
       <span className="min-w-0 text-xs text-[#A1A1AA] sm:truncate sm:text-right">{item.source_name || "source"}</span>
     </a>
   );
 }
 
+function InfographicRowLink({ item }: { item: InfographicRow }) {
+  const label = item.source_type === "github" ? "GitHub" : "논문";
+  const meta = item.source_type === "github" ? item.repository || "repo" : item.authors || "paper";
+
+  return (
+    <a
+      href={item.original_url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="grid gap-2 rounded-2xl border border-[#F1EAE0] bg-white px-4 py-3 transition-colors hover:border-[#D9EFEA] hover:bg-[#FBFEFD] sm:grid-cols-[72px_minmax(0,1fr)_96px_112px] sm:items-center"
+    >
+      <span className="whitespace-nowrap text-[11px] font-black text-[#6D3FB8]">{label}</span>
+      <span className="min-w-0 text-sm font-bold text-[#18181B] sm:truncate">{item.title}</span>
+      <span className="whitespace-nowrap text-xs font-semibold text-[#6B6760] sm:text-right">
+        {item.published_at ? formatShortDate(item.published_at) : formatShortDate(item.created_at)}
+      </span>
+      <span className="min-w-0 text-xs text-[#A1A1AA] sm:truncate sm:text-right">{meta}</span>
+    </a>
+  );
+}
+
 async function HomeContent() {
-  const [{ hackathons, contests }, meetups, signals, stats] = await Promise.all([
+  const [{ hackathons, contests }, meetups, signals, infographics, stats] = await Promise.all([
     getHomeData(),
     getFeaturedMeetups(4),
     getFeaturedSignals(4),
+    getFeaturedInfographics(3),
     getStats(),
   ]);
 
@@ -113,6 +136,9 @@ async function HomeContent() {
               <Link href="/hackathons" className="rounded-2xl border border-[#E6DED4] bg-white px-5 py-3 text-sm font-bold text-[#18181B] transition-colors hover:bg-[#F8F5F0]">
                 기회 보드 보기
               </Link>
+              <Link href="/infographics" className="rounded-2xl border border-[#E7D9F8] bg-white px-5 py-3 text-sm font-bold text-[#6D3FB8] transition-colors hover:bg-[#FCF9FF]">
+                인포그래픽 보기
+              </Link>
             </div>
           </div>
 
@@ -120,16 +146,16 @@ async function HomeContent() {
             <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#5C7D78]">live inventory</p>
             <div className="mt-4 grid grid-cols-3 gap-2 text-center">
               <div className="rounded-2xl bg-[#F3FBF9] p-3">
-                <p className="text-2xl font-black text-[#0F766E]">{stats.hackathons}</p>
-                <p className="text-[11px] font-bold text-[#5C7D78]">해커톤</p>
+                <p className="text-2xl font-black text-[#0F766E]">{stats.hackathons + stats.contests}</p>
+                <p className="whitespace-nowrap text-[11px] font-bold text-[#5C7D78]">기회</p>
               </div>
               <div className="rounded-2xl bg-[#FFF6ED] p-3">
-                <p className="text-2xl font-black text-[#C46A1A]">{stats.contests}</p>
-                <p className="text-[11px] font-bold text-[#8A6A4A]">공모전</p>
+                <p className="text-2xl font-black text-[#C46A1A]">{deadlineSoon.length}</p>
+                <p className="whitespace-nowrap text-[11px] font-bold text-[#8A6A4A]">마감 임박</p>
               </div>
               <div className="rounded-2xl bg-[#F8F5F0] p-3">
                 <p className="text-2xl font-black text-[#18181B]">{stats.meetups}</p>
-                <p className="text-[11px] font-bold text-[#8A8278]">밋업</p>
+                <p className="whitespace-nowrap text-[11px] font-bold text-[#8A8278]">밋업</p>
               </div>
             </div>
             <Link href="/community" className="mt-4 flex items-center justify-between rounded-2xl border border-[#ECE7DF] px-4 py-3 text-sm font-bold text-[#18181B] hover:bg-[#F8F5F0]">
@@ -183,9 +209,8 @@ async function HomeContent() {
 
       <section className="rounded-[28px] border border-[#ECE7DF] bg-white p-5">
         <div className="mb-4 flex flex-wrap items-center gap-3">
-          <h2 className="text-sm font-black text-[#18181B]">해커톤 · 공모전 비교</h2>
-          <Link href="/hackathons" className="text-xs font-bold text-[#0F766E] hover:underline">해커톤 전체 →</Link>
-          <Link href="/contests" className="text-xs font-bold text-[#C46A1A] hover:underline">공모전 전체 →</Link>
+          <h2 className="text-sm font-black text-[#18181B]">기회 보드</h2>
+          <Link href="/hackathons" className="whitespace-nowrap text-xs font-bold text-[#0F766E] hover:underline">전체 보기 →</Link>
         </div>
         {opportunities.length > 0 ? (
           <div className="space-y-2">
@@ -193,6 +218,24 @@ async function HomeContent() {
           </div>
         ) : (
           <p className="py-10 text-center text-sm text-[#A1A1AA]">등록된 항목이 없습니다. 매일 업데이트됩니다.</p>
+        )}
+      </section>
+
+      <section className="rounded-[28px] border border-[#E7D9F8] bg-[#FCF9FF] p-5">
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <h2 className="text-sm font-black text-[#18181B]">인포그래픽</h2>
+          <Link href="/infographics" className="text-xs font-bold text-[#6D3FB8] hover:underline">전체 보기 →</Link>
+          <p className="w-full text-xs leading-5 text-[#7B7188] sm:w-auto">논문과 GitHub 프로젝트를 한 장 요약으로 읽습니다.</p>
+        </div>
+        {infographics.length > 0 ? (
+          <div className="space-y-2">
+            {infographics.map((item) => <InfographicRowLink key={item.id} item={item} />)}
+          </div>
+        ) : (
+          <div className="rounded-2xl bg-white px-4 py-6">
+            <p className="text-sm font-bold text-[#18181B]">첫 인포그래픽을 준비 중입니다.</p>
+            <p className="mt-1 text-sm leading-6 text-[#6B6760]">논문과 GitHub 프로젝트의 핵심 한 줄, 구조, 실험/기능, 결과, 한계, 다음 액션을 한 장으로 정리해 쌓습니다.</p>
+          </div>
         )}
       </section>
 

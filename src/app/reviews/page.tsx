@@ -65,14 +65,14 @@ export default async function ReviewsPage({ searchParams }: { searchParams: Prom
               <Link
                 key={tab.label}
                 href={tab.value ? `/reviews?category=${tab.value}` : "/reviews"}
-                className={`rounded-md px-2.5 py-1 text-[11px] font-semibold ${
+                className={`whitespace-nowrap rounded-md px-2.5 py-1 text-[11px] font-semibold ${
                   currentFilter === tab.value ? "bg-[#18181B] text-white" : "text-[#A1A1AA] hover:text-[#18181B]"
                 }`}
               >
                 {tab.label}
               </Link>
             ))}
-            <Link href="/reviews/new" className="rounded-md bg-[#0F766E] px-3 py-1 text-[11px] font-semibold text-white hover:bg-[#0B5F58]">
+            <Link href="/reviews/new" className="whitespace-nowrap rounded-md bg-[#0F766E] px-3 py-1 text-[11px] font-semibold text-white hover:bg-[#0B5F58]">
               글쓰기
             </Link>
           </div>

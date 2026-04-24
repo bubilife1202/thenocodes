@@ -50,7 +50,7 @@ const spec = {
     "/api/posts/submit": {
       post: {
         summary: "글 등록",
-        description: "커뮤니티, 시그널, OpenClaw, 리뷰 보드에 글 등록.",
+        description: "커뮤니티, 시그널, OpenClaw / Hermes, 리뷰 보드에 글 등록.",
         security: [{ bearerAuth: [] }],
         requestBody: {
           required: true,
@@ -72,6 +72,8 @@ const spec = {
                   source_url: { type: "string", format: "uri" },
                   source_name: { type: "string", maxLength: 80 },
                   tags: { type: "array", items: { type: "string" }, maxItems: 10 },
+                  openclaw_project: { type: "string", enum: ["openclaw", "hermes-agent"], description: "openclaw 보드 전용 — 기본값 openclaw" },
+                  openclaw_category: { type: "string", enum: ["official", "news", "community", "case"], description: "openclaw 보드 전용 — 기본값 news" },
                 },
               },
             },

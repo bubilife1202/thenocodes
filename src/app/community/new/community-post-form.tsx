@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import { submitCommunityPost } from "../actions";
 import type { CommunityPostType } from "@/lib/data/community";
@@ -23,13 +23,11 @@ function SubmitButton() {
 
 export function CommunityPostForm() {
   const [postType, setPostType] = useState<CommunityPostType>(INITIAL_POST_TYPE);
-  const [nickname, setNickname] = useState("");
+  const [nickname, setNickname] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem(NICKNAME_KEY) ?? "";
+  });
   const linkRequired = postType === "found_it";
-
-  useEffect(() => {
-    const saved = localStorage.getItem(NICKNAME_KEY);
-    if (saved) setNickname(saved);
-  }, []);
 
   function handleNicknameChange(e: React.ChangeEvent<HTMLInputElement>) {
     const value = e.target.value;

@@ -79,7 +79,7 @@ export default async function SignalsPage({ searchParams }: { searchParams: Prom
               <Link
                 key={tab.label}
                 href={tab.value ? `/signals?type=${tab.value}` : "/signals"}
-                className={`rounded-md px-2.5 py-1 text-[11px] font-semibold ${
+                className={`whitespace-nowrap rounded-md px-2.5 py-1 text-[11px] font-semibold ${
                   currentFilter === tab.value
                     ? "bg-[#18181B] text-white"
                     : "text-[#A1A1AA] hover:text-[#18181B]"

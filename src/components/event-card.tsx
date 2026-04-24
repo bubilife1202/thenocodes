@@ -110,12 +110,12 @@ export function EventCard({
       />
 
       <div className={`mb-4 flex flex-wrap items-center gap-2 ${compact ? "pl-1" : "pl-2"}`}>
-        <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${STATUS_COLORS[status]}`}>
+        <span className={`whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-bold ${STATUS_COLORS[status]}`}>
           {STATUS_LABELS[accent][status]}
         </span>
         {dday !== null && (
           <span
-            className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${
+            className={`whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-bold ${
               dday <= 3
                 ? "bg-red-50 text-red-600"
                 : dday <= 7
@@ -126,9 +126,9 @@ export function EventCard({
             {dday === 0 ? "오늘 마감" : `마감 D-${dday}`}
           </span>
         )}
-        {item.prize && <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${styles.tag}`}>{item.prize}</span>}
+        {item.prize && <span className={`whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-bold ${styles.tag}`}>{item.prize}</span>}
         {item.source && item.source !== "manual" && (
-          <span className="rounded-full bg-[#F5F3EF] px-2 py-1 text-[10px] text-[#78716C]">{item.source}</span>
+          <span className="whitespace-nowrap rounded-full bg-[#F5F3EF] px-2 py-1 text-[10px] text-[#78716C]">{item.source}</span>
         )}
       </div>
 
@@ -155,7 +155,7 @@ export function EventCard({
         {showTags && item.tags.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-1.5">
             {item.tags.slice(0, compact ? 3 : 4).map((tag) => (
-              <span key={tag} className="rounded-full bg-[#F5F3EF] px-2.5 py-1 text-[10px] text-[#78716C]">
+              <span key={tag} className="whitespace-nowrap rounded-full bg-[#F5F3EF] px-2.5 py-1 text-[10px] text-[#78716C]">
                 {tag}
               </span>
             ))}

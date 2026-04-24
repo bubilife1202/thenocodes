@@ -69,6 +69,15 @@ export async function getMeetups(filter?: HackathonStatus) {
   return getEvents("meetup", filter);
 }
 
+export async function getOpportunities(filter?: HackathonStatus) {
+  const [hackathons, contests] = await Promise.all([
+    getHackathons(filter),
+    getContests(filter),
+  ]);
+
+  return sortHackathons([...hackathons, ...contests], new Date(), filter);
+}
+
 export async function getHomeData() {
   const [hackathons, contests] = await Promise.all([
     getHackathons(),

@@ -2,11 +2,11 @@ import Link from "next/link";
 
 const PRIMARY_LINKS = [
   { href: "/", label: "홈" },
-  { href: "/hackathons", label: "해커톤" },
-  { href: "/contests", label: "공모전" },
+  { href: "/hackathons", label: "기회 보드" },
   { href: "/meetups", label: "밋업 / 세미나" },
+  { href: "/infographics", label: "인포그래픽" },
   { href: "/signals", label: "흐름" },
-  { href: "/openclaw", label: "OpenClaw" },
+  { href: "/openclaw", label: "OpenClaw / Hermes" },
   { href: "/reviews", label: "사용 후기" },
   { href: "/community", label: "커뮤니티" },
   { href: "/feedback", label: "피드백 보드" },
@@ -29,7 +29,7 @@ export function Footer() {
               더노코즈<span className="text-[#14B8A6]">.</span>
             </p>
             <p className="text-sm leading-relaxed text-[#71717A]">
-              한국 AI 해커톤, 공모전, 밋업을 매일 자동으로 모아둡니다.
+              한국 AI 기회 보드와 밋업을 매일 자동으로 모아둡니다.
             </p>
           </div>
 

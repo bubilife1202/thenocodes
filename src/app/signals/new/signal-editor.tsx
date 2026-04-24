@@ -61,7 +61,7 @@ export function SignalEditor({ initialPublishedAt }: { initialPublishedAt: strin
 
       {/* 콘텐츠 진입 기준 가이드 */}
       <div className="mb-8 rounded-2xl border border-[#E9DDFE] bg-[#FAF7FF] p-5">
-        <p className="mb-3 text-sm font-bold text-[#7C3AED]">진입 기준 — "이걸로 빌더가 만드는 방식이 바뀌는가?"</p>
+        <p className="mb-3 text-sm font-bold text-[#7C3AED]">진입 기준 — &quot;이걸로 빌더가 만드는 방식이 바뀌는가?&quot;</p>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <p className="mb-2 text-xs font-bold text-[#22C55E]">넣는다 (O)</p>
@@ -78,7 +78,7 @@ export function SignalEditor({ initialPublishedAt }: { initialPublishedAt: strin
             <ul className="space-y-1 text-xs leading-relaxed text-[#5F5951]">
               <li>• 투자/인수 가십</li>
               <li>• 벤치마크만 있는 발표</li>
-              <li>• 추상적 비전 ("10년 로드맵")</li>
+              <li>• 추상적 비전 (&quot;10년 로드맵&quot;)</li>
               <li>• B2C 앱 출시 (API 없음)</li>
               <li>• 마이너 패치/버그픽스</li>
               <li>• 언론사 루머, 밈, 개인 의견</li>

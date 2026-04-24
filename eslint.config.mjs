@@ -14,6 +14,9 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     ".open-next/**",
     ".wrangler/**",
+    // Local agent/build artifacts can contain generated Next/Turbopack output.
+    ".claude/**",
+    "**/.next/**",
   ]),
 ]);
 

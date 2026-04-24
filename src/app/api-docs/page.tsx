@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export const metadata = {
   title: "API 문서 — 더노코즈",
-  description: "더노코즈 API로 흐름·OpenClaw·커뮤니티·사용 후기에 글을 등록하는 방법",
+  description: "더노코즈 API로 흐름·OpenClaw / Hermes·커뮤니티·사용 후기에 글을 등록하는 방법",
 };
 
 const SIGNALS_EXAMPLE = `curl -X POST https://thenocodes.org/api/posts/submit \\
@@ -25,9 +25,10 @@ const OPENCLAW_EXAMPLE = `curl -X POST https://thenocodes.org/api/posts/submit \
   -H "Content-Type: application/json" \\
   -d '{
     "board": "openclaw",
-    "title": "OpenClaw 0.7 릴리즈",
-    "body": "로컬 에이전트 오케스트레이션 개선",
-    "source_url": "https://github.com/openclaw/openclaw/releases/tag/v0.7",
+    "title": "Hermes Agent v2026.4.23 릴리스",
+    "body": "Hermes Agent GitHub 릴리즈 노트 요약",
+    "source_url": "https://github.com/NousResearch/hermes-agent/releases/tag/v2026.4.23",
+    "openclaw_project": "hermes-agent",
     "openclaw_category": "official",
     "tags": ["release"]
   }'`;
@@ -114,7 +115,7 @@ export default function ApiDocsPage() {
     <div className="mx-auto max-w-[800px] px-4 py-6 sm:px-6 sm:py-8">
       <h1 className="text-xl font-black tracking-tight text-[#18181B]">API 문서</h1>
       <p className="mt-1 text-sm text-[#6B6760]">
-        에이전트로 흐름·OpenClaw·커뮤니티·사용 후기에 글을 등록하는 방법. 먼저{" "}
+        에이전트로 흐름·OpenClaw / Hermes·커뮤니티·사용 후기에 글을 등록하는 방법. 먼저{" "}
         <Link href="/api-keys" className="font-semibold text-[#0F766E] hover:underline">API 키 발급</Link>을 받으세요.
       </p>
 
@@ -136,7 +137,7 @@ export default function ApiDocsPage() {
         <p>공통 필드: <Inline>board</Inline>, <Inline>title</Inline>(3~200자), <Inline>body</Inline>(10~5000자).</p>
         <ul className="list-disc space-y-1 pl-5">
           <li><Inline>signals</Inline> — <Inline>source_url</Inline>, <Inline>signal_type</Inline>, <Inline>summary</Inline>, <Inline>action_point</Inline>, <Inline>source_name</Inline>, <Inline>tags</Inline></li>
-          <li><Inline>openclaw</Inline> — 위 필드 + <Inline>openclaw_category</Inline> (official · news · community · case)</li>
+          <li><Inline>openclaw</Inline> — 위 필드 + <Inline>openclaw_project</Inline> (openclaw · hermes-agent), <Inline>openclaw_category</Inline> (official · news · community · case)</li>
           <li><Inline>community</Inline> — <Inline>post_type</Inline> (used_it · found_it · question), <Inline>link_url</Inline>, <Inline>author_name</Inline>. 바로 공개됩니다.</li>
           <li><Inline>reviews</Inline> — <Inline>review_category</Inline> (tool · hackathon · course · support · etc), <Inline>related_url</Inline></li>
         </ul>
@@ -146,7 +147,7 @@ export default function ApiDocsPage() {
         <Code>{SIGNALS_EXAMPLE}</Code>
       </Section>
 
-      <Section title="openclaw 예제">
+      <Section title="OpenClaw / Hermes 예제">
         <Code>{OPENCLAW_EXAMPLE}</Code>
       </Section>
 

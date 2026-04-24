@@ -68,7 +68,21 @@ async function seedContests() {
   if (error) {
     if (error.message.includes("category")) {
       console.log("Category column doesn't exist yet, inserting without it...");
-      const withoutCategory = contests.map(({ category, ...rest }) => rest);
+      const withoutCategory = contests.map((contest) => ({
+        source: contest.source,
+        external_id: contest.external_id,
+        title: contest.title,
+        description: contest.description,
+        organizer: contest.organizer,
+        url: contest.url,
+        thumbnail_url: contest.thumbnail_url,
+        prize: contest.prize,
+        tags: contest.tags,
+        starts_at: contest.starts_at,
+        ends_at: contest.ends_at,
+        location: contest.location,
+        collected_at: contest.collected_at,
+      }));
       const { error: err2 } = await supabase
         .from("hackathons")
         .upsert(withoutCategory, { onConflict: "source,external_id" });

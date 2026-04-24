@@ -43,7 +43,7 @@ async function MeetupTable({ filter }: { filter?: HackathonStatus }) {
             <span className="min-w-0"><strong className="block text-sm text-[#18181B]">{m.title}</strong>{m.description && <span className="mt-1 line-clamp-2 block text-xs leading-5 text-[#8A8278]">{m.description}</span>}</span>
             <span className="truncate text-xs text-[#6B6760]">{m.organizer || "주최 미정"}</span>
             <span className="truncate text-xs text-[#A1A1AA]">{m.location || "온라인"}</span>
-            <span className={`text-xs font-black ${status === "active" ? "text-[#0F766E]" : status === "upcoming" ? "text-[#315E9B]" : "text-[#A1A1AA]"}`}>{status === "active" ? "진행중" : status === "upcoming" ? "예정" : "종료"}</span>
+            <span className={`whitespace-nowrap text-xs font-black ${status === "active" ? "text-[#0F766E]" : status === "upcoming" ? "text-[#315E9B]" : "text-[#A1A1AA]"}`}>{status === "active" ? "진행중" : status === "upcoming" ? "예정" : "종료"}</span>
           </a>
         );
       })}
@@ -73,7 +73,7 @@ export default async function MeetupsPage({ searchParams }: { searchParams: Prom
             <Link
               key={tab.label}
               href={tab.value ? `/meetups?status=${tab.value}` : "/meetups"}
-              className={`rounded-md px-2.5 py-1 text-[11px] font-semibold ${
+              className={`whitespace-nowrap rounded-md px-2.5 py-1 text-[11px] font-semibold ${
                 currentFilter === tab.value
                   ? "bg-[#18181B] text-white"
                   : "text-[#A1A1AA] hover:text-[#18181B]"

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { hashToken } from "@/lib/auth/api-token";
+import { buildOpenclawBoardTags } from "@/lib/data/openclaw";
 
 type ApiTokenQuotaRow = {
   id: string;
@@ -25,7 +26,8 @@ const postSchema = z.object({
   action_point: z.string().trim().max(500).optional(),
   source_name: z.string().trim().max(80).optional(),
   tags: z.array(z.string().trim()).max(10).optional(),
-  // openclaw category
+  // openclaw/openclaw-hermes category
+  openclaw_project: z.enum(["openclaw", "hermes-agent"]).optional(),
   openclaw_category: z.enum(["official", "news", "community", "case"]).optional(),
   // reviews specific
   review_category: z.enum(["tool", "hackathon", "course", "support", "etc"]).optional(),
@@ -128,10 +130,12 @@ export async function POST(request: Request) {
 
   if (values.board === "signals" || values.board === "openclaw") {
     const slug = values.title.toLowerCase().replace(/[^a-z0-9가-힣]+/g, "-").slice(0, 60) + "-" + Date.now().toString(36);
-    const tags = [...(values.tags ?? [])];
+    let tags = [...(values.tags ?? [])];
     if (values.board === "openclaw") {
-      tags.push("openclaw");
-      if (values.openclaw_category) tags.push(`openclaw-${values.openclaw_category}`);
+      tags = buildOpenclawBoardTags(tags, {
+        project: values.openclaw_project ?? "openclaw",
+        category: values.openclaw_category ?? "news",
+      });
     }
 
     const { data: inserted, error } = await supabase.from("builder_signals").insert({

@@ -38,7 +38,7 @@ export default function ApiKeysPage() {
     <div className="mx-auto max-w-[800px] px-4 py-6 sm:px-6 sm:py-8">
       <h1 className="text-xl font-black tracking-tight text-[#18181B]">API 키</h1>
       <p className="mt-1 text-sm text-[#6B6760]">
-        자기 AI 에이전트로 흐름·OpenClaw·사용 후기에 글을 올릴 수 있습니다. 발급 후 에이전트에 키를 설정하세요.
+        자기 AI 에이전트로 흐름·OpenClaw / Hermes·사용 후기에 글을 올릴 수 있습니다. 발급 후 에이전트에 키를 설정하세요.
       </p>
 
       {!token && (

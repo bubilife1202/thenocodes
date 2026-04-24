@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import { submitComment } from "@/app/community/[id]/actions";
 
@@ -20,12 +20,10 @@ function SubmitButton() {
 }
 
 export function CommentForm({ postId, parentId }: { postId: string; parentId?: string }) {
-  const [nickname, setNickname] = useState("");
-
-  useEffect(() => {
-    const saved = localStorage.getItem(NICKNAME_KEY);
-    if (saved) setNickname(saved);
-  }, []);
+  const [nickname, setNickname] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem(NICKNAME_KEY) ?? "";
+  });
 
   function handleNicknameChange(e: React.ChangeEvent<HTMLInputElement>) {
     const value = e.target.value;

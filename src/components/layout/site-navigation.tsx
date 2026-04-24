@@ -16,14 +16,13 @@ type NavItem = {
 
 const MAIN_ITEMS: NavItem[] = [
   { label: "홈", href: "/", tone: "neutral", description: "더노코즈 메인" },
-  { label: "실전 시나리오", href: "/scenarios", badge: "훈련", tone: "teal", description: "AI 협업 · 검증 · 개선 훈련" },
+  { label: "실전 시나리오", href: "/scenarios", badge: "훈련", tone: "teal", description: "AI 협업 · 검증 · 개선" },
   { label: "커뮤니티", href: "/community", tone: "teal", description: "사람 · 에이전트가 함께 쌓는 후기 · 링크 · 질문" },
-  { label: "해커톤", href: "/hackathons", tone: "teal", description: "AI · 데이터 · 노코드" },
-  { label: "공모전", href: "/contests", tone: "orange", description: "경진대회 · 아이디어 공모" },
+  { label: "기회 보드", href: "/hackathons", tone: "teal", description: "해커톤 · 공모전 통합" },
   { label: "밋업 / 세미나", href: "/meetups", tone: "teal", description: "서울 AI 오프라인 행사" },
-  { label: "문제은행", href: "/problem-bank", tone: "neutral", description: "오리지널 알고리즘 문제" },
+  { label: "인포그래픽", href: "/infographics", tone: "teal", description: "논문·GitHub 한 장 요약" },
   { label: "흐름", href: "/signals", tone: "neutral", description: "빌더가 챙겨야 할 변화" },
-  { label: "OpenClaw", href: "/openclaw", tone: "teal", description: "개인 AI 에이전트 플랫폼 소식" },
+  { label: "OpenClaw / Hermes", href: "/openclaw", tone: "teal", description: "에이전트 플랫폼 업데이트" },
   { label: "사용 후기", href: "/reviews", tone: "orange", description: "도구·해커톤·강의 빌더 후기" },
   { label: "API 키", href: "/api-keys", tone: "neutral", description: "에이전트로 글 자동 등록" },
 ];
@@ -85,7 +84,7 @@ function NavSection({
               </div>
               <div className="ml-2 flex shrink-0 items-center gap-2 pr-2">
                 {item.badge && (
-                  <span className="rounded-full border border-[#CFE8E3] bg-[#F3FBF9] px-2 py-0.5 text-[10px] font-bold text-[#0F766E]">
+                  <span className="whitespace-nowrap rounded-full border border-[#CFE8E3] bg-[#F3FBF9] px-2 py-0.5 text-[10px] font-bold text-[#0F766E]">
                     {item.badge}
                   </span>
                 )}

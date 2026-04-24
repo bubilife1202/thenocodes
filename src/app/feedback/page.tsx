@@ -42,8 +42,8 @@ export default async function FeedbackPage() {
             <section key={column.status} className="rounded-[24px] border border-[#ECE7DF] bg-[#FCFBF8] p-3">
               <div className={`mb-3 rounded-2xl border px-3 py-2 ${meta.tone}`}>
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-bold">{meta.label}</p>
-                  <span className="rounded-full bg-white/80 px-2 py-0.5 text-xs font-semibold text-[#6B6760]">
+                  <p className="whitespace-nowrap text-sm font-bold">{meta.label}</p>
+                  <span className="whitespace-nowrap rounded-full bg-white/80 px-2 py-0.5 text-xs font-semibold text-[#6B6760]">
                     {column.items.length}
                   </span>
                 </div>
@@ -58,13 +58,13 @@ export default async function FeedbackPage() {
                   column.items.map((item) => (
                     <article key={item.id} className="rounded-2xl border border-[#ECE7DF] bg-white p-4 shadow-[0_10px_24px_-22px_rgba(24,24,27,0.45)]">
                       <div className="mb-2 flex flex-wrap gap-2">
-                        <span className="rounded-full border border-[#E7E0D7] bg-[#FCFBF8] px-2 py-0.5 text-[10px] font-bold text-[#8A8278]">
+                        <span className="whitespace-nowrap rounded-full border border-[#E7E0D7] bg-[#FCFBF8] px-2 py-0.5 text-[10px] font-bold text-[#8A8278]">
                           {item.kind}
                         </span>
-                        <span className="rounded-full border border-[#E7E0D7] bg-[#FCFBF8] px-2 py-0.5 text-[10px] font-bold text-[#8A8278]">
+                        <span className="whitespace-nowrap rounded-full border border-[#E7E0D7] bg-[#FCFBF8] px-2 py-0.5 text-[10px] font-bold text-[#8A8278]">
                           {PRIORITY_META[item.priority]}
                         </span>
-                        <span className="rounded-full border border-[#E7E0D7] bg-[#FCFBF8] px-2 py-0.5 text-[10px] font-bold text-[#8A8278]">
+                        <span className="whitespace-nowrap rounded-full border border-[#E7E0D7] bg-[#FCFBF8] px-2 py-0.5 text-[10px] font-bold text-[#8A8278]">
                           👍 {item.vote_count}
                         </span>
                       </div>
@@ -73,7 +73,7 @@ export default async function FeedbackPage() {
                       {item.tags.length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-1.5">
                           {item.tags.slice(0, 3).map((tag) => (
-                            <span key={tag} className="rounded-full bg-[#F5F3EF] px-2 py-0.5 text-[10px] text-[#78716C]">
+                            <span key={tag} className="whitespace-nowrap rounded-full bg-[#F5F3EF] px-2 py-0.5 text-[10px] text-[#78716C]">
                               {tag}
                             </span>
                           ))}

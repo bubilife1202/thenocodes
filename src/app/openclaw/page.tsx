@@ -1,9 +1,22 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { getOpenclawPosts, isOpenclawCategory, OPENCLAW_CATEGORY_KO, type OpenclawCategory } from "@/lib/data/openclaw";
+import {
+  getOpenclawPosts,
+  isOpenclawCategory,
+  isOpenclawProject,
+  OPENCLAW_CATEGORY_KO,
+  OPENCLAW_PROJECT_KO,
+  type OpenclawCategory,
+  type OpenclawProject,
+} from "@/lib/data/openclaw";
 import { formatShortDate } from "@/lib/utils/date";
 
 export const revalidate = 300;
+
+const PROJECT_STYLE: Record<OpenclawProject, string> = {
+  openclaw: "border-[#CFE8E3] bg-[#F3FBF9] text-[#0F766E]",
+  "hermes-agent": "border-[#D9D4FF] bg-[#F5F3FF] text-[#6D28D9]",
+};
 
 const CATEGORY_STYLE: Record<OpenclawCategory, string> = {
   official: "text-[#0F766E]",
@@ -12,7 +25,13 @@ const CATEGORY_STYLE: Record<OpenclawCategory, string> = {
   case: "text-[#4B5563]",
 };
 
-const TABS: { label: string; value?: OpenclawCategory }[] = [
+const PROJECT_TABS: { label: string; value?: OpenclawProject }[] = [
+  { label: "전체" },
+  { label: "OpenClaw", value: "openclaw" },
+  { label: "Hermes Agent", value: "hermes-agent" },
+];
+
+const CATEGORY_TABS: { label: string; value?: OpenclawCategory }[] = [
   { label: "전체" },
   { label: "공식", value: "official" },
   { label: "뉴스", value: "news" },
@@ -20,8 +39,16 @@ const TABS: { label: string; value?: OpenclawCategory }[] = [
   { label: "사례", value: "case" },
 ];
 
-async function OpenclawTable({ filter }: { filter?: OpenclawCategory }) {
-  const posts = await getOpenclawPosts(filter);
+function boardHref(project?: OpenclawProject, category?: OpenclawCategory) {
+  const params = new URLSearchParams();
+  if (project) params.set("project", project);
+  if (category) params.set("category", category);
+  const query = params.toString();
+  return query ? `/openclaw?${query}` : "/openclaw";
+}
+
+async function OpenclawTable({ project, category }: { project?: OpenclawProject; category?: OpenclawCategory }) {
+  const posts = await getOpenclawPosts(project, category);
 
   if (posts.length === 0) {
     return <p className="py-12 text-center text-sm text-[#A1A1AA]">등록된 글이 없습니다</p>;
@@ -32,6 +59,7 @@ async function OpenclawTable({ filter }: { filter?: OpenclawCategory }) {
       <table className="w-full text-left text-sm">
         <thead>
           <tr className="border-b border-[#ECE7DF] text-[11px] font-bold text-[#A1A1AA]">
+            <th className="w-28 pb-2 pr-2">프로젝트</th>
             <th className="w-16 pb-2 pr-2">분류</th>
             <th className="pb-2 pr-2">제목</th>
             <th className="hidden w-28 pb-2 pr-2 sm:table-cell">출처</th>
@@ -42,7 +70,12 @@ async function OpenclawTable({ filter }: { filter?: OpenclawCategory }) {
           {posts.map((p) => (
             <tr key={p.id} className="hover:bg-[#FCFBF8]">
               <td className="py-2.5 pr-2">
-                <span className={`text-[11px] font-semibold ${CATEGORY_STYLE[p.category]}`}>
+                <span className={`whitespace-nowrap rounded-full border px-2 py-0.5 text-[11px] font-semibold ${PROJECT_STYLE[p.project]}`}>
+                  {OPENCLAW_PROJECT_KO[p.project]}
+                </span>
+              </td>
+              <td className="py-2.5 pr-2">
+                <span className={`whitespace-nowrap text-[11px] font-semibold ${CATEGORY_STYLE[p.category]}`}>
                   {OPENCLAW_CATEGORY_KO[p.category]}
                 </span>
               </td>
@@ -62,22 +95,42 @@ async function OpenclawTable({ filter }: { filter?: OpenclawCategory }) {
   );
 }
 
-export default async function OpenclawPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
+export default async function OpenclawPage({ searchParams }: { searchParams: Promise<{ project?: string; category?: string }> }) {
   const params = await searchParams;
-  const currentFilter = isOpenclawCategory(params.category) ? params.category : undefined;
+  const currentProject = isOpenclawProject(params.project) ? params.project : undefined;
+  const currentCategory = isOpenclawCategory(params.category) ? params.category : undefined;
 
   return (
-    <div className="mx-auto max-w-[900px] px-4 py-6 sm:px-6 sm:py-8">
-      <div className="mb-6 flex items-baseline gap-3">
-        <h1 className="text-xl font-black tracking-tight text-[#18181B]">OpenClaw</h1>
-        <span className="text-xs text-[#A1A1AA]">개인 AI 에이전트 플랫폼 소식</span>
-        <div className="ml-auto flex gap-1.5">
-          {TABS.map((tab) => (
+    <div className="mx-auto max-w-[980px] px-4 py-6 sm:px-6 sm:py-8">
+      <div className="mb-6 space-y-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline">
+          <h1 className="text-xl font-black tracking-tight text-[#18181B]">OpenClaw / Hermes</h1>
+          <span className="text-xs text-[#A1A1AA]">개인 AI 에이전트 플랫폼과 Hermes Agent 업데이트</span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#B0AAA2]">project</span>
+          {PROJECT_TABS.map((tab) => (
             <Link
               key={tab.label}
-              href={tab.value ? `/openclaw?category=${tab.value}` : "/openclaw"}
-              className={`rounded-md px-2.5 py-1 text-[11px] font-semibold ${
-                currentFilter === tab.value ? "bg-[#18181B] text-white" : "text-[#A1A1AA] hover:text-[#18181B]"
+              href={boardHref(tab.value, currentCategory)}
+              className={`whitespace-nowrap rounded-md px-2.5 py-1 text-[11px] font-semibold ${
+                currentProject === tab.value ? "bg-[#18181B] text-white" : "text-[#A1A1AA] hover:text-[#18181B]"
+              }`}
+            >
+              {tab.label}
+            </Link>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#B0AAA2]">type</span>
+          {CATEGORY_TABS.map((tab) => (
+            <Link
+              key={tab.label}
+              href={boardHref(currentProject, tab.value)}
+              className={`whitespace-nowrap rounded-md px-2.5 py-1 text-[11px] font-semibold ${
+                currentCategory === tab.value ? "bg-[#18181B] text-white" : "text-[#A1A1AA] hover:text-[#18181B]"
               }`}
             >
               {tab.label}
@@ -87,7 +140,7 @@ export default async function OpenclawPage({ searchParams }: { searchParams: Pro
       </div>
 
       <Suspense fallback={<div className="h-60 animate-pulse rounded-xl bg-gray-50" />}>
-        <OpenclawTable filter={currentFilter} />
+        <OpenclawTable project={currentProject} category={currentCategory} />
       </Suspense>
     </div>
   );
