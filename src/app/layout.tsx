@@ -4,11 +4,11 @@ import { Footer } from "@/components/layout/footer";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "더노코즈 - AI 빌더 실전 시나리오와 기회 보드",
-  description: "AI 빌더를 위한 실전 시나리오 훈련, 한국 AI 해커톤, 공모전, 밋업, 커뮤니티 흐름을 매일 정리합니다.",
+  title: "더노코즈 - AI 빌더 보드와 기회 레이더",
+  description: "AI 빌더를 위한 한국 AI 해커톤, 공모전, 밋업, 에이전트 업데이트, 커뮤니티 흐름을 매일 정리합니다.",
   openGraph: {
-    title: "더노코즈 - AI 빌더 실전 시나리오와 기회 보드",
-    description: "실전 시나리오 훈련과 한국 AI 해커톤·공모전·밋업 기회 보드.",
+    title: "더노코즈 - AI 빌더 보드와 기회 레이더",
+    description: "한국 AI 해커톤·공모전·밋업과 에이전트 업데이트를 모은 AI 빌더 보드.",
     siteName: "더노코즈",
   },
 };

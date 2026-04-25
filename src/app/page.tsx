@@ -122,19 +122,19 @@ async function HomeContent() {
       <section className="rounded-[32px] border border-[#ECE7DF] bg-[linear-gradient(135deg,#FFFFFF_0%,#F8FFFD_52%,#FFF8EF_100%)] p-5 shadow-[0_24px_60px_-42px_rgba(24,24,27,0.32)] sm:p-7">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-end">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-[#0F766E]">AI builder dashboard</p>
+            <p className="text-xs font-black tracking-[0.18em] text-[#0F766E]">오늘의 AI 빌더 보드</p>
             <h1 className="mt-3 max-w-3xl text-3xl font-black tracking-tight text-[#18181B] sm:text-5xl">
-              실전 시나리오로 훈련하고, 오늘 열린 기회로 바로 실행하세요.
+              오늘 확인할 AI 빌더 흐름과 기회를 한 화면에서 봅니다.
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#6B6760]">
-              더노코즈는 AI 협업·검증·개선 역량을 보여주는 훈련 경로와 해커톤, 공모전, 밋업, 빌더 흐름을 한 화면에서 비교하는 운영 보드입니다.
+              더노코즈는 해커톤·공모전 마감, 밋업, 에이전트 플랫폼 업데이트, 논문·GitHub 요약을 매일 정리하는 운영 보드입니다.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
-              <Link href="/scenarios" className="rounded-2xl bg-[#0F766E] px-5 py-3 text-sm font-black text-white transition-colors hover:bg-[#0B5F58]">
-                실전 시나리오 시작하기
+              <Link href="/hackathons" className="rounded-2xl bg-[#0F766E] px-5 py-3 text-sm font-black text-white transition-colors hover:bg-[#0B5F58]">
+                마감 임박 보기
               </Link>
-              <Link href="/hackathons" className="rounded-2xl border border-[#E6DED4] bg-white px-5 py-3 text-sm font-bold text-[#18181B] transition-colors hover:bg-[#F8F5F0]">
-                기회 보드 보기
+              <Link href="/openclaw" className="rounded-2xl border border-[#E6DED4] bg-white px-5 py-3 text-sm font-bold text-[#18181B] transition-colors hover:bg-[#F8F5F0]">
+                에이전트 업데이트
               </Link>
               <Link href="/infographics" className="rounded-2xl border border-[#E7D9F8] bg-white px-5 py-3 text-sm font-bold text-[#6D3FB8] transition-colors hover:bg-[#FCF9FF]">
                 인포그래픽 보기
@@ -169,16 +169,16 @@ async function HomeContent() {
         <div className="rounded-[28px] border border-[#D9EFEA] bg-[#F6FCFB] p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#0F766E]">featured path</p>
-              <h2 className="mt-2 text-xl font-black text-[#123B38]">실전 시나리오 #1 · flaky timezone test</h2>
+              <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#0F766E]">에이전트 레이더</p>
+              <h2 className="mt-2 text-xl font-black text-[#123B38]">Hugging Face ML Intern 먼저 확인</h2>
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#5C7D78]">
-                AI에게 맡기는 실력이 아니라, AI를 지휘하고 검증하며 결과를 개선하는 과정을 정적 증거로 남깁니다. 제출 후 사람 채점 워크스루로 Collaboration · Verification · Improvement를 확인합니다.
+                ML 작업을 실제로 수행하는 에이전트 레퍼런스입니다. 논문·문서·데이터셋 탐색, 코드 작성, 학습·평가 루프를 어떻게 도구화했는지 OpenClaw/Hermes 흐름과 함께 봅니다.
               </p>
             </div>
-            <span className="rounded-full bg-white px-3 py-1 text-[11px] font-black text-[#0F766E]">L1-L4 rubric</span>
+            <span className="whitespace-nowrap rounded-full bg-white px-3 py-1 text-[11px] font-black text-[#0F766E]">HF 공개 프로젝트</span>
           </div>
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
-            {["시나리오 저장소", "정적 대화 증거", "사람 채점 워크스루"].map((label, i) => (
+            {["ML 작업 에이전트", "OpenClaw / Hermes", "논문·GitHub 요약"].map((label, i) => (
               <div key={label} className="rounded-2xl border border-[#D9EFEA] bg-white px-4 py-3">
                 <p className="text-[11px] font-black text-[#0F766E]">0{i + 1}</p>
                 <p className="mt-1 text-sm font-bold text-[#18181B]">{label}</p>
@@ -186,8 +186,8 @@ async function HomeContent() {
             ))}
           </div>
           <div className="mt-5 flex flex-wrap gap-2">
-            <Link href="/scenarios" className="rounded-xl bg-[#0F766E] px-4 py-2 text-sm font-bold text-white hover:bg-[#0B5F58]">실전 시나리오 보기</Link>
-            <Link href="/scenarios/walkthrough" className="rounded-xl border border-[#D9EFEA] bg-white px-4 py-2 text-sm font-bold text-[#123B38] hover:bg-[#F3FBF9]">채점 예시 보기</Link>
+            <a href="https://github.com/huggingface/ml-intern" target="_blank" rel="noopener noreferrer" className="rounded-xl bg-[#0F766E] px-4 py-2 text-sm font-bold text-white hover:bg-[#0B5F58]">ML Intern GitHub</a>
+            <Link href="/openclaw" className="rounded-xl border border-[#D9EFEA] bg-white px-4 py-2 text-sm font-bold text-[#123B38] hover:bg-[#F3FBF9]">OpenClaw / Hermes 보기</Link>
           </div>
         </div>
 

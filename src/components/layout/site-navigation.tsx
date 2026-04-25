@@ -16,7 +16,6 @@ type NavItem = {
 
 const MAIN_ITEMS: NavItem[] = [
   { label: "홈", href: "/", tone: "neutral", description: "더노코즈 메인" },
-  { label: "실전 시나리오", href: "/scenarios", badge: "훈련", tone: "teal", description: "AI 협업 · 검증 · 개선" },
   { label: "커뮤니티", href: "/community", tone: "teal", description: "사람 · 에이전트가 함께 쌓는 후기 · 링크 · 질문" },
   { label: "기회 보드", href: "/hackathons", tone: "teal", description: "해커톤 · 공모전 통합" },
   { label: "밋업 / 세미나", href: "/meetups", tone: "teal", description: "서울 AI 오프라인 행사" },
@@ -121,14 +120,14 @@ function SidebarBody({ pathname, onNavigate }: { pathname: string; onNavigate?: 
           더노코즈<span className="text-[#14B8A6]">.</span>
         </Link>
         <p className="mt-2 text-sm leading-relaxed text-[#71717A]">
-          실전 시나리오로 AI 빌더 역량을 훈련하고, 해커톤·공모전·밋업 기회를 매일 모읍니다.
+          AI 빌더가 오늘 확인할 기회, 밋업, 에이전트 업데이트, 커뮤니티 흐름을 한 곳에 모읍니다.
         </p>
         <Link
-          href="/scenarios"
+          href="/openclaw"
           onClick={onNavigate}
           className="mt-3 inline-flex w-full items-center justify-between rounded-xl border border-[#CFE8E3] bg-[#F3FBF9] px-3 py-2 text-xs font-bold text-[#0F766E] hover:bg-[#E7F6F3]"
         >
-          실전 시나리오 시작
+          에이전트 업데이트 보기
           <span aria-hidden>→</span>
         </Link>
       </div>
@@ -139,8 +138,8 @@ function SidebarBody({ pathname, onNavigate }: { pathname: string; onNavigate?: 
       </div>
 
       <div className="mt-auto rounded-[20px] border border-[#D9EFEA] bg-[linear-gradient(180deg,#F6FCFB_0%,#EEF8F6_100%)] p-4">
-        <p className="text-sm font-bold text-[#123B38]">실전 빌더 라운지</p>
-        <p className="mt-1 text-[11px] leading-relaxed text-[#5C7D78]">시나리오 제보 · 운영 의견 · 기회 추천을 여기서 받아요.</p>
+        <p className="text-sm font-bold text-[#123B38]">AI 빌더 라운지</p>
+        <p className="mt-1 text-[11px] leading-relaxed text-[#5C7D78]">운영 의견 · 기회 추천 · 에이전트 제보를 여기서 받아요.</p>
         <div className="mt-3 space-y-2">
           <a
             href="https://discord.gg/Qjw8FSBg"
@@ -175,8 +174,8 @@ export function SiteNavigation() {
           <Link href="/" className="text-sm font-black tracking-tight text-[#18181B]">
             더노코즈<span className="text-[#14B8A6]">.</span>
           </Link>
-          <Link href="/scenarios" className="ml-auto mr-2 rounded-full bg-[#0F766E] px-3 py-1 text-[11px] font-bold text-white">
-            실전 시나리오
+          <Link href="/hackathons" className="ml-auto mr-2 rounded-full bg-[#0F766E] px-3 py-1 text-[11px] font-bold text-white">
+            기회 보드
           </Link>
           <button
             type="button"
