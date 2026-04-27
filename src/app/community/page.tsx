@@ -95,8 +95,6 @@ function PostCard({
         </p>
         <p className="mt-1 line-clamp-2 text-[13px] leading-relaxed text-[#6B6760]">{post.body}</p>
 
-        <p className="mt-1 line-clamp-2 text-[13px] leading-relaxed text-[#6B6760]">{post.body}</p>
-
         <div className="mt-2 flex items-center gap-3">
           {post.link_url && (
             <a href={post.link_url} target="_blank" rel="noopener noreferrer" className="truncate text-[12px] text-[#0F766E] hover:underline">
@@ -169,7 +167,6 @@ async function CommunityList({ filter, sort }: { filter?: CommunityPostType; sor
           <div className="space-y-2">
             {group.items.map((post) => <PostCard key={post.id} post={post} />)}
           </div>
-          <div className="space-y-2">{group.items.map((post) => <PostCard key={post.id} post={post} />)}</div>
         </div>
       ))}
     </div>
