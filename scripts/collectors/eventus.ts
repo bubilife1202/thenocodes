@@ -1,83 +1,172 @@
 import type { Hackathon } from "./types.js";
 
 const EVENTUS_API = "https://api.event-us.kr/api/v1/engine/search";
+const MAX_PAGES_PER_QUERY = 5;
+
+type OpportunityCategory = NonNullable<Hackathon["category"]>;
+
+type EventUsQuery = {
+  query: string;
+  fallbackCategory: OpportunityCategory;
+  tags: string[];
+};
+
+const EVENTUS_QUERIES: EventUsQuery[] = [
+  { query: "AI 해커톤", fallbackCategory: "hackathon", tags: ["AI", "해커톤"] },
+  { query: "인공지능 해커톤", fallbackCategory: "hackathon", tags: ["인공지능", "해커톤"] },
+  { query: "노코드 해커톤", fallbackCategory: "hackathon", tags: ["노코드", "해커톤"] },
+  { query: "AI 공모전", fallbackCategory: "contest", tags: ["AI", "공모전"] },
+  { query: "인공지능 공모전", fallbackCategory: "contest", tags: ["인공지능", "공모전"] },
+  { query: "AI 경진대회", fallbackCategory: "contest", tags: ["AI", "경진대회"] },
+  { query: "AI 밋업", fallbackCategory: "meetup", tags: ["AI", "밋업"] },
+  { query: "인공지능 밋업", fallbackCategory: "meetup", tags: ["인공지능", "밋업"] },
+  { query: "AI 세미나", fallbackCategory: "meetup", tags: ["AI", "세미나"] },
+  { query: "생성형 AI 세미나", fallbackCategory: "meetup", tags: ["생성형 AI", "세미나"] },
+  { query: "노코드 세미나", fallbackCategory: "meetup", tags: ["노코드", "세미나"] },
+];
+
+const CATEGORY_TAG: Record<OpportunityCategory, string> = {
+  hackathon: "해커톤",
+  contest: "공모전",
+  meetup: "밋업",
+};
+
+const CONTEST_TERMS = ["공모전", "경진대회", "콘테스트", "competition", "contest", "challenge"];
+const MEETUP_TERMS = ["밋업", "세미나", "웨비나", "컨퍼런스", "포럼", "강연", "워크숍", "meetup", "seminar", "webinar", "conference", "workshop"];
+const HACKATHON_TERMS = ["해커톤", "hackathon"];
+
+function rawValue(value: unknown): string | null {
+  if (value && typeof value === "object" && "raw" in value) {
+    const raw = (value as { raw?: unknown }).raw;
+    return typeof raw === "string" || typeof raw === "number" ? String(raw) : null;
+  }
+  return typeof value === "string" || typeof value === "number" ? String(value) : null;
+}
+
+function rawArray(value: unknown): string[] {
+  if (value && typeof value === "object" && "raw" in value) {
+    const raw = (value as { raw?: unknown }).raw;
+    if (Array.isArray(raw)) return raw.map(String).filter(Boolean);
+    if (typeof raw === "string") return [raw].filter(Boolean);
+  }
+  if (Array.isArray(value)) return value.map(String).filter(Boolean);
+  return [];
+}
+
+function hasAny(haystack: string, terms: string[]) {
+  return terms.some((term) => haystack.includes(term.toLowerCase()));
+}
+
+export function classifyEventUsCategory(input: {
+  title?: string | null;
+  description?: string | null;
+  tags?: string[] | null;
+  fallbackCategory: OpportunityCategory;
+}): OpportunityCategory {
+  const haystack = [input.title, input.description, ...(input.tags ?? [])]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  if (hasAny(haystack, CONTEST_TERMS)) return "contest";
+  if (hasAny(haystack, MEETUP_TERMS)) return "meetup";
+  if (hasAny(haystack, HACKATHON_TERMS)) return "hackathon";
+  return input.fallbackCategory;
+}
+
+function normalizeThumbnail(coverImage: string | null) {
+  if (!coverImage) return null;
+  return coverImage.startsWith("http")
+    ? coverImage
+    : `https://eventusstorage.blob.core.windows.net/evs${coverImage}`;
+}
+
+function buildEventUrl(subdomain: string | null, id: string) {
+  return subdomain ? `https://event-us.kr/${subdomain}/${id}` : `https://event-us.kr/events/${id}`;
+}
+
+async function fetchEventUsPage(query: EventUsQuery, page: number) {
+  const res = await fetch(EVENTUS_API, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query: query.query,
+      page: { current: page, size: 20 },
+    }),
+  });
+
+  if (!res.ok) {
+    console.error(`[EventUs] ${query.query} page ${page} failed: ${res.status}`);
+    return null;
+  }
+
+  return res.json() as Promise<{ results?: unknown[] }>;
+}
 
 export async function collectEventUs(): Promise<Hackathon[]> {
-  const hackathons: Hackathon[] = [];
+  const opportunities: Hackathon[] = [];
   const seen = new Set<string>();
+  const now = new Date();
 
   try {
-    for (let page = 1; page <= 5; page++) {
-      const res = await fetch(EVENTUS_API, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          query: "해커톤",
-          page: { current: page, size: 20 },
-        }),
-      });
+    for (const query of EVENTUS_QUERIES) {
+      for (let page = 1; page <= MAX_PAGES_PER_QUERY; page++) {
+        const data = await fetchEventUsPage(query, page);
+        const items = data?.results ?? [];
 
-      if (!res.ok) {
-        console.error(`[EventUs] page ${page} failed: ${res.status}`);
-        break;
-      }
+        if (items.length === 0) break;
 
-      const data = await res.json();
-      const items = data.results ?? [];
+        for (const item of items) {
+          if (!item || typeof item !== "object") continue;
+          const e = item as Record<string, unknown>;
+          const id = rawValue(e.id);
+          if (!id || seen.has(id)) continue;
 
-      if (items.length === 0) break;
+          const title = rawValue(e.title)?.trim() ?? "";
+          const state = rawValue(e.state);
+          const subdomain = rawValue(e.subdomain);
 
-      for (const e of items) {
-        const id = e.id?.raw?.toString();
-        if (!id || seen.has(id)) continue;
-        seen.add(id);
+          if (!title || state === "Temp" || state === "unpublished") continue;
 
-        const title = e.title?.raw ?? "";
-        const state = e.state?.raw;
-        const subdomain = e.subdomain?.raw ?? "";
+          const startsAt = rawValue(e.start_date);
+          const endsAt = rawValue(e.close_date);
+          if (endsAt && new Date(endsAt) < now) continue;
 
-        // Skip temp/unpublished
-        if (state === "Temp" || state === "unpublished") continue;
+          const description = rawValue(e.description)?.trim() ?? "";
+          const eventTags = rawArray(e.tags);
+          const category = classifyEventUsCategory({
+            title,
+            description,
+            tags: eventTags,
+            fallbackCategory: query.fallbackCategory,
+          });
+          const tags = Array.from(new Set([...eventTags, ...query.tags, CATEGORY_TAG[category]])).filter(Boolean);
 
-        const startsAt = e.start_date?.raw ?? null;
-        const endsAt = e.close_date?.raw ?? null;
-
-        // Skip events that ended before 2026
-        if (endsAt && new Date(endsAt) < new Date("2025-06-01")) continue;
-
-        const coverImage = e.cover_image_url?.raw;
-        const thumbnail = coverImage
-          ? coverImage.startsWith("http")
-            ? coverImage
-            : `https://eventusstorage.blob.core.windows.net/evs${coverImage}`
-          : null;
-
-        const location = e.area?.raw ?? e.area_detail?.raw ?? null;
-        const description = e.description?.raw ?? "";
-        const organizer = e.app_title?.raw ?? e.fullname?.raw ?? null;
-
-        hackathons.push({
-          source: "eventus",
-          external_id: id,
-          title,
-          description: description.slice(0, 300),
-          organizer,
-          url: `https://event-us.kr/${subdomain}/${id}`,
-          thumbnail_url: thumbnail,
-          prize: null,
-          tags: e.tags?.raw?.length ? e.tags.raw : ["해커톤"],
-          starts_at: startsAt,
-          ends_at: endsAt,
-          location,
-        });
+          seen.add(id);
+          opportunities.push({
+            source: "eventus",
+            external_id: id,
+            title,
+            description: description.slice(0, 300),
+            organizer: rawValue(e.app_title) ?? rawValue(e.fullname),
+            url: buildEventUrl(subdomain, id),
+            thumbnail_url: normalizeThumbnail(rawValue(e.cover_image_url)),
+            prize: null,
+            tags,
+            starts_at: startsAt,
+            ends_at: endsAt,
+            location: rawValue(e.area) ?? rawValue(e.area_detail),
+            category,
+          });
+        }
       }
     }
   } catch (err) {
     console.error("[EventUs] Error:", err);
   }
 
-  console.log(`[EventUs] Collected ${hackathons.length} hackathons`);
-  return hackathons;
+  console.log(`[EventUs] Collected ${opportunities.length} opportunities`);
+  return opportunities;
 }

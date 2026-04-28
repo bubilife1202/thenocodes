@@ -5,6 +5,7 @@ import { getFeaturedMeetups } from "@/lib/data/meetups";
 import { getFeaturedSignals, type SignalRow } from "@/lib/data/signals";
 import { getFeaturedInfographics, type InfographicRow } from "@/lib/data/infographics";
 import { getHackathonStatus, sortHackathons } from "@/lib/hackathons";
+import { buildTodayActivity, formatKstActivityTime, getLatestActivityAt, type TodayActivityItem } from "@/lib/home/today-board";
 import { formatShortDate } from "@/lib/utils/date";
 import type { SignalType } from "@/lib/signals/constants";
 
@@ -18,12 +19,26 @@ const SIGNAL_TYPE_KO: Record<SignalType, string> = {
   research: "연구",
 };
 
+const ACTIVITY_TONE_CLASS: Record<NonNullable<TodayActivityItem["tone"]>, string> = {
+  teal: "border-[#D9EFEA] bg-white text-[#0F766E]",
+  orange: "border-[#F2D7BC] bg-white text-[#C46A1A]",
+  purple: "border-[#E7D9F8] bg-white text-[#6D3FB8]",
+  neutral: "border-[#ECE7DF] bg-white text-[#6B6760]",
+};
+
 function deadlineLabel(item: HackathonRow, now: Date) {
   if (!item.ends_at) return "상시";
   const daysLeft = Math.ceil((new Date(item.ends_at).getTime() - now.getTime()) / 86400000);
   if (daysLeft <= 0) return "오늘";
   if (daysLeft <= 7) return `D-${daysLeft}`;
   return formatShortDate(item.ends_at);
+}
+
+function opportunityLabel(item: HackathonRow) {
+  if (item.category === "contest") return "공모전";
+  if (item.tags?.some((tag) => tag.includes("세미나"))) return "세미나";
+  if (item.category === "meetup") return "밋업";
+  return "해커톤";
 }
 
 function OpportunityRow({ item, now }: { item: HackathonRow; now: Date }) {
@@ -33,14 +48,18 @@ function OpportunityRow({ item, now }: { item: HackathonRow; now: Date }) {
       href={item.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="grid gap-2 rounded-2xl border border-[#F1EAE0] bg-white px-4 py-3 transition-colors hover:border-[#D9EFEA] hover:bg-[#FBFEFD] sm:grid-cols-[72px_minmax(0,1fr)_96px_112px] sm:items-center"
+      className="block rounded-2xl border border-[#F1EAE0] bg-white px-4 py-3 transition-colors hover:border-[#D9EFEA] hover:bg-[#FBFEFD]"
     >
-      <span className={`whitespace-nowrap text-[11px] font-black ${isContest ? "text-[#C46A1A]" : "text-[#0F766E]"}`}>
-        {isContest ? "공모전" : "해커톤"}
-      </span>
-      <span className="min-w-0 text-sm font-bold text-[#18181B] sm:truncate">{item.title}</span>
-      <span className="whitespace-nowrap text-xs font-semibold text-[#6B6760] sm:text-right">{deadlineLabel(item, now)}</span>
-      <span className="min-w-0 text-xs text-[#A1A1AA] sm:truncate sm:text-right">{item.organizer || item.source}</span>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className={`whitespace-nowrap text-[11px] font-black ${isContest ? "text-[#C46A1A]" : "text-[#0F766E]"}`}>
+          {opportunityLabel(item)}
+        </span>
+        <span className="ml-auto whitespace-nowrap rounded-full bg-[#F8F5F0] px-2.5 py-1 text-[11px] font-black text-[#6B6760]">
+          {deadlineLabel(item, now)}
+        </span>
+      </div>
+      <p className="mt-1 break-keep text-sm font-bold leading-5 text-[#18181B]">{item.title}</p>
+      <p className="mt-1 break-keep text-xs leading-5 text-[#8A8278]">{item.organizer || item.source}</p>
     </a>
   );
 }
@@ -51,12 +70,16 @@ function MeetupRow({ item }: { item: HackathonRow }) {
       href={item.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="grid gap-2 rounded-2xl border border-[#F1EAE0] bg-white px-4 py-3 transition-colors hover:border-[#D9EFEA] hover:bg-[#FBFEFD] sm:grid-cols-[72px_minmax(0,1fr)_96px_112px] sm:items-center"
+      className="block rounded-2xl border border-[#F1EAE0] bg-white px-4 py-3 transition-colors hover:border-[#D9EFEA] hover:bg-[#FBFEFD]"
     >
-      <span className="whitespace-nowrap text-[11px] font-black text-[#0F766E]">밋업</span>
-      <span className="min-w-0 text-sm font-bold text-[#18181B] sm:truncate">{item.title}</span>
-      <span className="whitespace-nowrap text-xs font-semibold text-[#6B6760] sm:text-right">{item.starts_at ? formatShortDate(item.starts_at) : "일정 미정"}</span>
-      <span className="min-w-0 text-xs text-[#A1A1AA] sm:truncate sm:text-right">{item.organizer || item.location || item.source}</span>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="whitespace-nowrap text-[11px] font-black text-[#0F766E]">{opportunityLabel(item)}</span>
+        <span className="ml-auto whitespace-nowrap rounded-full bg-[#F3FBF9] px-2.5 py-1 text-[11px] font-black text-[#5C7D78]">
+          {item.starts_at ? formatShortDate(item.starts_at) : "일정 미정"}
+        </span>
+      </div>
+      <p className="mt-1 break-keep text-sm font-bold leading-5 text-[#18181B]">{item.title}</p>
+      <p className="mt-1 break-keep text-xs leading-5 text-[#8A8278]">{item.organizer || item.location || item.source}</p>
     </a>
   );
 }
@@ -67,12 +90,16 @@ function SignalRowLink({ item }: { item: SignalRow }) {
       href={item.source_url}
       target="_blank"
       rel="noopener noreferrer"
-      className="grid gap-2 rounded-2xl border border-[#F1EAE0] bg-white px-4 py-3 transition-colors hover:border-[#D9EFEA] hover:bg-[#FBFEFD] sm:grid-cols-[72px_minmax(0,1fr)_96px_112px] sm:items-center"
+      className="block rounded-2xl border border-[#F1EAE0] bg-white px-4 py-3 transition-colors hover:border-[#D9EFEA] hover:bg-[#FBFEFD]"
     >
-      <span className="whitespace-nowrap text-[11px] font-black text-[#0F766E]">{SIGNAL_TYPE_KO[item.signal_type]}</span>
-      <span className="min-w-0 text-sm font-bold text-[#18181B] sm:truncate">{item.title}</span>
-      <span className="whitespace-nowrap text-xs font-semibold text-[#6B6760] sm:text-right">{formatShortDate(item.published_at)}</span>
-      <span className="min-w-0 text-xs text-[#A1A1AA] sm:truncate sm:text-right">{item.source_name || "source"}</span>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="whitespace-nowrap text-[11px] font-black text-[#0F766E]">{SIGNAL_TYPE_KO[item.signal_type]}</span>
+        <span className="ml-auto whitespace-nowrap rounded-full bg-[#F3FBF9] px-2.5 py-1 text-[11px] font-black text-[#5C7D78]">
+          {formatShortDate(item.published_at)}
+        </span>
+      </div>
+      <p className="mt-1 break-keep text-sm font-bold leading-5 text-[#18181B]">{item.title}</p>
+      <p className="mt-1 break-keep text-xs leading-5 text-[#8A8278]">{item.source_name || "source"}</p>
     </a>
   );
 }
@@ -86,14 +113,36 @@ function InfographicRowLink({ item }: { item: InfographicRow }) {
       href={item.original_url}
       target="_blank"
       rel="noopener noreferrer"
-      className="grid gap-2 rounded-2xl border border-[#F1EAE0] bg-white px-4 py-3 transition-colors hover:border-[#D9EFEA] hover:bg-[#FBFEFD] sm:grid-cols-[72px_minmax(0,1fr)_96px_112px] sm:items-center"
+      className="block rounded-2xl border border-[#F1EAE0] bg-white px-4 py-3 transition-colors hover:border-[#D9EFEA] hover:bg-[#FBFEFD]"
     >
-      <span className="whitespace-nowrap text-[11px] font-black text-[#6D3FB8]">{label}</span>
-      <span className="min-w-0 text-sm font-bold text-[#18181B] sm:truncate">{item.title}</span>
-      <span className="whitespace-nowrap text-xs font-semibold text-[#6B6760] sm:text-right">
-        {item.published_at ? formatShortDate(item.published_at) : formatShortDate(item.created_at)}
-      </span>
-      <span className="min-w-0 text-xs text-[#A1A1AA] sm:truncate sm:text-right">{meta}</span>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="whitespace-nowrap text-[11px] font-black text-[#6D3FB8]">{label}</span>
+        <span className="ml-auto whitespace-nowrap rounded-full bg-[#FCF9FF] px-2.5 py-1 text-[11px] font-black text-[#6D3FB8]">
+          {item.published_at ? formatShortDate(item.published_at) : formatShortDate(item.created_at)}
+        </span>
+      </div>
+      <p className="mt-1 break-keep text-sm font-bold leading-5 text-[#18181B]">{item.title}</p>
+      <p className="mt-1 break-keep text-xs leading-5 text-[#8A8278]">{meta}</p>
+    </a>
+  );
+}
+
+function ActivityRow({ item }: { item: TodayActivityItem }) {
+  const toneClass = ACTIVITY_TONE_CLASS[item.tone || "neutral"];
+
+  return (
+    <a
+      href={item.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block rounded-2xl border border-[#D9EFEA] bg-white px-4 py-3 transition-colors hover:border-[#0F766E]/30 hover:bg-[#FBFEFD]"
+    >
+      <div className="flex flex-wrap items-center gap-2">
+        <span className={`whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] font-black ${toneClass}`}>{item.source}</span>
+        <span className="ml-auto whitespace-nowrap text-[11px] font-bold text-[#8A8278]">{formatKstActivityTime(item.timestamp).replace(" KST", "")}</span>
+      </div>
+      <p className="mt-2 break-keep text-sm font-bold leading-5 text-[#18181B]">{item.title}</p>
+      {item.meta ? <p className="mt-1 break-keep text-xs leading-5 text-[#8A8278]">{item.meta}</p> : null}
     </a>
   );
 }
@@ -117,17 +166,63 @@ async function HomeContent() {
     return daysLeft >= 0 && daysLeft <= 7;
   });
 
+  const activityItems: TodayActivityItem[] = [
+    ...opportunities.map((item) => ({
+      id: `opportunity-${item.id}`,
+      title: item.title,
+      href: item.url,
+      source: opportunityLabel(item),
+      timestamp: item.collected_at,
+      meta: item.organizer || item.source,
+      tone: item.category === "contest" ? "orange" as const : "teal" as const,
+    })),
+    ...meetups.map((item) => ({
+      id: `meetup-${item.id}`,
+      title: item.title,
+      href: item.url,
+      source: opportunityLabel(item),
+      timestamp: item.collected_at,
+      meta: item.organizer || item.location || item.source,
+      tone: "teal" as const,
+    })),
+    ...signals.map((item) => ({
+      id: `signal-${item.id}`,
+      title: item.title,
+      href: item.source_url,
+      source: SIGNAL_TYPE_KO[item.signal_type],
+      timestamp: item.updated_at || item.published_at,
+      meta: item.source_name || "builder signal",
+      tone: "neutral" as const,
+    })),
+    ...infographics.map((item) => ({
+      id: `infographic-${item.id}`,
+      title: item.title,
+      href: item.original_url,
+      source: item.source_type === "github" ? "GitHub" : "논문",
+      timestamp: item.updated_at || item.created_at,
+      meta: item.repository || item.authors || "infographic",
+      tone: "purple" as const,
+    })),
+  ];
+  const todayActivity = buildTodayActivity(activityItems, now, 5);
+  const latestActivityAt = getLatestActivityAt(activityItems);
+
   return (
     <div className="space-y-6">
       <section className="rounded-[32px] border border-[#ECE7DF] bg-[linear-gradient(135deg,#FFFFFF_0%,#F8FFFD_52%,#FFF8EF_100%)] p-5 shadow-[0_24px_60px_-42px_rgba(24,24,27,0.32)] sm:p-7">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-end">
           <div>
-            <p className="text-xs font-black tracking-[0.18em] text-[#0F766E]">오늘의 AI 빌더 보드</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-xs font-black tracking-[0.18em] text-[#0F766E]">오늘의 AI 빌더 보드</p>
+              <span className="rounded-full border border-[#D9EFEA] bg-white/80 px-3 py-1 text-[11px] font-bold text-[#5C7D78]">
+                마지막 반영 {latestActivityAt ? formatKstActivityTime(latestActivityAt) : "수집 대기"}
+              </span>
+            </div>
             <h1 className="mt-3 max-w-3xl text-3xl font-black tracking-tight text-[#18181B] sm:text-5xl">
-              오늘 확인할 AI 빌더 흐름과 기회를 한 화면에서 봅니다.
+              오늘 볼 AI 기회와 빌더 흐름만 압축했습니다.
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#6B6760]">
-              더노코즈는 해커톤·공모전 마감, 밋업, 에이전트 플랫폼 업데이트, 논문·GitHub 요약을 매일 정리하는 운영 보드입니다.
+              해커톤·공모전 마감, 밋업·세미나 일정, OpenClaw/Hermes 업데이트, 논문·GitHub 요약을 매일 정리합니다.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
               <Link href="/hackathons" className="rounded-2xl bg-[#0F766E] px-5 py-3 text-sm font-black text-white transition-colors hover:bg-[#0B5F58]">
@@ -143,7 +238,7 @@ async function HomeContent() {
           </div>
 
           <div className="rounded-[26px] border border-[#D9EFEA] bg-white/85 p-4">
-            <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#5C7D78]">live inventory</p>
+            <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#5C7D78]">live board</p>
             <div className="mt-4 grid grid-cols-3 gap-2 text-center">
               <div className="rounded-2xl bg-[#F3FBF9] p-3">
                 <p className="text-2xl font-black text-[#0F766E]">{stats.hackathons + stats.contests}</p>
@@ -169,25 +264,23 @@ async function HomeContent() {
         <div className="rounded-[28px] border border-[#D9EFEA] bg-[#F6FCFB] p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#0F766E]">에이전트 레이더</p>
-              <h2 className="mt-2 text-xl font-black text-[#123B38]">Hugging Face ML Intern 먼저 확인</h2>
+              <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#0F766E]">오늘 반영</p>
+              <h2 className="mt-2 text-xl font-black text-[#123B38]">새로 들어온 기회·흐름</h2>
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#5C7D78]">
-                ML 작업을 실제로 수행하는 에이전트 레퍼런스입니다. 논문·문서·데이터셋 탐색, 코드 작성, 학습·평가 루프를 어떻게 도구화했는지 OpenClaw/Hermes 흐름과 함께 봅니다.
+                실제 수집·등록된 항목만 보여줍니다. 오늘 새 항목이 없으면 아래 보드에서 최근 반영 항목을 이어서 확인하세요.
               </p>
             </div>
-            <span className="whitespace-nowrap rounded-full bg-white px-3 py-1 text-[11px] font-black text-[#0F766E]">HF 공개 프로젝트</span>
+            <span className="whitespace-nowrap rounded-full bg-white px-3 py-1 text-[11px] font-black text-[#0F766E]">KST 기준</span>
           </div>
-          <div className="mt-5 grid gap-3 sm:grid-cols-3">
-            {["ML 작업 에이전트", "OpenClaw / Hermes", "논문·GitHub 요약"].map((label, i) => (
-              <div key={label} className="rounded-2xl border border-[#D9EFEA] bg-white px-4 py-3">
-                <p className="text-[11px] font-black text-[#0F766E]">0{i + 1}</p>
-                <p className="mt-1 text-sm font-bold text-[#18181B]">{label}</p>
+          <div className="mt-5 space-y-2">
+            {todayActivity.length > 0 ? todayActivity.map((item) => (
+              <ActivityRow key={item.id} item={item} />
+            )) : (
+              <div className="rounded-2xl border border-[#D9EFEA] bg-white px-4 py-6">
+                <p className="text-sm font-bold text-[#18181B]">오늘 새로 반영된 항목은 아직 없습니다.</p>
+                <p className="mt-1 text-sm leading-6 text-[#6B6760]">일일 수집기가 다음 실행에서 해커톤·공모전·밋업·세미나 항목을 갱신합니다.</p>
               </div>
-            ))}
-          </div>
-          <div className="mt-5 flex flex-wrap gap-2">
-            <a href="https://github.com/huggingface/ml-intern" target="_blank" rel="noopener noreferrer" className="rounded-xl bg-[#0F766E] px-4 py-2 text-sm font-bold text-white hover:bg-[#0B5F58]">ML Intern GitHub</a>
-            <Link href="/openclaw" className="rounded-xl border border-[#D9EFEA] bg-white px-4 py-2 text-sm font-bold text-[#123B38] hover:bg-[#F3FBF9]">OpenClaw / Hermes 보기</Link>
+            )}
           </div>
         </div>
 
@@ -213,7 +306,7 @@ async function HomeContent() {
           <Link href="/hackathons" className="whitespace-nowrap text-xs font-bold text-[#0F766E] hover:underline">전체 보기 →</Link>
         </div>
         {opportunities.length > 0 ? (
-          <div className="space-y-2">
+          <div className="grid gap-2 md:grid-cols-2">
             {opportunities.map((item) => <OpportunityRow key={item.id} item={item} now={now} />)}
           </div>
         ) : (
@@ -242,10 +335,10 @@ async function HomeContent() {
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="rounded-[28px] border border-[#ECE7DF] bg-white p-5">
           <div className="mb-4 flex items-center gap-3">
-            <h2 className="text-sm font-black text-[#18181B]">서울 밋업</h2>
+            <h2 className="text-sm font-black text-[#18181B]">밋업 · 세미나</h2>
             <Link href="/meetups" className="text-xs font-bold text-[#0F766E] hover:underline">전체 보기 →</Link>
           </div>
-          {meetups.length > 0 ? <div className="space-y-2">{meetups.map((item) => <MeetupRow key={item.id} item={item} />)}</div> : <p className="py-10 text-center text-sm text-[#A1A1AA]">등록된 밋업이 없습니다.</p>}
+          {meetups.length > 0 ? <div className="space-y-2">{meetups.map((item) => <MeetupRow key={item.id} item={item} />)}</div> : <p className="py-10 text-center text-sm text-[#A1A1AA]">등록된 밋업·세미나가 없습니다.</p>}
         </section>
 
         <section className="rounded-[28px] border border-[#ECE7DF] bg-white p-5">
