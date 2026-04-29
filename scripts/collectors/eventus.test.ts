@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import test from "node:test";
-import { classifyEventUsCategory } from "./eventus.js";
+import { buildEventUrl, classifyEventUsCategory } from "./eventus.js";
 
 test("classifyEventUsCategory maps seminars and meetups to meetup category", () => {
   assert.equal(
@@ -24,4 +24,9 @@ test("classifyEventUsCategory keeps contests and hackathons distinct", () => {
     classifyEventUsCategory({ title: "노코드 해커톤", description: "", tags: [], fallbackCategory: "contest" }),
     "hackathon"
   );
+});
+
+test("buildEventUrl uses the current Event-us public detail route", () => {
+  assert.equal(buildEventUrl("spectory2", "123124"), "https://event-us.kr/spectory2/event/123124");
+  assert.equal(buildEventUrl(null, "123124"), "https://event-us.kr/event/123124");
 });

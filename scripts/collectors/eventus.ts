@@ -81,8 +81,8 @@ function normalizeThumbnail(coverImage: string | null) {
     : `https://eventusstorage.blob.core.windows.net/evs${coverImage}`;
 }
 
-function buildEventUrl(subdomain: string | null, id: string) {
-  return subdomain ? `https://event-us.kr/${subdomain}/${id}` : `https://event-us.kr/events/${id}`;
+export function buildEventUrl(subdomain: string | null, id: string) {
+  return subdomain ? `https://event-us.kr/${subdomain}/event/${id}` : `https://event-us.kr/event/${id}`;
 }
 
 async function fetchEventUsPage(query: EventUsQuery, page: number) {
