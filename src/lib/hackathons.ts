@@ -10,6 +10,7 @@ export interface HackathonLike {
   ends_at: string | null;
   location: string | null;
   url: string;
+  category?: string | null;
 }
 
 const KOREAN_SOURCES = new Set(["eventus", "dacon"]);
@@ -68,6 +69,27 @@ export function getHackathonStatus(hackathon: Pick<HackathonLike, "starts_at" | 
   if (hackathon.starts_at && new Date(hackathon.starts_at) > now) return "upcoming";
   if (hackathon.ends_at && new Date(hackathon.ends_at) < now) return "ended";
   return "active";
+}
+
+export function hasDisplayableEventWindow(
+  event: Pick<HackathonLike, "starts_at" | "ends_at"> & { category?: string | null },
+  now = new Date(),
+) {
+  const category = event.category ?? "hackathon";
+  const start = event.starts_at ? new Date(event.starts_at) : null;
+  const end = event.ends_at ? new Date(event.ends_at) : null;
+  const validStart = start && !Number.isNaN(start.getTime()) ? start : null;
+  const validEnd = end && !Number.isNaN(end.getTime()) ? end : null;
+
+  if (!validStart && !validEnd) return false;
+  if (validEnd && validEnd < now) return true;
+
+  if (category === "meetup") {
+    if (validEnd) return true;
+    return Boolean(validStart && validStart >= now);
+  }
+
+  return Boolean(validEnd);
 }
 
 export function isKoreanHackathon(hackathon: HackathonLike) {

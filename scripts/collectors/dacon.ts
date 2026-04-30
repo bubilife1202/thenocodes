@@ -148,8 +148,18 @@ function buildTags(card: DaconCompetitionCard) {
   return Array.from(new Set(["AI", "공모전", "DACON", ...keywordTags]));
 }
 
-function isEndedWithoutDate(card: DaconCompetitionCard) {
-  return Boolean(card.statusText?.includes("마감") || card.statusText?.includes("종료"));
+function isEndedStatusText(statusText: string | null | undefined) {
+  return Boolean(statusText?.includes("마감") || statusText?.includes("종료"));
+}
+
+export function shouldKeepDaconCompetition(
+  dates: DaconDateFields,
+  statusText: string | null | undefined,
+  now = new Date(),
+) {
+  if (!dates.endsAt) return false;
+  if (isEndedStatusText(statusText)) return false;
+  return new Date(dates.endsAt) >= now;
 }
 
 export async function collectDacon(): Promise<Hackathon[]> {
@@ -171,8 +181,7 @@ export async function collectDacon(): Promise<Hackathon[]> {
     }));
 
     for (const { card, url, dates, prize } of detailed) {
-      if (dates.endsAt && new Date(dates.endsAt) < now) continue;
-      if (!dates.endsAt && isEndedWithoutDate(card)) continue;
+      if (!shouldKeepDaconCompetition(dates, card.statusText, now)) continue;
 
       competitions.push({
         source: "dacon",

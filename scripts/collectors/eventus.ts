@@ -85,6 +85,33 @@ export function buildEventUrl(subdomain: string | null, id: string) {
   return subdomain ? `https://event-us.kr/${subdomain}/event/${id}` : `https://event-us.kr/event/${id}`;
 }
 
+function parseDate(value: string | null | undefined) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+export function hasUsableEventUsSchedule(input: {
+  category: OpportunityCategory;
+  startsAt: string | null | undefined;
+  endsAt: string | null | undefined;
+  now?: Date;
+}) {
+  const now = input.now ?? new Date();
+  const start = parseDate(input.startsAt);
+  const end = parseDate(input.endsAt);
+
+  if (!start && !end) return false;
+  if (end && end < now) return false;
+
+  if (input.category === "meetup") {
+    if (end) return true;
+    return Boolean(start && start >= now);
+  }
+
+  return Boolean(end);
+}
+
 async function fetchEventUsPage(query: EventUsQuery, page: number) {
   const res = await fetch(EVENTUS_API, {
     method: "POST",
@@ -142,6 +169,9 @@ export async function collectEventUs(): Promise<Hackathon[]> {
             tags: eventTags,
             fallbackCategory: query.fallbackCategory,
           });
+
+          if (!hasUsableEventUsSchedule({ category, startsAt, endsAt, now })) continue;
+
           const tags = Array.from(new Set([...eventTags, ...query.tags, CATEGORY_TAG[category]])).filter(Boolean);
 
           seen.add(id);

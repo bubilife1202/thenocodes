@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import test from "node:test";
-import { extractDaconCompetitionCards, extractDaconDateFields, extractDaconPrize } from "./dacon.js";
+import { extractDaconCompetitionCards, extractDaconDateFields, extractDaconPrize, shouldKeepDaconCompetition } from "./dacon.js";
 
 test("extractDaconCompetitionCards reads current official competition card markup", () => {
   const html = `
@@ -32,4 +32,21 @@ test("extractDaconDateFields prefers period_end as the public competition deadli
   assert.equal(dates.startsAt, "2026-04-01T01:00:00.000Z");
   assert.equal(dates.endsAt, "2026-05-04T01:00:00.000Z");
   assert.equal(extractDaconPrize(html), "데이스쿨 프로 구독권");
+});
+
+test("shouldKeepDaconCompetition drops rows without a public deadline", () => {
+  const now = new Date("2026-04-30T00:00:00.000Z");
+
+  assert.equal(
+    shouldKeepDaconCompetition({ startsAt: "2026-12-02T01:00:00.000Z", endsAt: null }, "참가신청중", now),
+    false,
+  );
+  assert.equal(
+    shouldKeepDaconCompetition({ startsAt: "2026-04-01T01:00:00.000Z", endsAt: "2026-05-04T01:00:00.000Z" }, "참가신청중", now),
+    true,
+  );
+  assert.equal(
+    shouldKeepDaconCompetition({ startsAt: "2026-03-01T01:00:00.000Z", endsAt: "2026-04-01T01:00:00.000Z" }, "종료", now),
+    false,
+  );
 });

@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import {
   getHackathonStatus,
+  hasDisplayableEventWindow,
   isKoreanHackathon,
   sortHackathons,
   type HackathonStatus,
@@ -49,7 +50,9 @@ async function getEvents(
     return [];
   }
 
-  const rows = ((data ?? []) as HackathonRow[]).filter(isKoreanHackathon);
+  const rows = ((data ?? []) as HackathonRow[])
+    .filter(isKoreanHackathon)
+    .filter((row) => hasDisplayableEventWindow(row, now));
   const filteredRows = filter
     ? rows.filter((row) => getHackathonStatus(row, now) === filter)
     : rows;

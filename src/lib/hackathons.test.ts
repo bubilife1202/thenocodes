@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   getHackathonStatus,
+  hasDisplayableEventWindow,
   isKoreanHackathon,
   sortHackathons,
   type HackathonLike,
@@ -92,5 +93,26 @@ test("getHackathonStatus uses dates consistently around now", () => {
       now,
     ),
     "ended",
+  );
+});
+
+test("hasDisplayableEventWindow hides legacy opportunities without deadlines", () => {
+  const now = new Date("2026-04-30T00:00:00.000Z");
+
+  assert.equal(
+    hasDisplayableEventWindow({ starts_at: null, ends_at: null, category: "hackathon" }, now),
+    false,
+  );
+  assert.equal(
+    hasDisplayableEventWindow({ starts_at: "2026-12-02T01:00:00.000Z", ends_at: null, category: "contest" }, now),
+    false,
+  );
+  assert.equal(
+    hasDisplayableEventWindow({ starts_at: "2026-05-02T10:00:00.000Z", ends_at: null, category: "meetup" }, now),
+    true,
+  );
+  assert.equal(
+    hasDisplayableEventWindow({ starts_at: "2026-04-01T00:00:00.000Z", ends_at: "2026-05-01T00:00:00.000Z", category: "contest" }, now),
+    true,
   );
 });
